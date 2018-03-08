@@ -12,7 +12,7 @@ Author: 上海大学足球协会技术部
 # 部署步骤
 1. 下载安装python3、python3-pip、nodejs、mysql-server、mysql-client、libmysql-cil-dev(linux)
 2. git clone https://github.com/shusufa/SHU_SUFA.git
-3. 进入文件夹，创建media文件夹以及sufa.cnf数据库配置文件
+3. 进入文件夹，创建media文件夹以及sufa.env数据库配置文件
 4. pip3 install -r requirements
 5. 在根目录新建文件夹static(存储静态文件)、media（存储上传的文件）
 6. python manager.py collectstatic

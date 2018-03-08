@@ -154,6 +154,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'Register',
   data: () => ({
@@ -181,9 +182,9 @@ export default {
         (v) => !!v || '性别不能为空'
       ],
       college: '',
-      collegeRules: [
-        (v) => !!v || '学院不能为空'
-      ],
+      // collegeRules: [
+      //   (v) => !!v || '学院不能为空'
+      // ],
       // TODO: 学院选项由后端数据库调入，数据满足格式{text: '学院名', value: '数据库存储对应值'}
       collegeChoices: [],
       campus: '',
@@ -220,7 +221,7 @@ export default {
   },
   methods: {
     getColleges: function () {
-      this.$axios.get('/colleges/')
+      this.$axios.get('/teams/colleges/')
         .then((response) => {
           for (var i = 0; i < response.data.length; i++) {
             this.register.collegeChoices.push({
@@ -235,11 +236,28 @@ export default {
     },
     cer: function () {
       // TODO: 验证学生证号
+      // TODO: 验证是否注册
       this.step = 2
     },
     reg: function () {
-      // TODO: 注册信息
-      this.step = 3
+      let info = JSON.stringify({
+        id: this.certificate.studentID,
+        name: this.register.studentName,
+        gender: this.register.gender,
+        mobile: this.register.mobile,
+        campus: this.register.campus,
+        favorite_club: this.register.favoriteClub,
+        password: this.register.password
+      })
+      axios.post('http://127.0.0.1:8000/register/', info)
+      .then(response => {
+        console.log(response)
+        // TODO: 加入学院队伍
+        this.step = 3
+      })
+      .catch(error => {
+        console.log(error)
+      })
     },
     auth: function () {
       // TODO: 验证手机号码

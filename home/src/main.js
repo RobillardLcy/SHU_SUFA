@@ -13,8 +13,12 @@ Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
 
 Vue.prototype.$axios = axios.create({
-  baseURL: 'http://www.yellowsea.com/api/'
-  // baseURL: 'https://www.shusufa.com/api/'
+  baseURL: 'http://www.yellowsea.top:8000/api/',
+  // baseURL: 'https://www.shusufa.com/api/',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json; charset=utf-8'
+  }
 })
 
 /* eslint-disable no-new */

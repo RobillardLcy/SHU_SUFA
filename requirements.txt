@@ -1,0 +1,15 @@
+django
+djangorestframework
+djangorestframework-jwt
+markdown
+django-filter
+django-crispy-forms
+django-reversion
+django-formtools
+django-cors-headers
+django-redis
+django-hosts
+requests
+Pillow
+pygments
+mysqlclient

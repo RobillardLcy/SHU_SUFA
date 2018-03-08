@@ -9,26 +9,22 @@ class NewsPositionSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'status')
 
 
-# 新闻管理
-class NewsAdminSerializer(serializers.Serializer):
-    pass
+# 新闻
+class NewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = News
+        fields = ('id', 'title', 'writer', 'position', 'thumb_up', 'status')
 
 
-# 发表新闻
-class NewsSerializer(serializers.Serializer):
-    pass
+# 新闻内容
+class NewsContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsContent
+        fields = ('news', 'content')
 
 
-# 浏览新闻列表
-class NewsListSerializer(serializers.Serializer):
-    pass
-
-
-# 浏览新闻内容
-class NewsContentSerializer(serializers.Serializer):
-    pass
-
-
-# 浏览及发表新闻评论
-class NewsReviewSerializer(serializers.Serializer):
-    pass
+# 新闻评论
+class NewsReviewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsReviews
+        fields = ('id', 'member', 'news', 'content')

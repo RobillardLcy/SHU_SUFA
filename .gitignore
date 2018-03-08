@@ -1,13 +1,8 @@
 .idea/
 .vscode/
-*.cnf
-*.pyc
+sufa.cnf
 __pycache__/
 media/
 video/
-<<<<<<< HEAD
-shusufa/static/
-=======
 /static/
->>>>>>> d3c299ebbac2d325a97214a5d1782b8c50f6acce
 node_modules/

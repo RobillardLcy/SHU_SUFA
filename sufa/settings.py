@@ -94,7 +94,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES', innodb_strict_mode=1",
-            'read_default_file': os.path.join(BASE_DIR, 'sufa.env')
+            'read_default_file': os.path.join(BASE_DIR, 'sufa.cnf')
         }
     }
 }

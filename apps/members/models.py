@@ -1,11 +1,13 @@
+import datetime
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager)
 from apps.admins.models import Admins
 
+
 class MembersManager(BaseUserManager):
     def create(self, id, name, gender, mobile, campus, favorite_club, password):
-        if Members.objects.get(id=id):
+        if Members.objects.filter(id=id):
             raise ValueError('学号已注册')
         else:
             member = self.model(
@@ -14,7 +16,8 @@ class MembersManager(BaseUserManager):
                 gender=gender,
                 mobile=mobile,
                 campus=campus,
-                favorite_club=favorite_club
+                favorite_club=favorite_club,
+                date_joined=datetime.date.today().strftime('%Y-%m-%d')
             )
             member.set_password(password)
             member.save()
@@ -22,12 +25,15 @@ class MembersManager(BaseUserManager):
             return member
 
     def create_admin(self, id, position):
-        admin = Admins(id=id, position=position)
-        admin.save()
-        member = Members.objects.get(id=id)
-        member.is_admin = True
-        member.save()
-        return admin
+        if Admins.objects.filter(id=id):
+            raise ValueError('该成员已注册社团骨干或曾任社团骨干')
+        else:
+            admin = Admins(id=id, position=position)
+            admin.save()
+            member = Members.objects.get(id=id)
+            member.is_admin = True
+            member.save()
+            return admin
 
 
 class Members(AbstractBaseUser):
@@ -52,7 +58,7 @@ class Members(AbstractBaseUser):
     favorite_club = models.CharField(max_length=20, verbose_name='喜爱的球队')
     # 普通成员不需上传，如需参加社团及校级以上足球比赛，则需证件照，通过学生证认证，并获取社团成员本人许可从成就中心获取
     photo = models.ImageField(upload_to='member/', max_length=100, verbose_name='证件照', null=True, blank=True)
-    date_joined = models.DateField(auto_created=True, verbose_name='加入社团时间')
+    date_joined = models.DateField(verbose_name='加入社团时间')
 
     # 登录社团管理平台凭据
     is_admin = models.BooleanField(default=False, verbose_name='是否是社团骨干')

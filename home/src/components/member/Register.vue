@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import Axios from 'axios'
 export default {
   name: 'Register',
   data: () => ({
@@ -222,7 +222,7 @@ export default {
   methods: {
     getColleges: function () {
       this.$axios.get('/teams/colleges/')
-        .then((response) => {
+        .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.register.collegeChoices.push({
               text: response.data[i].name,
@@ -236,8 +236,21 @@ export default {
     },
     cer: function () {
       // TODO: 验证学生证号
-      // TODO: 验证是否注册
-      this.step = 2
+      let certificateData = '__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=dDwtMTIwMjUxOTIxNDs7PgsutpRut9zsvBpg1XMbyVjRyEAg&txtUserName=' + this.certificate.studentID + '&txtPassword=' + this.certificate.password + '&btnOk=%E6%8F%90%E4%BA%A4%28Submit%29'
+      Axios.post('http://services.shu.edu.cn/Login.aspx', certificateData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Access-Control-Allow-Origin': 'http://services.shu.edu.cn'
+        }
+      })
+      .then(response => {
+        console.log(response.length)
+        // TODO: 验证是否注册
+        this.step = 2
+      })
+      .catch(error => {
+        console.log(error)
+      })
     },
     reg: function () {
       let info = JSON.stringify({
@@ -249,9 +262,8 @@ export default {
         favorite_club: this.register.favoriteClub,
         password: this.register.password
       })
-      axios.post('http://127.0.0.1:8000/register/', info)
+      this.$axios.post('register/', info)
       .then(response => {
-        console.log(response)
         // TODO: 加入学院队伍
         this.step = 3
       })

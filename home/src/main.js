@@ -2,7 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import axios from 'axios'
+import Axios from 'axios'
 import Home from './Home'
 import router from './router'
 
@@ -12,13 +12,11 @@ Vue.config.productionTip = true
 Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
 
-Vue.prototype.$axios = axios.create({
+Vue.prototype.$axios = Axios.create({
   baseURL: 'http://www.yellowsea.top:8000/api/',
-  // baseURL: 'https://www.shusufa.com/api/',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json; charset=utf-8'
-  }
+  timeout: 5000,
+  headers: {'Content-Type': 'application/json;Charset=utf-8'},
+  withCredentials: true
 })
 
 /* eslint-disable no-new */

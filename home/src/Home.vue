@@ -26,7 +26,7 @@
           </v-list-group>
         </v-list>
         <v-divider></v-divider>
-        <v-subheader v-show="login.active">报名通道</v-subheader>
+        <v-subheader v-show="loginData.active">报名通道</v-subheader>
         <v-list dense>
           <v-list-tile v-for="activity in activities" :key="activity.title" router :to="activity.url">
             <v-list-tile-content>
@@ -34,8 +34,8 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <v-divider v-show="login.active"></v-divider>
-        <v-subheader v-show="login.active">我的球队</v-subheader>
+        <v-divider v-show="loginData.active"></v-divider>
+        <v-subheader v-show="loginData.active">我的球队</v-subheader>
         <v-list dense>
           <v-list-tile v-for="team in teams" :key="team.name" router :to="team.url">
             <v-list-tile-content>
@@ -53,7 +53,7 @@
         </v-toolbar-title>
         <a href="/"><img src="/static/logo/sufa_logo_website.png" alt="SUFA"></a>
         <v-spacer></v-spacer>
-        <v-menu v-show="login.active" offset-x :nudge-width="150" v-model="menu">
+        <v-menu v-show="loginData.active" offset-x :nudge-width="150" v-model="menu">
           <v-btn color="light-blue darken-4" dark slot="activator">
             <v-icon left>account_circle</v-icon>
             {{ memberProfile.studentName }}
@@ -76,42 +76,46 @@
               <v-card-actions>
                 <v-btn flat small color="primary" to="/member">个人中心</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn flat small color="red" @click="logOut">注销</v-btn>
+                <v-btn flat small color="red" @click="logout">注销</v-btn>
               </v-card-actions>
             </v-list>
           </v-card>
         </v-menu>
-        <v-dialog v-show="!login.active" v-model="loginDialog" max-width=800>
+        <v-dialog v-show="!loginData.active" v-model="loginDialog" max-width=800>
           <v-btn color="light-blue darken-4" dark slot="activator">
             <v-icon left>account_circle</v-icon>
             登录
           </v-btn>
           <v-card class="text-xs-center">
-            <v-card-title class="headline">登录</v-card-title>
+            <v-toolbar dark color="light-blue darken-4">
+              <v-toolbar-title>登录</v-toolbar-title>
+            </v-toolbar>
             <v-container>
               <v-form>
                 <v-text-field
+                  prepend-icon="person"
                   label="学号"
-                  :rules="login.studentIDRules"
-                  v-model="login.studentID"
+                  :rules="loginData.studentIDRules"
+                  v-model="loginData.studentID"
                   required></v-text-field>
                 <v-text-field
+                  prepend-icon="lock"
                   label="密码"
-                  :rules="login.passwordRules"
-                  v-model="login.password"
-                  :append-icon="login.visible ? 'visibility_off' : 'visibility'"
-                  :append-icon-cb="() => (login.visible = !login.visible)"
-                  :type="login.visible ? 'text' : 'password'"
+                  :rules="loginData.passwordRules"
+                  v-model="loginData.password"
+                  :append-icon="loginData.visible ? 'visibility_off' : 'visibility'"
+                  :append-icon-cb="() => (loginData.visible = !loginData.visible)"
+                  :type="loginData.visible ? 'text' : 'password'"
                   @keyup.enter="loginTest"
                   required></v-text-field>
                 <!-- TODO: 验证码 -->
-                <v-btn large color="primary" dark @click="loginTest">登录</v-btn>
+                <v-btn large color="primary" dark @click="login">登录</v-btn>
                 <v-btn large color="green" dark router :to="register" @click.native="loginDialog = false">社团注册</v-btn>
               </v-form>
             </v-container>
           </v-card>
         </v-dialog>
-        <v-btn color="success" dark v-show="!login.active" router :to="register">
+        <v-btn color="success" dark v-show="!loginData.active" router :to="register">
           社团注册
         </v-btn>
       </v-toolbar>
@@ -140,7 +144,7 @@ export default {
     drawer: null,
     loginDialog: false,
     menu: false,
-    login: {
+    loginData: {
       active: false,
       visible: false,
       studentID: '',
@@ -232,20 +236,30 @@ export default {
   computed: {
   },
   methods: {
-    // 测试用
-    loginTest: function () {
-      this.memberProfile.studentID = this.login.studentID
-      this.memberProfile.studentName = '黄海'
-      this.memberProfile.gender = '男'
-      this.memberProfile.grade = '大三'
-      this.memberProfile.college = '社会科学学部（筹）（马克思主义学院、哲学系）'
-      this.memberProfile.photo = '/static/logo/sufa_logo.png'
-      this.login.active = true
-      this.loginDialog = false
+    // 账户登录
+    login: function () {
+      let loginInfo = JSON.stringify({
+        id: this.loginData.studentID,
+        password: this.loginData.password
+      })
+      this.$axios.post('login/', loginInfo)
+      .then(response => {
+        this.loginData.active = true
+        this.loginDialog = false
+      })
+      .catch(error => {
+        console.log(error)
+      })
     },
-    // TODO: 账户注销
-    logOut: function () {
-      this.login.active = false
+    // 账户注销
+    logout: function () {
+      this.$axios.post('logout/')
+      .then(response => {
+        this.loginData.active = false
+      })
+      .catch(error => {
+        console.log(error)
+      })
     }
   }
 }

@@ -1,7 +1,0 @@
-[client]
-HOST=localhost
-PORT=3306
-database=sufa
-default-character-set=utf8
-user=sufa
-password=Hh199711@18

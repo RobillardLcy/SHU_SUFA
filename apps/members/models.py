@@ -56,7 +56,7 @@ class Members(AbstractBaseUser):
                                   ('JD', '嘉定')
                               ), default='BS', verbose_name='校区')
     favorite_club = models.CharField(max_length=20, verbose_name='喜爱的球队')
-    # 普通成员不需上传，如需参加社团及校级以上足球比赛，则需证件照，通过学生证认证，并获取社团成员本人许可从成就中心获取
+    # 普通成员不需上传，如需参加社团及校级以上足球比赛，则需证件照，        user = Members.objects.all()通过学生证认证，并获取社团成员本人许可从成就中心获取
     photo = models.ImageField(upload_to='member/', max_length=100, verbose_name='证件照', null=True, blank=True)
     date_joined = models.DateField(verbose_name='加入社团时间')
 

@@ -90,6 +90,12 @@
             <v-toolbar dark color="light-blue darken-4">
               <v-toolbar-title>登录</v-toolbar-title>
             </v-toolbar>
+            <v-alert
+              type="error"
+              v-model="loginData.errorAlert"
+              transition="fade-transition"
+              dismissible
+              >{{ loginData.error }}</v-alert>
             <v-container>
               <v-form>
                 <v-text-field
@@ -145,6 +151,8 @@ export default {
     loginDialog: false,
     menu: false,
     loginData: {
+      errorAlert: false,
+      error: '',
       active: false,
       visible: false,
       studentID: '',
@@ -244,8 +252,23 @@ export default {
       })
       this.$axios.post('login/', loginInfo)
       .then(response => {
-        this.loginData.active = true
-        this.loginDialog = false
+        console.log(response.data.error)
+        if ('id' in response.data && response.data.id === this.loginInfo.id) {
+          this.loginData.active = true
+          this.loginDialog = false
+        } else if (response.data.error === 1) {
+          // 用户未注册或密码错误
+          this.loginData.errorAlert = true
+          this.loginData.error = '学号错误或密码错误'
+        } else if (response.data.error === 2) {
+          // 用户手机未激活, 登录后重定向到激活界面
+          this.loginData.active = true
+          this.loginDialog = false
+        } else if (response.data.error === 3) {
+          // 用户本学期未认证，登录后重定向到认证页面，并提交课表信息
+          this.loginData.active = true
+          this.loginDialog = false
+        }
       })
       .catch(error => {
         console.log(error)

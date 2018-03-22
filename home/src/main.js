@@ -13,7 +13,7 @@ Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
 
 Vue.prototype.$axios = Axios.create({
-  baseURL: 'http://www.yellowsea.top:8000/api/',
+  baseURL: 'http://www.yellowsea.top/api/',
   timeout: 5000,
   headers: {'Content-Type': 'application/json;Charset=utf-8'},
   withCredentials: true

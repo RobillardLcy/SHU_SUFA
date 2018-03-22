@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Members, MembersClasses
 
 
+# 社团成员注册序列化
 class MemberRegistrationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(required=True, min_length=8, max_length=8)
     name = serializers.CharField(required=True, max_length=50)
@@ -19,15 +20,18 @@ class MemberRegistrationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'gender', 'mobile', 'campus', 'favorite_club', 'password')
 
 
+# 社团成员获取个人详细信息序列化
 class MemberProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        models = Members.objects.all()
-        fields = ('id', 'name', 'gender', 'mobile', 'email', 'campus', 'favorite_club', 'photo')
+        model = Members
+        fields = ('id', 'name', 'gender', 'mobile', 'campus', 'favorite_club', 'photo')
 
 
+# 社团成员重置密码序列化
 class MemberResetPasswordSerializer(serializers.ModelSerializer):
     pass
 
 
+# 社团成员课程序列化
 class MemberClassesSerializer(serializers.ModelSerializer):
     pass

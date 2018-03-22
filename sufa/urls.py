@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.views.static import serve
 from sufa.settings import MEDIA_ROOT
 from rest_framework import routers
+from rest_framework.authtoken import views
 
 from apps.members.views import (MemberRegistration, MemberActive, MemberAuthentication,
                                 MemberLogin, MemberLogout, MemberResetMobile, MemberResetPassword,
@@ -14,6 +15,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest-framework')),
+    path('api-token-auth', views.obtain_auth_token),
     re_path('media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
 
     path('api/register/', MemberRegistration.as_view(), name='register'),

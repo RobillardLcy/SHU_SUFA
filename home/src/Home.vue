@@ -26,7 +26,7 @@
           </v-list-group>
         </v-list>
         <v-divider></v-divider>
-        <v-subheader v-show="loginData.active">报名通道</v-subheader>
+        <v-subheader v-show="checkLogin()">报名通道</v-subheader>
         <v-list dense>
           <v-list-tile v-for="activity in activities" :key="activity.title" router :to="activity.url">
             <v-list-tile-content>
@@ -34,8 +34,8 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <v-divider v-show="loginData.active"></v-divider>
-        <v-subheader v-show="loginData.active">我的球队</v-subheader>
+        <v-divider v-show="checkLogin()"></v-divider>
+        <v-subheader v-show="checkLogin()">我的球队</v-subheader>
         <v-list dense>
           <v-list-tile v-for="team in teams" :key="team.name" router :to="team.url">
             <v-list-tile-content>
@@ -53,10 +53,10 @@
         </v-toolbar-title>
         <a href="/"><img src="/static/logo/sufa_logo_website.png" alt="SUFA"></a>
         <v-spacer></v-spacer>
-        <v-menu v-show="loginData.active" offset-x :nudge-width="150" v-model="menu">
+        <v-menu v-show="checkLogin()" offset-x :nudge-width="150" v-model="menu">
           <v-btn color="light-blue darken-4" dark slot="activator">
             <v-icon left>account_circle</v-icon>
-            {{ memberProfile.studentName }}
+            {{ memberProfile.name }}
           </v-btn>
           <v-card>
             <v-list>
@@ -65,8 +65,8 @@
                   <img :src="memberProfile.photo">
                 </v-list-tile-avatar>
                 <v-list-tile-content>
-                  <v-list-tile-title>{{ memberProfile.studentID }}  {{ memberProfile.studentName }}</v-list-tile-title>
-                  <v-list-tile-sub-title>{{ memberProfile.gender }}  {{ memberProfile.grade }}</v-list-tile-sub-title>
+                  <v-list-tile-title>{{ memberProfile.id }}  {{ memberProfile.name }}</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ memberProfile.gender }}</v-list-tile-sub-title>
                   <v-list-tile-sub-title>{{ memberProfile.college }}</v-list-tile-sub-title>
                 </v-list-tile-content>
               </v-list-tile>
@@ -81,12 +81,13 @@
             </v-list>
           </v-card>
         </v-menu>
-        <v-dialog v-show="!loginData.active" v-model="loginDialog" max-width=800>
+        <v-dialog v-show="!checkLogin()" v-model="loginDialog" max-width=800>
           <v-btn color="light-blue darken-4" dark slot="activator">
             <v-icon left>account_circle</v-icon>
             登录
           </v-btn>
           <v-card class="text-xs-center">
+            <!--TODO: 使用member/Login.vue显示-->
             <v-toolbar dark color="light-blue darken-4">
               <v-toolbar-title>登录</v-toolbar-title>
             </v-toolbar>
@@ -121,7 +122,7 @@
             </v-container>
           </v-card>
         </v-dialog>
-        <v-btn color="success" dark v-show="!loginData.active" router :to="register">
+        <v-btn color="success" dark v-show="!checkLogin()" router :to="register">
           社团注册
         </v-btn>
       </v-toolbar>
@@ -153,7 +154,6 @@ export default {
     loginData: {
       errorAlert: false,
       error: '',
-      active: false,
       visible: false,
       studentID: '',
       studentIDRules: [
@@ -166,10 +166,9 @@ export default {
     },
     register: '/register',
     memberProfile: {
-      studentID: '',
-      studentName: '',
+      id: '',
+      name: '',
       gender: '',
-      grade: '',
       college: '',
       photo: ''
     },
@@ -243,7 +242,33 @@ export default {
   },
   computed: {
   },
+  mounted: () => {
+    if (this.checkLogin()) {
+      this.mountProfile()
+    }
+  },
   methods: {
+    checkLogin: function () {
+      if (window.sessionStorage.getItem('id')) {
+        return true
+      } else {
+        return false
+      }
+    },
+    mountProfile: function () {
+      this.memberProfile.id = window.sessionStorage.getItem('id')
+      this.memberProfile.name = window.sessionStorage.getItem('name')
+      this.memberProfile.gender = window.sessionStorage.getItem('gender')
+      this.memberProfile.college = window.sessionStorage.getItem('college')
+      this.memberProfile.photo = window.sessionStorage.getItem('photo')
+    },
+    clearProfile: function () {
+      this.memberProfile.id = ''
+      this.memberProfile.name = ''
+      this.memberProfile.gender = ''
+      this.memberProfile.college = ''
+      this.memberProfile.photo = ''
+    },
     // 账户登录
     login: function () {
       let loginInfo = JSON.stringify({
@@ -252,21 +277,23 @@ export default {
       })
       this.$axios.post('login/', loginInfo)
       .then(response => {
-        console.log(response.data.error)
-        if ('id' in response.data && response.data.id === this.loginInfo.id) {
-          this.loginData.active = true
+        if ('id' in response.data && response.data.id === this.loginData.studentID) {
           this.loginDialog = false
+          window.sessionStorage.setItem('id', response.data.id)
+          window.sessionStorage.setItem('name', response.data.name)
+          window.sessionStorage.setItem('gender', (response.data.gender === 'male' ? '男性' : '女性'))
+          window.sessionStorage.setItem('college', response.data.college)
+          window.sessionStorage.setItem('photo', (response.data.photo === null) ? '/api/media/sufa.png' : response.data.photo)
+          this.mountProfile()
         } else if (response.data.error === 1) {
           // 用户未注册或密码错误
           this.loginData.errorAlert = true
           this.loginData.error = '学号错误或密码错误'
         } else if (response.data.error === 2) {
           // 用户手机未激活, 登录后重定向到激活界面
-          this.loginData.active = true
           this.loginDialog = false
         } else if (response.data.error === 3) {
           // 用户本学期未认证，登录后重定向到认证页面，并提交课表信息
-          this.loginData.active = true
           this.loginDialog = false
         }
       })
@@ -276,9 +303,13 @@ export default {
     },
     // 账户注销
     logout: function () {
-      this.$axios.post('logout/')
+      let logoutInfo = JSON.stringify({
+        user: window.sessionStorage.getItem('id')
+      })
+      this.$axios.post('logout/', logoutInfo)
       .then(response => {
-        this.loginData.active = false
+        window.sessionStorage.clear()
+        this.clearProfile()
       })
       .catch(error => {
         console.log(error)

@@ -12,6 +12,8 @@ Vue.config.productionTip = true
 Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
 
+Axios.defaults.xsrfCookieName = 'csrftoken'
+Axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 Vue.prototype.$axios = Axios.create({
   baseURL: 'http://www.yellowsea.top/api/',
   timeout: 5000,

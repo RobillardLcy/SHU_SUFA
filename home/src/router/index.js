@@ -321,10 +321,17 @@ router.beforeEach((to, from, next) => {
     if (to.meta.need_log) {
       if (to.path !== '/login') {
         next('/login')
+      } else {
+        next()
       }
+    } else {
+      next()
     }
+  } else if (to.path === '/login') {
+    next('/')
+  } else {
+    next()
   }
-  next()
 })
 
 export default router

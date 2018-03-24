@@ -26,7 +26,7 @@
           </v-list-group>
         </v-list>
         <v-divider></v-divider>
-        <v-subheader v-show="checkLogin()">报名通道</v-subheader>
+        <v-subheader v-show="memberProfile.id">报名通道</v-subheader>
         <v-list dense>
           <v-list-tile v-for="activity in activities" :key="activity.title" router :to="activity.url">
             <v-list-tile-content>
@@ -34,8 +34,8 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <v-divider v-show="checkLogin()"></v-divider>
-        <v-subheader v-show="checkLogin()">我的球队</v-subheader>
+        <v-divider v-show="memberProfile.id"></v-divider>
+        <v-subheader v-show="memberProfile.id">我的球队</v-subheader>
         <v-list dense>
           <v-list-tile v-for="team in teams" :key="team.name" router :to="team.url">
             <v-list-tile-content>
@@ -53,7 +53,7 @@
         </v-toolbar-title>
         <a href="/"><img src="/static/logo/sufa_logo_website.png" alt="SUFA"></a>
         <v-spacer></v-spacer>
-        <v-menu v-show="checkLogin()" offset-x :nudge-width="150" v-model="menu">
+        <v-menu v-show="memberProfile.id" offset-x :nudge-width="150" v-model="menu">
           <v-btn color="light-blue darken-4" dark slot="activator">
             <v-icon left>account_circle</v-icon>
             {{ memberProfile.name }}
@@ -81,48 +81,14 @@
             </v-list>
           </v-card>
         </v-menu>
-        <v-dialog v-show="!checkLogin()" v-model="loginDialog" max-width=800>
+        <v-dialog v-show="!memberProfile.id" v-model="loginDialog" max-width=800>
           <v-btn color="light-blue darken-4" dark slot="activator">
             <v-icon left>account_circle</v-icon>
             登录
           </v-btn>
-          <v-card class="text-xs-center">
-            <!--TODO: 使用member/Login.vue显示-->
-            <v-toolbar dark color="light-blue darken-4">
-              <v-toolbar-title>登录</v-toolbar-title>
-            </v-toolbar>
-            <v-alert
-              type="error"
-              v-model="loginData.errorAlert"
-              transition="fade-transition"
-              dismissible
-              >{{ loginData.error }}</v-alert>
-            <v-container>
-              <v-form>
-                <v-text-field
-                  prepend-icon="person"
-                  label="学号"
-                  :rules="loginData.studentIDRules"
-                  v-model="loginData.studentID"
-                  required></v-text-field>
-                <v-text-field
-                  prepend-icon="lock"
-                  label="密码"
-                  :rules="loginData.passwordRules"
-                  v-model="loginData.password"
-                  :append-icon="loginData.visible ? 'visibility_off' : 'visibility'"
-                  :append-icon-cb="() => (loginData.visible = !loginData.visible)"
-                  :type="loginData.visible ? 'text' : 'password'"
-                  @keyup.enter="loginTest"
-                  required></v-text-field>
-                <!-- TODO: 验证码 -->
-                <v-btn large color="primary" dark @click="login">登录</v-btn>
-                <v-btn large color="green" dark router :to="register" @click.native="loginDialog = false">社团注册</v-btn>
-              </v-form>
-            </v-container>
-          </v-card>
+          <login-card @closeLoginDialog="loginDialog = false"></login-card>
         </v-dialog>
-        <v-btn color="success" dark v-show="!checkLogin()" router :to="register">
+        <v-btn color="success" dark v-show="!memberProfile.id" router :to="register">
           社团注册
         </v-btn>
       </v-toolbar>
@@ -145,25 +111,13 @@
 </template>
 
 <script>
+import Login from '@/components/member/Login'
 export default {
   name: 'home',
   data: () => ({
     drawer: null,
     loginDialog: false,
     menu: false,
-    loginData: {
-      errorAlert: false,
-      error: '',
-      visible: false,
-      studentID: '',
-      studentIDRules: [
-        (v) => !!v || '学号不能为空'
-      ],
-      password: '',
-      passwordRules: [
-        (v) => !!v || '密码不能为空'
-      ]
-    },
     register: '/register',
     memberProfile: {
       id: '',
@@ -240,21 +194,17 @@ export default {
   }),
   props: {
   },
+  components: {
+    'login-card': Login
+  },
   computed: {
   },
-  mounted: () => {
-    if (this.checkLogin()) {
+  updated: function () {
+    if (window.sessionStorage.getItem('id')) {
       this.mountProfile()
     }
   },
   methods: {
-    checkLogin: function () {
-      if (window.sessionStorage.getItem('id')) {
-        return true
-      } else {
-        return false
-      }
-    },
     mountProfile: function () {
       this.memberProfile.id = window.sessionStorage.getItem('id')
       this.memberProfile.name = window.sessionStorage.getItem('name')
@@ -269,44 +219,9 @@ export default {
       this.memberProfile.college = ''
       this.memberProfile.photo = ''
     },
-    // 账户登录
-    login: function () {
-      let loginInfo = JSON.stringify({
-        id: this.loginData.studentID,
-        password: this.loginData.password
-      })
-      this.$axios.post('login/', loginInfo)
-      .then(response => {
-        if ('id' in response.data && response.data.id === this.loginData.studentID) {
-          this.loginDialog = false
-          window.sessionStorage.setItem('id', response.data.id)
-          window.sessionStorage.setItem('name', response.data.name)
-          window.sessionStorage.setItem('gender', (response.data.gender === 'male' ? '男性' : '女性'))
-          window.sessionStorage.setItem('college', response.data.college)
-          window.sessionStorage.setItem('photo', (response.data.photo === null) ? '/api/media/sufa.png' : response.data.photo)
-          this.mountProfile()
-        } else if (response.data.error === 1) {
-          // 用户未注册或密码错误
-          this.loginData.errorAlert = true
-          this.loginData.error = '学号错误或密码错误'
-        } else if (response.data.error === 2) {
-          // 用户手机未激活, 登录后重定向到激活界面
-          this.loginDialog = false
-        } else if (response.data.error === 3) {
-          // 用户本学期未认证，登录后重定向到认证页面，并提交课表信息
-          this.loginDialog = false
-        }
-      })
-      .catch(error => {
-        console.log(error)
-      })
-    },
     // 账户注销
     logout: function () {
-      let logoutInfo = JSON.stringify({
-        user: window.sessionStorage.getItem('id')
-      })
-      this.$axios.post('logout/', logoutInfo)
+      this.$axios.post('logout/')
       .then(response => {
         window.sessionStorage.clear()
         this.clearProfile()

@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
 
 from .models import Members
-from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer, MemberClassesSerializer)
+from .serializers import (MemberRegistrationSerializer, MemberLoginSerializer, MemberProfileSerializer, MemberClassesSerializer)
 
 
 class MemberRegistration(APIView):
@@ -32,14 +32,17 @@ class MemberLogin(APIView):
         try:
             user = Members.objects.get(id=id)
             if user.check_password(password):
+                user_profile = MemberLoginSerializer(user).data
                 if user.is_active:
                     if user.is_auth:
                         login(request, user)
-                        return Response(MemberProfileSerializer(user).data)
+                        return Response(user_profile)
                     else:
-                        return Response({"error": 3})
+                        user_profile['error'] = 3
+                        return Response(user_profile)
                 else:
-                    return Response({"error": 2})
+                    user_profile['error'] = 2
+                    return Response(user_profile)
             else:
                 return Response({"error": 1})
         except Members.DoesNotExist:

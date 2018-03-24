@@ -86,9 +86,9 @@
             <v-icon left>account_circle</v-icon>
             登录
           </v-btn>
-          <login-card @closeLoginDialog="loginDialog = false"></login-card>
+          <login-card :loginDialog="loginDialog" @closeLoginDialog="loginDialog = false"></login-card>
         </v-dialog>
-        <v-btn color="success" dark v-show="!memberProfile.id" router :to="register">
+        <v-btn color="success" dark v-show="!memberProfile.id && $vuetify.breakpoint.width > 1264" router :to="register">
           社团注册
         </v-btn>
       </v-toolbar>

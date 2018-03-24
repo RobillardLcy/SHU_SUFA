@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="Login">
-    <v-card class="text-xs-center">
+    <v-card class="text-xs-center" max-width=800>
       <v-toolbar dark color="light-blue darken-4">
         <v-toolbar-title>登录</v-toolbar-title>
       </v-toolbar>
@@ -55,7 +55,14 @@ export default {
     },
     register: '/register'
   }),
-  props: ['loginDialog'],
+  props: {
+    loginDialog: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    }
+  },
   methods: {
     // 账户登录
     login: function () {
@@ -78,8 +85,11 @@ export default {
               // 用户本学期未认证，登录后重定向到认证页面，并提交课表信息
             }
           } else {
-            this.$router.go(-1)
-            this.$emit('closeLoginDialog')
+            if (this.loginDialog) {
+              this.$emit('closeLoginDialog')
+            } else {
+              this.$router.go(-1)
+            }
           }
         } else if ('error' in response.data && response.data.error === 1) {
           // 用户未注册或密码错误

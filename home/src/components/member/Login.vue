@@ -30,7 +30,7 @@
             required></v-text-field>
           <!-- TODO: 验证码 -->
           <v-btn large color="primary" dark @click="login">登录</v-btn>
-          <v-btn large color="green" dark router :to="register" @click="">社团注册</v-btn>
+          <v-btn large color="green" dark @click="register">社团注册</v-btn>
         </v-form>
       </v-container>
     </v-card>
@@ -52,8 +52,7 @@ export default {
       passwordRules: [
         (v) => !!v || '密码不能为空'
       ]
-    },
-    register: '/register'
+    }
   }),
   props: {
     loginDialog: {
@@ -93,6 +92,7 @@ export default {
           }
         } else if ('error' in response.data && response.data.error === 1) {
           // 用户未注册或密码错误
+          // TODO: 提醒窗口
           this.loginData.errorAlert = true
           this.loginData.error = '学号错误或密码错误'
         } else {
@@ -105,6 +105,11 @@ export default {
         this.loginData.errorAlert = true
         this.loginData.error = '网络错误，请重试'
       })
+    },
+    // 用户注册页面跳转
+    register: function () {
+      this.$router.push('/register')
+      this.$emit('closeLoginDialog')
     }
   }
 }

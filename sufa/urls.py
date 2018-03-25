@@ -25,4 +25,6 @@ urlpatterns = [
     path('api/login/', MemberLogin.as_view(), name='login'),
     # 用户注销(POST)
     path('api/logout/', MemberLogout.as_view(), name='logout'),
+    # 用户学生证认证(POST)
+    path('api/authentication/', MemberAuthentication.as_view(), name='authentication'),
 ]

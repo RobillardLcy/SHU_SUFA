@@ -154,7 +154,6 @@
 </template>
 
 <script>
-import Axios from 'axios'
 export default {
   name: 'Register',
   data: () => ({
@@ -236,25 +235,28 @@ export default {
     },
     cer: function () {
       // TODO: 验证学生证号
-      let certificateData = '__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=dDwtMTIwMjUxOTIxNDs7PgsutpRut9zsvBpg1XMbyVjRyEAg&txtUserName=' + this.certificate.studentID + '&txtPassword=' + this.certificate.password + '&btnOk=%E6%8F%90%E4%BA%A4%28Submit%29'
-      Axios.post('http://services.shu.edu.cn/Login.aspx', certificateData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Access-Control-Allow-Origin': 'http://services.shu.edu.cn'
-        }
+      let certificateData = JSON.stringify({
+        id: this.certificate.studentID,
+        password: this.certificate.password
       })
+      this.$axios.post('authentication/', certificateData)
       .then(response => {
-        console.log(response.length)
-        // TODO: 验证是否注册
-        this.step = 2
+        if ('id' in response.data && response.data.id === this.certificate.studentID) {
+          this.step = 2
+          window.sessionStorage.setItem('studentID', response.data.id)
+        } else {
+          // TODO: 提醒窗口
+          window.alert(response.data.error)
+        }
       })
       .catch(error => {
         console.log(error)
+        window.alert('网络错误，请重试！')
       })
     },
     reg: function () {
       let info = JSON.stringify({
-        id: this.certificate.studentID,
+        id: window.sessionStorage.getItem('studentID'),
         name: this.register.studentName,
         gender: this.register.gender,
         mobile: this.register.mobile,

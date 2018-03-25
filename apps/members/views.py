@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
+import requests
 
 from .models import Members
 from .serializers import (MemberRegistrationSerializer, MemberLoginSerializer, MemberProfileSerializer, MemberClassesSerializer)
@@ -67,8 +68,23 @@ class MemberActive(APIView):
 
 
 class MemberAuthentication(APIView):
+    renderer_classes = (JSONRenderer,)
+    authentication_classes = (TokenAuthentication,)
+
     def post(self, request, format=None):
-        pass
+        id = request.data.get('id')
+        password = request.data.get('password')
+        data = '__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=dDwtMTIwMjUxOTIxNDs7PpieU75voA1bajkV2Gj8O9OVHDLE&txtUserName=' + id + '&txtPassword=' + password + '&btnOk=%E6%8F%90%E4%BA%A4%28Submit%29'
+        url = 'http://services.shu.edu.cn/Login.aspx'
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        response = requests.post(url, data=data, headers=headers)
+        if response.headers.get('Content-Length') == '2229':
+            return Response({'id': id})
+        else:
+            return Response({'error': '验证失败！'})
 
 
 class MemberProfile(APIView):

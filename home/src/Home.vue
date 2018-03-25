@@ -54,7 +54,7 @@
         <a href="/"><img src="/static/logo/sufa_logo_website.png" alt="SUFA"></a>
         <v-spacer></v-spacer>
         <v-menu v-show="memberProfile.id" offset-x :nudge-width="150" v-model="menu">
-          <v-btn color="light-blue darken-4" dark slot="activator">
+          <v-btn color="orange" dark slot="activator">
             <v-icon left>account_circle</v-icon>
             {{ memberProfile.name }}
           </v-btn>
@@ -211,6 +211,9 @@ export default {
       this.memberProfile.gender = window.sessionStorage.getItem('gender')
       this.memberProfile.college = window.sessionStorage.getItem('college')
       this.memberProfile.photo = window.sessionStorage.getItem('photo')
+      if (window.location.hash === '#/register' || window.location.hash === '#/login') {
+        this.$router.push('/')
+      }
     },
     clearProfile: function () {
       this.memberProfile.id = ''

@@ -5,9 +5,9 @@ from sufa.settings import MEDIA_ROOT
 from rest_framework import routers
 from rest_framework.authtoken import views
 
-from apps.members.views import (MemberRegistration, MemberActive, MemberAuthentication,
+from apps.members.views import (MemberRegistration, MemberActiveMobile, MemberAuthentication,
                                 MemberLogin, MemberLogout, MemberResetMobile, MemberResetPassword,
-                                MemberProfile, MemberClasses)
+                                MemberProfile, MemberActiveAuth)
 
 # API路由接口（统一在域名后跟api）
 router = routers.DefaultRouter()

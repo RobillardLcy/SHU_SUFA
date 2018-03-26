@@ -6,6 +6,8 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
 import requests
+from PIL import Image
+from io import BytesIO
 
 from .models import Members
 from .serializers import (MemberRegistrationSerializer, MemberLoginSerializer, MemberProfileSerializer, MemberClassesSerializer)
@@ -131,10 +133,29 @@ class MemberResetMobile(APIView):
 
 
 # 用户在校认证（获取课程时间）接口
+# TODO: 限制验证次数<=5
 class MemberActiveAuth(APIView):
     renderer_classes = (JSONRenderer,)
     permission_classes = (IsAuthenticated,)
     authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
-        pass
+        student_id = request.data.get('id')
+        password = request.data.get('password')
+        url = 'http://xk.autoisp.shu.edu.cn:8080/'
+        img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
+        response = requests.get(url)
+        img_response = requests.get(img_url, cookies=response.cookies)
+        img = Image.open(BytesIO(img_response.content))
+        # TODO: 验证码识别
+        img_text = ''
+        login_data = {
+            'txtUserName': student_id,
+            'txtPassword': password,
+            'txtVailCode': img_text
+        }
+        login_response = requests.post(url, data=login_data, cookies=response.cookies)
+        if login.headers.get('Content-Length') == '5650':
+            return Response({'id': student_id})
+        else:
+            return Response({'error': '认证失败！'})

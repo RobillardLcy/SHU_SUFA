@@ -37,17 +37,14 @@ class MemberLogin(APIView):
         try:
             user = Members.objects.get(id=id)
             if user.check_password(password):
-                user_profile = MemberLoginSerializer(user).data
                 if user.is_active:
                     if user.is_auth:
                         login(request, user)
-                        return Response(user_profile)
+                        return Response({'id': user.id})
                     else:
-                        user_profile['error'] = 3
-                        return Response(user_profile)
+                        return Response({'id': user.id, 'error': 3})
                 else:
-                    user_profile['error'] = 2
-                    return Response(user_profile)
+                    return Response({'id': user.id, 'error': 2})
             else:
                 return Response({"error": 1})
         except Members.DoesNotExist:
@@ -106,9 +103,11 @@ class MemberProfile(APIView):
     authentication_classes = (JSONWebTokenAuthentication,)
 
     def get(self, request, format=None):
+        # RSA解密：sessionID + studentID
         pass
 
     def post(self, request, format=None):
+        # RSA解密：sessionID + {info(json)}
         pass
 
 
@@ -155,7 +154,7 @@ class MemberActiveAuth(APIView):
             'txtVailCode': img_text
         }
         login_response = requests.post(url, data=login_data, cookies=response.cookies)
-        if login.headers.get('Content-Length') == '5650':
+        if login_response.headers.get('Content-Length') == '5650':
             return Response({'id': student_id})
         else:
             return Response({'error': '认证失败！'})

@@ -26,7 +26,7 @@
           </v-list-group>
         </v-list>
         <v-divider></v-divider>
-        <v-subheader v-show="memberProfile.id">报名通道</v-subheader>
+        <v-subheader v-show="studentID">报名通道</v-subheader>
         <v-list dense>
           <v-list-tile v-for="activity in activities" :key="activity.title" router :to="activity.url">
             <v-list-tile-content>
@@ -34,8 +34,8 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <v-divider v-show="memberProfile.id"></v-divider>
-        <v-subheader v-show="memberProfile.id">我的球队</v-subheader>
+        <v-divider v-show="studentID"></v-divider>
+        <v-subheader v-show="studentID">我的球队</v-subheader>
         <v-list dense>
           <v-list-tile v-for="team in teams" :key="team.name" router :to="team.url">
             <v-list-tile-content>
@@ -53,42 +53,32 @@
         </v-toolbar-title>
         <a href="/"><img src="/static/logo/sufa_logo_website.png" alt="SUFA"></a>
         <v-spacer></v-spacer>
-        <v-menu v-show="memberProfile.id" offset-x :nudge-width="150" v-model="menu">
+        <v-menu v-show="studentID" v-model="menu">
           <v-btn color="orange" dark slot="activator">
             <v-icon left>account_circle</v-icon>
-            {{ memberProfile.name }}
+            {{ studentID }}
           </v-btn>
           <v-card>
-            <v-list>
-              <v-list-tile avatar>
-                <v-list-tile-avatar>
-                  <img :src="memberProfile.photo">
-                </v-list-tile-avatar>
-                <v-list-tile-content>
-                  <v-list-tile-title>{{ memberProfile.id }}  {{ memberProfile.name }}</v-list-tile-title>
-                  <v-list-tile-sub-title>{{ memberProfile.gender }}</v-list-tile-sub-title>
-                  <v-list-tile-sub-title>{{ memberProfile.college }}</v-list-tile-sub-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-            <v-divider></v-divider>
-            <v-list>
-              <v-card-actions>
+            <v-list dense>
+              <v-list-tile>
                 <v-btn flat small color="primary" to="/member">个人中心</v-btn>
-                <v-spacer></v-spacer>
+              </v-list-tile>
+              <v-list-tile>
+                <v-btn flat small color="primary" to="/team">我的球队</v-btn>
+              </v-list-tile>
+              <v-list-tile>
                 <v-btn flat small color="red" @click="logout">注销</v-btn>
-              </v-card-actions>
+              </v-list-tile>
             </v-list>
           </v-card>
         </v-menu>
-        <v-dialog v-show="!memberProfile.id" v-model="loginDialog" max-width=800>
-          <v-btn color="light-blue darken-4" dark slot="activator">
-            <v-icon left>account_circle</v-icon>
+        <v-dialog v-show="!studentID" v-model="loginDialog" max-width=800>
+          <v-btn color="success" dark slot="activator">
             登录
           </v-btn>
           <login-card :loginDialog="loginDialog" @closeLoginDialog="loginDialog = false"></login-card>
         </v-dialog>
-        <v-btn color="success" dark v-show="!memberProfile.id && $vuetify.breakpoint.width > 1264" router :to="register">
+        <v-btn color="success" dark v-show="!studentID && $vuetify.breakpoint.width > 1264" router :to="register">
           社团注册
         </v-btn>
       </v-toolbar>
@@ -119,13 +109,7 @@ export default {
     loginDialog: false,
     menu: false,
     register: '/register',
-    memberProfile: {
-      id: '',
-      name: '',
-      gender: '',
-      college: '',
-      photo: ''
-    },
+    studentID: '',
     // TODO: 网站导航栏可管理，即网站导航栏由后台数据库导入
     items: [
       {
@@ -206,28 +190,17 @@ export default {
   },
   methods: {
     mountProfile: function () {
-      this.memberProfile.id = window.sessionStorage.getItem('id')
-      this.memberProfile.name = window.sessionStorage.getItem('name')
-      this.memberProfile.gender = window.sessionStorage.getItem('gender')
-      this.memberProfile.college = window.sessionStorage.getItem('college')
-      this.memberProfile.photo = window.sessionStorage.getItem('photo')
+      this.studentID = window.sessionStorage.getItem('id')
       if (window.location.hash === '#/register' || window.location.hash === '#/login') {
         this.$router.push('/')
       }
-    },
-    clearProfile: function () {
-      this.memberProfile.id = ''
-      this.memberProfile.name = ''
-      this.memberProfile.gender = ''
-      this.memberProfile.college = ''
-      this.memberProfile.photo = ''
     },
     // 账户注销
     logout: function () {
       this.$axios.post('logout/')
       .then(response => {
         window.sessionStorage.clear()
-        this.clearProfile()
+        this.studentID = ''
       })
       .catch(error => {
         console.log(error)

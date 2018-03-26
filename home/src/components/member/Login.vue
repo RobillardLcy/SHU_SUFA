@@ -74,9 +74,6 @@ export default {
         if ('id' in response.data && response.data.id === this.loginData.studentID) {
           // TODO: 获取用户所在学院
           window.sessionStorage.setItem('id', response.data.id)
-          window.sessionStorage.setItem('name', response.data.name)
-          window.sessionStorage.setItem('gender', (response.data.gender === 'male' ? '男性' : '女性'))
-          window.sessionStorage.setItem('photo', (response.data.photo === null) ? '/api/media/sufa.png' : response.data.photo)
           if ('error' in response.data) {
             if (response.data.error === 2) {
               // 用户手机未激活, 登录后重定向到激活界面

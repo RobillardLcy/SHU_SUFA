@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="Login">
-    <v-card class="text-xs-center" max-width=800>
+    <v-card class="text-xs-center" max-width=500>
       <v-toolbar dark color="light-blue darken-4">
         <v-toolbar-title>登录</v-toolbar-title>
       </v-toolbar>
@@ -29,7 +29,7 @@
             @keyup.enter="loginTest"
             required></v-text-field>
           <!-- TODO: 验证码 -->
-          <v-btn large color="primary" dark @click="login">登录</v-btn>
+          <v-btn large color="primary" dark :disabled="loginData.status" @click="login">登录</v-btn>
           <v-btn large color="green" dark @click="register">社团注册</v-btn>
         </v-form>
       </v-container>
@@ -39,8 +39,10 @@
 
 <script>
 export default {
+  name: 'Login',
   data: () => ({
     loginData: {
+      status: false,
       errorAlert: false,
       error: '',
       visible: false,
@@ -65,6 +67,7 @@ export default {
   methods: {
     // 账户登录
     login: function () {
+      this.loginData.status = true
       let loginInfo = JSON.stringify({
         id: this.loginData.studentID,
         password: this.loginData.password
@@ -80,6 +83,7 @@ export default {
             } else if (response.data.error === 3) {
               // 用户本学期未认证，登录后重定向到认证页面，并提交课表信息
             }
+            this.$emit('closeLoginDialog')
           } else {
             if (this.loginDialog) {
               this.$emit('closeLoginDialog')
@@ -89,10 +93,11 @@ export default {
           }
         } else if ('error' in response.data && response.data.error === 1) {
           // 用户未注册或密码错误
-          // TODO: 提醒窗口
+          this.loginData.status = false
           this.loginData.errorAlert = true
           this.loginData.error = '学号错误或密码错误'
         } else {
+          this.loginData.status = false
           this.loginData.errorAlert = true
           this.loginData.error = '网络错误，请重试'
         }

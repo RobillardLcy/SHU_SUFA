@@ -61,7 +61,7 @@ class MemberLogout(APIView):
             logout(request)
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            return Response(e)
 
 
 # 用户手机激活接口
@@ -79,9 +79,10 @@ class MemberAuthentication(APIView):
         # TODO: Change to JWC authentication
         student_id = request.data.get('id')
         password = request.data.get('password')
+        viewstate = ['dDwtMTIwMjUxOTIxNDs7PkDnn2OF9c2UDJgkVr2XnJDqY131', 'dDwtMTIwMjUxOTIxNDs7PpieU75voA1bajkV2Gj8O9OVHDLE']
         data = '__EVENTTARGET=&' \
                '__EVENTARGUMENT=&' \
-               '__VIEWSTATE=dDwtMTIwMjUxOTIxNDs7PpieU75voA1bajkV2Gj8O9OVHDLE&' \
+               '__VIEWSTATE=' + viewstate[0] + '&' \
                'txtUserName=' + student_id + '&txtPassword=' + password + '&btnOk=%E6%8F%90%E4%BA%A4%28Submit%29'
         url = 'http://services.shu.edu.cn/Login.aspx'
         headers = {
@@ -89,8 +90,9 @@ class MemberAuthentication(APIView):
             'Content-Type': 'application/x-www-form-urlencoded'
         }
         response = requests.post(url, data=data, headers=headers)
-        if response.headers.get('Content-Length') == '2229':
-            # TODO: 验证用户是否已注册
+        if response.headers.get('Content-Length') == '2230':
+            if Members.objects.get(id=student_id):
+                return Response({'error': '您已加入社团！'})
             return Response({'id': student_id})
         else:
             return Response({'error': '验证失败！'})

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import NotFoundPage from '@/components/NotFoundPage'
+import NotFoundPage from '@/components/public/NotFoundPage'
 import Home from '@/components/Home'
 
 import Member from '@/components/member/Member'

@@ -1,7 +1,7 @@
 # 上海大学足球协会官方网站（WebAPP）
 Author: 上海大学足球协会技术部
 # 整体框架结构
-后端： Django(Python3.6) + MySQL
+后端： Django(Python3.5+) + MySQL
 
 前端： Vue(Vuetify)
 # 功能
@@ -20,5 +20,5 @@ Author: 上海大学足球协会技术部
 8. cd home && npm install && npm build（最好安装npm淘宝镜像）
    cd admin && npm install && npm build
 # 开发注意事项
-1. 前端页面设计仅需在home或admin中通过npm run dev运行即可，如需获得数据完成动态页面则需通过python manager.py runserver运行
-2. 所有数据交互通过api接口完成，资料可查询django rest framework（后端）以及axios（前端）
+1. 前端页面设计仅需在home或admin中通过npm run dev运行即可，如需获得数据完成动态页面则需通过python3 manage.py runserver运行
+2. 所有数据交互通过api接口完成，资料可查询django rest framework（后端）以及axios（前端）,数据格式为JSON

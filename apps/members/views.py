@@ -76,26 +76,31 @@ class MemberAuthentication(APIView):
     authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
-        # TODO: Change to JWC authentication
         student_id = request.data.get('id')
         password = request.data.get('password')
-        viewstate = ['dDwtMTIwMjUxOTIxNDs7PkDnn2OF9c2UDJgkVr2XnJDqY131', 'dDwtMTIwMjUxOTIxNDs7PpieU75voA1bajkV2Gj8O9OVHDLE']
-        data = '__EVENTTARGET=&' \
-               '__EVENTARGUMENT=&' \
-               '__VIEWSTATE=' + viewstate[0] + '&' \
-               'txtUserName=' + student_id + '&txtPassword=' + password + '&btnOk=%E6%8F%90%E4%BA%A4%28Submit%29'
-        url = 'http://services.shu.edu.cn/Login.aspx'
+        url = 'http://xk.autoisp.shu.edu.cn:8080/'
+        img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
         headers = {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-        response = requests.post(url, data=data, headers=headers)
-        if response.headers.get('Content-Length') == '2230':
-            if Members.objects.get(id=student_id):
-                return Response({'error': '您已加入社团！'})
-            return Response({'id': student_id})
+        response = requests.get(url)
+        img_response = requests.get(img_url, cookies=response.cookies)
+        img = Image.open(BytesIO(img_response.content))
+        # TODO: 验证码识别
+        img.show()
+        img_text = input('auth:')
+        login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
+        login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
+        if login_response.headers.get('Content-Length') == '5650':
+            try:
+                Members.objects.get(id=student_id)
+            except Members.DoesNotExist:
+                # TODO: 获取姓名
+                student_name = ''
+                return Response({'id': student_id, 'name': student_name})
         else:
-            return Response({'error': '验证失败！'})
+            return Response({'error': '认证失败！'})
 
 
 # 用户个人信息接口
@@ -145,18 +150,21 @@ class MemberActiveAuth(APIView):
         password = request.data.get('password')
         url = 'http://xk.autoisp.shu.edu.cn:8080/'
         img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
         response = requests.get(url)
         img_response = requests.get(img_url, cookies=response.cookies)
         img = Image.open(BytesIO(img_response.content))
         # TODO: 验证码识别
-        img_text = ''
-        login_data = {
-            'txtUserName': student_id,
-            'txtPassword': password,
-            'txtVailCode': img_text
-        }
-        login_response = requests.post(url, data=login_data, cookies=response.cookies)
+        img.show()
+        img_text = input('auth:')
+        login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
+        login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
         if login_response.headers.get('Content-Length') == '5650':
-            return Response({'id': student_id})
+            # TODO: (1)验证学号与用户学号是否匹配; (2)获取课程信息
+            classes = ''
+            return Response({'id': student_id, 'classes': classes})
         else:
             return Response({'error': '认证失败！'})

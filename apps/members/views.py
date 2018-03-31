@@ -45,7 +45,7 @@ class MemberLogin(APIView):
         except Exception as e:
             return Response({"error": 1})
 
-pass
+
 # 用户注销接口
 class MemberLogout(APIView):
 

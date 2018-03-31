@@ -1,9 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.renderers import JSONRenderer
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 from django.contrib.auth import login, logout
 import requests
 from PIL import Image
@@ -15,8 +14,6 @@ from .serializers import (MemberRegistrationSerializer, MemberLoginSerializer, M
 
 # 用户注册接口
 class MemberRegistration(APIView):
-    renderer_classes = (JSONRenderer,)
-    authentication_classes = (JSONWebTokenAuthentication, )
 
     def post(self, request, format=None):
         serializer = MemberRegistrationSerializer(data=request.data)
@@ -28,8 +25,6 @@ class MemberRegistration(APIView):
 
 # 用户登录接口
 class MemberLogin(APIView):
-    renderer_classes = (JSONRenderer,)
-    authentication_classes = (JSONWebTokenAuthentication, )
 
     def post(self, request, format=None):
         id = request.data.get('id')
@@ -47,14 +42,12 @@ class MemberLogin(APIView):
                     return Response({'id': user.id, 'error': 2})
             else:
                 return Response({"error": 1})
-        except Members.DoesNotExist:
+        except Exception as e:
             return Response({"error": 1})
 
-
+pass
 # 用户注销接口
 class MemberLogout(APIView):
-    renderer_classes = (JSONRenderer,)
-    authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
         try:
@@ -66,14 +59,13 @@ class MemberLogout(APIView):
 
 # 用户手机激活接口
 class MemberActiveMobile(APIView):
+
     def post(self, request, format=None):
         pass
 
 
 # 学生证认证接口
 class MemberAuthentication(APIView):
-    renderer_classes = (JSONRenderer,)
-    authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
         student_id = request.data.get('id')
@@ -95,7 +87,7 @@ class MemberAuthentication(APIView):
         if login_response.headers.get('Content-Length') == '5650':
             try:
                 Members.objects.get(id=student_id)
-            except Members.DoesNotExist:
+            except Exception as e:
                 # TODO: 获取姓名
                 student_name = ''
                 return Response({'id': student_id, 'name': student_name})
@@ -105,9 +97,7 @@ class MemberAuthentication(APIView):
 
 # 用户个人信息接口
 class MemberProfile(APIView):
-    renderer_classes = (JSONRenderer,)
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (JSONWebTokenAuthentication,)
 
     def get(self, request, format=None):
         # RSA解密：sessionID + studentID
@@ -120,9 +110,7 @@ class MemberProfile(APIView):
 
 # 用户重置密码接口
 class MemberResetPassword(APIView):
-    renderer_classes = (JSONRenderer,)
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
         pass
@@ -130,9 +118,7 @@ class MemberResetPassword(APIView):
 
 # 用户重置手机接口
 class MemberResetMobile(APIView):
-    renderer_classes = (JSONRenderer,)
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
         pass
@@ -141,9 +127,7 @@ class MemberResetMobile(APIView):
 # 用户在校认证（获取课程时间）接口
 # TODO: 限制验证次数<=5
 class MemberActiveAuth(APIView):
-    renderer_classes = (JSONRenderer,)
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (JSONWebTokenAuthentication,)
 
     def post(self, request, format=None):
         student_id = request.data.get('id')

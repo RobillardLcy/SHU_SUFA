@@ -1,8 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.renderers import JSONRenderer
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
 
@@ -13,8 +11,6 @@ from .serializers import AdminSerializer
 
 
 class MemberLogin(APIView):
-    renderer_classes = (JSONRenderer,)
-    # authentication_classes = (JSONWebTokenAuthentication, )
 
     def post(self, request, format=None):
         id = request.data.get('id')
@@ -40,9 +36,10 @@ class MemberLogin(APIView):
 
 
 class MemberLogout(APIView):
+
     def post(self, request, format=None):
         try:
             logout(request)
-            return Response(status=status.HTTP_200_OK)
+            return Response({"status": 1})
         except Exception as e:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"status": 2})

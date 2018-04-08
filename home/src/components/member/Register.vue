@@ -241,9 +241,13 @@ export default {
       })
       this.$axios.post('authentication/', certificateData)
       .then(response => {
-        if ('id' in response.data && response.data.id === this.certificate.studentID) {
-          this.step = 2
-          window.sessionStorage.setItem('studentID', response.data.id)
+        if ('studentID' in response.data && 'studentName' in response.data) {
+          if (response.data.studentID === this.certificate.studentID) {
+            this.register.studentName = response.data.name
+            this.step = 2
+          } else {
+            window.alert('认证失败！')
+          }
         } else {
           // TODO: 提醒窗口
           window.alert(response.data.error)
@@ -256,8 +260,6 @@ export default {
     },
     reg: function () {
       let info = JSON.stringify({
-        id: window.sessionStorage.getItem('studentID'),
-        name: this.register.studentName,
         gender: this.register.gender,
         mobile: this.register.mobile,
         campus: this.register.campus,
@@ -267,7 +269,14 @@ export default {
       this.$axios.post('register/', info)
       .then(response => {
         // TODO: 加入学院队伍
-        this.step = 3
+        if ('error' in response.data) {
+          if (response.data.error === 'not_auth') {
+            window.alert('未认证或认证已失效！')
+            this.step = 1
+          } else {
+            window.alert(response.data.error)
+          }
+        }
       })
       .catch(error => {
         console.log(error)
@@ -275,7 +284,6 @@ export default {
     },
     auth: function () {
       // TODO: 验证手机号码
-      this.step = 1
     }
   }
 }

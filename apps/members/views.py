@@ -17,11 +17,17 @@ class MemberRegistration(APIView):
     # TODO: 用户学生证认证凭据(Session + studentID)
 
     def post(self, request, format=None):
-        serializer = MemberRegistrationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        memberInfo = request.data
+        if request.session.get('id'):
+            memberInfo['id'] = request.session.get('studentID')
+            memberInfo['name'] = request.session.get('studentName')
+            serializer = MemberRegistrationSerializer(data=memberInfo)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            return Response({'error': '注册失败，请重试！'})
+        else:
+            return Response({'error': 'not_auth'})
 
 
 # 用户登录接口
@@ -85,13 +91,15 @@ class MemberAuthentication(APIView):
         img_text = input('auth:')
         login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
         login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
+        # TODO: 获取姓名，由姓名判断是否认证成功
+        student_name = ''
         if login_response.headers.get('Content-Length') == '5650':
-            try:
-                Members.objects.get(id=student_id)
-            except Exception as e:
-                # TODO: 获取姓名
-                student_name = ''
-                return Response({'id': student_id, 'name': student_name})
+            if Members.objects.filter(id=student_id):
+                return Response({'error': '您已加入社团！'})
+            else:
+                request.session['studentID'] = student_id
+                request.session['studentName'] = student_name
+                return Response({'studentID': student_id, 'studentName': student_name})
         else:
             return Response({'error': '认证失败！'})
 

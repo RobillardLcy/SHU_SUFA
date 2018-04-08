@@ -14,6 +14,7 @@ from .serializers import (MemberRegistrationSerializer, MemberLoginSerializer, M
 
 # 用户注册接口
 class MemberRegistration(APIView):
+    # TODO: 用户学生证认证凭据(Session + studentID)
 
     def post(self, request, format=None):
         serializer = MemberRegistrationSerializer(data=request.data)

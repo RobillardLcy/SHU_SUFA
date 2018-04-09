@@ -17,9 +17,10 @@ class MemberRegistration(APIView):
 
     def post(self, request, format=None):
         memberInfo = request.data
-        if request.session.get('id'):
+        if request.session.get('studentID'):
             memberInfo['id'] = request.session.get('studentID')
             memberInfo['name'] = request.session.get('studentName')
+            # TODO: 学院注册
             serializer = MemberRegistrationSerializer(data=memberInfo)
             if serializer.is_valid():
                 serializer.save()
@@ -74,7 +75,7 @@ class MemberActiveMobile(APIView):
 class MemberAuthentication(APIView):
 
     def post(self, request, format=None):
-        student_id = request.data.get('id')
+        student_id = request.data.get('studentID')
         password = request.data.get('password')
         url = 'http://xk.autoisp.shu.edu.cn:8080/'
         img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
@@ -86,8 +87,7 @@ class MemberAuthentication(APIView):
         img_response = requests.get(img_url, cookies=response.cookies)
         img = Image.open(BytesIO(img_response.content))
         # TODO: 验证码识别
-        img.show()
-        img_text = input('auth:')
+        img_text = ''
         login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
         login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
         # TODO: 获取姓名，由姓名判断是否认证成功

@@ -35,20 +35,63 @@
           <v-stepper-content :step="2" class="text-xs-center">
             <h1>社团注册</h1>
             <v-form v-model="register.active">
-              <v-layout row>
-                <v-flex md6 xs8>
-                  <v-text-field
-                    label="姓名"
-                    :rules="register.studentNameRules"
-                    v-model="register.studentName"
-                    required></v-text-field>
-                </v-flex>
-                <v-flex md2 xs3 offset-xs1>
+              <v-text-field
+                label="学号"
+                :value="certificate.studentID"
+                disabled
+                v-show="$vuetify.breakpoint.width < 1264"></v-text-field>
+              <v-text-field
+                label="姓名"
+                :value="register.studentName"
+                disabled
+                v-show="$vuetify.breakpoint.width < 1264"></v-text-field>
+              <v-layout row justify-space-between v-show="$vuetify.breakpoint.width < 1264">
+                <v-flex xs5>
                   <v-select
                     label="性别"
                     :items="[{text:'男',value:'male'},{text:'女',value:'female'}]"
                     :rules="register.genderRules"
                     v-model="register.gender"
+                    required></v-select>
+                </v-flex>
+                <v-flex xs5>
+                  <v-select
+                    label="校区"
+                    :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
+                    :rules="register.campusRules"
+                    v-model="register.campus"
+                    required></v-select>
+                </v-flex>
+              </v-layout>
+              <v-layout row v-show="$vuetify.breakpoint.width >= 1264">
+                <v-flex md2>
+                  <v-text-field
+                    label="学号"
+                    :value="certificate.studentID"
+                    disabled></v-text-field>
+                </v-flex>
+                <v-flex md5 offset-md1>
+                  <v-text-field
+                    label="姓名"
+                    :value="register.studentName"
+                    disabled></v-text-field>
+                </v-flex>
+              </v-layout>
+              <v-layout row v-show="$vuetify.breakpoint.width >= 1264">
+                <v-flex md2>
+                  <v-select
+                    label="性别"
+                    :items="[{text:'男',value:'male'},{text:'女',value:'female'}]"
+                    :rules="register.genderRules"
+                    v-model="register.gender"
+                    required></v-select>
+                </v-flex>
+                <v-flex md2 offset-md1>
+                  <v-select
+                    label="校区"
+                    :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
+                    :rules="register.campusRules"
+                    v-model="register.campus"
                     required></v-select>
                 </v-flex>
               </v-layout>
@@ -61,24 +104,13 @@
                   required
                   autocomplete></v-select>
               </v-flex>
-              <v-layout row>
-                <v-flex md6 xs8>
-                  <v-text-field
-                    label="电话"
-                    :rules="register.mobileRules"
-                    v-model="register.mobile"
-                    prepend-icon="phone"
-                    required></v-text-field>
-                </v-flex>
-                <v-flex md2 xs3 offset-xs1>
-                  <v-select
-                    label="校区"
-                    :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
-                    :rules="register.campusRules"
-                    v-model="register.campus"
-                    required></v-select>
-                </v-flex>
-              </v-layout>
+              <v-flex md6 xs12>
+                <v-text-field
+                  label="电话"
+                  :rules="register.mobileRules"
+                  v-model="register.mobile"
+                  required></v-text-field>
+              </v-flex>
               <br/>
               <v-divider></v-divider>
               <br/>
@@ -181,10 +213,9 @@ export default {
         (v) => !!v || '性别不能为空'
       ],
       college: '',
-      // collegeRules: [
-      //   (v) => !!v || '学院不能为空'
-      // ],
-      // TODO: 学院选项由后端数据库调入，数据满足格式{text: '学院名', value: '数据库存储对应值'}
+      collegeRules: [
+        (v) => !!v || '学院不能为空'
+      ],
       collegeChoices: [],
       campus: '',
       campusRules: [
@@ -236,14 +267,14 @@ export default {
     cer: function () {
       // TODO: 验证学生证号
       let certificateData = JSON.stringify({
-        id: this.certificate.studentID,
+        studentID: this.certificate.studentID,
         password: this.certificate.password
       })
       this.$axios.post('authentication/', certificateData)
       .then(response => {
         if ('studentID' in response.data && 'studentName' in response.data) {
           if (response.data.studentID === this.certificate.studentID) {
-            this.register.studentName = response.data.name
+            this.register.studentName = response.data.studentName
             this.step = 2
           } else {
             window.alert('认证失败！')
@@ -268,18 +299,22 @@ export default {
       })
       this.$axios.post('register/', info)
       .then(response => {
-        // TODO: 加入学院队伍
-        if ('error' in response.data) {
+        if (response.status === 201) {
+          this.step = 3
+        } else if ('error' in response.data) {
           if (response.data.error === 'not_auth') {
             window.alert('未认证或认证已失效！')
             this.step = 1
           } else {
             window.alert(response.data.error)
           }
+        } else {
+          window.alert('注册出错，请重试！')
         }
       })
       .catch(error => {
         console.log(error)
+        window.alert('网络错误，请重试！')
       })
     },
     auth: function () {

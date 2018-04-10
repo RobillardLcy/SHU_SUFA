@@ -51,6 +51,8 @@
                     label="性别"
                     :items="[{text:'男',value:'male'},{text:'女',value:'female'}]"
                     :rules="register.genderRules"
+                    v-validate="'required'"
+                    data-vv-name="gender"
                     v-model="register.gender"
                     required></v-select>
                 </v-flex>
@@ -59,6 +61,8 @@
                     label="校区"
                     :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
                     :rules="register.campusRules"
+                    v-validate="'required'"
+                    data-vv-name="campus"
                     v-model="register.campus"
                     required></v-select>
                 </v-flex>
@@ -83,6 +87,8 @@
                     label="性别"
                     :items="[{text:'男',value:'male'},{text:'女',value:'female'}]"
                     :rules="register.genderRules"
+                    v-validate="'required'"
+                    data-vv-name="gender"
                     v-model="register.gender"
                     required></v-select>
                 </v-flex>
@@ -91,6 +97,8 @@
                     label="校区"
                     :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
                     :rules="register.campusRules"
+                    v-validate="'required'"
+                    data-vv-name="campus"
                     v-model="register.campus"
                     required></v-select>
                 </v-flex>
@@ -100,14 +108,18 @@
                   label="学院"
                   :items="register.collegeChoices"
                   :rules="register.collegeRules"
+                  v-validate="'required'"
+                  data-vv-name="college"
                   v-model="register.college"
-                  required
-                  autocomplete></v-select>
+                  autocomplete
+                  required></v-select>
               </v-flex>
               <v-flex md6 xs12>
                 <v-text-field
                   label="电话"
                   :rules="register.mobileRules"
+                  v-validate="'required'"
+                  data-vv-name="gender"
                   v-model="register.mobile"
                   required></v-text-field>
               </v-flex>
@@ -118,6 +130,8 @@
                 <v-text-field
                   label="密码"
                   :rules="register.passwordRules"
+                  v-validate="'required'"
+                  data-vv-name="password"
                   v-model="register.password"
                   :append-icon="register.visible ? 'visibility_off' : 'visibility'"
                   :append-icon-cb="() => (register.visible = !register.visible)"
@@ -128,6 +142,8 @@
               <v-flex lg6 md8>
                 <v-text-field
                   label="密码确认"
+                  v-validate="'required'"
+                  data-vv-name="passwordConfirm"
                   :error="register.password === register.passwordConfirm ? false : true"
                   :hint="register.password === register.passwordConfirm ? '' : '密码不一致'"
                   v-model="register.passwordConfirm"
@@ -140,7 +156,10 @@
               <v-flex lg6 md8>
                 <v-text-field
                   label="喜爱的球队"
-                  v-model="register.favoriteClub"></v-text-field>
+                  v-model="register.favoriteClub"
+                  v-validate="'required'"
+                  data-vv-name="favoriteClub"
+                  required></v-text-field>
               </v-flex>
               <v-flex md2>
                 <v-select
@@ -153,7 +172,9 @@
                   <v-checkbox
                     label="我同意"
                     v-model="register.contactAgree"
-                    required></v-checkbox>
+                    v-validate="'required'"
+                    data-vv-name="contact"
+                    type="checkbox"></v-checkbox>
                 </v-flex>
                 <v-flex xl1 md2 s3 xs6>
                   <v-dialog v-model="register.contact.active" persistent max-width=1000>
@@ -192,11 +213,11 @@ export default {
     step: 1,
     certificate: {
       active: true,
-      studentID: '',
+      studentID: null,
       studentIDRules: [
         (v) => !!v || '学号不能为空'
       ],
-      password: '',
+      password: null,
       passwordRules: [
         (v) => !!v || '学生证密码不能为空'
       ],
@@ -217,25 +238,26 @@ export default {
         (v) => !!v || '学院不能为空'
       ],
       collegeChoices: [],
-      campus: '',
+      campus: null,
       campusRules: [
         (v) => !!v || '校区不能为空'
       ],
-      mobile: '',
+      mobile: null,
       mobileRules: [
         (v) => !!v || '电话不能为空',
         (v) => (v && v.length === 11 && /^1[3|4|5|7|8][0-9]\d{4,8}$/.test(v)) || '电话不符合规范'
       ],
-      password: '',
+      password: null,
       passwordRules: [
         (v) => !!v || '密码不能为空',
         (v) => (v && v.length >= 6 && v.length <= 32) || '密码不符合要求, 长度为6~32位'
       ],
       visible: false,
-      passwordConfirm: '',
-      favoriteClub: '',
-      foot: '',
-      learn: '',
+      passwordConfirm: null,
+      favoriteClub: null,
+      foot: null,
+      experience: null,
+      contactAgree: false,
       // TODO: 足协加入协议由后端数据库调入
       contact: {
         active: false,
@@ -251,7 +273,7 @@ export default {
   },
   methods: {
     getColleges: function () {
-      this.$axios.get('/teams/colleges/')
+      this.$axios.get('/colleges/list/')
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.register.collegeChoices.push({
@@ -265,7 +287,13 @@ export default {
         })
     },
     cer: function () {
-      // TODO: 验证学生证号
+      if (!this.certificate.studentID) {
+        window.alert('请填写学号！')
+        return
+      } else if (!this.certificate.password) {
+        window.alert('请填写学生证密码！')
+        return
+      }
       let certificateData = JSON.stringify({
         studentID: this.certificate.studentID,
         password: this.certificate.password
@@ -280,7 +308,6 @@ export default {
             window.alert('认证失败！')
           }
         } else {
-          // TODO: 提醒窗口
           window.alert(response.data.error)
         }
       })
@@ -290,31 +317,43 @@ export default {
       })
     },
     reg: function () {
-      let info = JSON.stringify({
-        gender: this.register.gender,
-        mobile: this.register.mobile,
-        campus: this.register.campus,
-        favorite_club: this.register.favoriteClub,
-        password: this.register.password
-      })
-      this.$axios.post('register/', info)
-      .then(response => {
-        if (response.status === 201) {
-          this.step = 3
-        } else if ('error' in response.data) {
-          if (response.data.error === 'not_auth') {
-            window.alert('未认证或认证已失效！')
-            this.step = 1
-          } else {
-            window.alert(response.data.error)
-          }
+      if (!this.register.contactAgree) {
+        window.alert('请先阅读社团注册协议！')
+        return
+      }
+      this.$validator.validateAll()
+      .then(isValid => {
+        if (isValid) {
+          let info = JSON.stringify({
+            gender: this.register.gender,
+            mobile: this.register.mobile,
+            campus: this.register.campus,
+            favorite_club: this.register.favoriteClub,
+            password: this.register.password,
+            college: this.register.college
+          })
+          this.$axios.post('register/', info)
+          .then(response => {
+            if (response.status === 201) {
+              this.step = 3
+            } else if ('error' in response.data) {
+              if (response.data.error === 'not_auth') {
+                window.alert('未认证或认证已失效！')
+                this.step = 1
+              } else {
+                window.alert(response.data.error)
+              }
+            } else {
+              window.alert('注册出错，请重试！')
+            }
+          })
+          .catch(error => {
+            console.log(error)
+            window.alert('网络错误，请重试！')
+          })
         } else {
-          window.alert('注册出错，请重试！')
+          window.alert('请完整填写信息！')
         }
-      })
-      .catch(error => {
-        console.log(error)
-        window.alert('网络错误，请重试！')
       })
     },
     auth: function () {

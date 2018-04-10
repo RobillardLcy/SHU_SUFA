@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import Axios from 'axios'
+import VeeValidate from 'vee-validate'
 import Home from './Home'
 import router from './router'
 
@@ -12,6 +13,8 @@ Vue.config.productionTip = true
 Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
 import('../node_modules/material-icons/iconfont/material-icons.css')
+
+Vue.use(VeeValidate)
 
 Axios.defaults.xsrfCookieName = 'csrftoken'
 Axios.defaults.xsrfHeaderName = 'X-CSRFToken'

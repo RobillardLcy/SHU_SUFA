@@ -23,11 +23,18 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         fields = ('id', 'member', 'team', 'num', 'join', 'leave', 'status')
 
 
-# 赛事
-class LeaguesSerializer(serializers.ModelSerializer):
+# 赛事列表
+class LeaguesListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leagues
         fields = ('id', 'name', 'reg_start', 'reg_end', 'start', 'category', 'status')
+
+
+# 赛事信息
+class LeagueProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Leagues
+        fields = ('id', 'name', 're_start', 'reg_end', 'start', 'description', 'photo', 'category', 'status')
 
 
 # 赛事报名

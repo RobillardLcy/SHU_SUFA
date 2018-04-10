@@ -6,7 +6,7 @@ class Activities(models.Model):
     """
     活动信息
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=20, verbose_name='名称')
     reg_start = models.DateTimeField(verbose_name='报名开始时间')
     reg_end = models.DateTimeField(verbose_name='报名结束时间')

@@ -77,7 +77,7 @@ class ManTeamMatches(models.Model):
     """
     男子足球队比赛信息
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     league = models.CharField(max_length=20, verbose_name='赛事')
     against = models.CharField(max_length=20, verbose_name='对手')
     time = models.DateTimeField(verbose_name='时间')
@@ -94,7 +94,7 @@ class WomanTeamMatches(models.Model):
     """
     女子足球队比赛信息
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     league = models.CharField(max_length=20, verbose_name='赛事')
     against = models.CharField(max_length=20, verbose_name='对手')
     time = models.DateTimeField(verbose_name='时间')
@@ -111,7 +111,7 @@ class ManTeamMatchData(models.Model):
     """
     男子足球队比赛数据
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     match = models.ForeignKey(ManTeamMatches, on_delete=models.CASCADE, verbose_name='比赛')
     team_member = models.ForeignKey(ManTeamMembers, on_delete=models.PROTECT, related_name='teammate', verbose_name='队员')
     category = models.CharField(max_length=6,
@@ -138,7 +138,7 @@ class WomanTeamMatchData(models.Model):
     """
     女子足球队比赛数据
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     match = models.ForeignKey(WomanTeamMatches, on_delete=models.CASCADE, verbose_name='比赛')
     team_member = models.ForeignKey(WomanTeamMembers, on_delete=models.PROTECT, related_name='teammate', verbose_name='队员')
     category = models.CharField(max_length=6,

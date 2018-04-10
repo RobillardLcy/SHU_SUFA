@@ -6,7 +6,7 @@ class Permissions(models.Model):
     """
     社团管理平台权限
     """
-    id = models.PositiveSmallIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=20, verbose_name='名称')
     description = models.CharField(max_length=50, verbose_name='描述')
 
@@ -23,7 +23,7 @@ class Departments(models.Model):
     """
     部门信息
     """
-    id = models.PositiveSmallIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=10, verbose_name='名称')
     description = models.CharField(max_length=200, verbose_name='简介')
     permission = models.ManyToManyField(Permissions, through='PermissionToDepartment', verbose_name='部门权限')
@@ -41,7 +41,7 @@ class Positions(models.Model):
     """
     职位
     """
-    id = models.PositiveSmallIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=10, verbose_name='名称')
     remind = models.CharField(max_length=200, verbose_name='提醒事项')
     department = models.ForeignKey(Departments, on_delete=models.CASCADE, verbose_name='所属部门')

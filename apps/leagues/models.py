@@ -11,11 +11,11 @@ class Teams(models.Model):
     """
     id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=10, verbose_name='队名')
-    logo = models.ImageField(upload_to='team/logo', default='team/logo/sufa.png', max_length=100, verbose_name='队徽')
+    logo = models.ImageField(upload_to='team/%(this.name)/logo', default='team/sufa/sufa.png', max_length=100, verbose_name='队徽')
     description = models.CharField(max_length=200, verbose_name='队伍简介')
     # 用于联系队伍
     captain = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    create_at = models.DateField(auto_created=True, verbose_name='创建时间')
+    create_at = models.DateField(auto_now_add=True, verbose_name='创建时间')
     # 队伍审核标记
     status = models.BooleanField(default=False, verbose_name='状态')
 
@@ -35,10 +35,10 @@ class TeamsMembers(models.Model):
     学员队伍入队时间均为社团注册时间
     其他队伍入队时间为通过审核时间
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='成员')
     team = models.ForeignKey(Teams, on_delete=models.CASCADE, verbose_name='队伍')
-    num = models.CharField(max_length=2, verbose_name='号码')
+    num = models.CharField(null=True, max_length=2, verbose_name='号码')
     join = models.DateField(null=True, verbose_name='入队时间')
     leave = models.DateField(null=True, verbose_name='离队时间')
     # -1:待审核
@@ -59,11 +59,15 @@ class Leagues(models.Model):
     """
     赛事信息
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=50, verbose_name='名称')
     reg_start = models.DateTimeField(verbose_name='报名开始时间')
     reg_end = models.DateTimeField(verbose_name='报名结束时间')
     start = models.DateTimeField(verbose_name='赛事开始时间')
+    # TODO:赛事简介：文字照片－> Vue组件显示(页面编辑器设计)，自动引入组件并载入
+    description = models.CharField(max_length=500, verbose_name="赛事简介")
+    photo = models.ImageField(upload_to='leagues/%(this.name)', max_length=100,
+                              null=True, blank=True, verbose_name='赛事宣传照片')
     # 主要用于赛事审核及队伍报名资格
     category = models.CharField(max_length=11,
                                 choices=(
@@ -73,7 +77,8 @@ class Leagues(models.Model):
                                 ), verbose_name='赛事类别')
     # -1：待审核
     #  0：报名阶段
-    #  1：正在举行或已结束
+    #  1：正在举行
+    #  2：已结束
     status = models.SmallIntegerField(default=-1, verbose_name='状态')
 
     class Meta:
@@ -109,7 +114,7 @@ class Matches(models.Model):
     比赛赛程
     记录比赛信息及结果
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     league = models.ForeignKey(Leagues, on_delete=models.CASCADE, verbose_name='赛事')
     home_team = models.ForeignKey(Teams, on_delete=models.CASCADE, related_name='home', verbose_name='主队')
     away_team = models.ForeignKey(Teams, on_delete=models.CASCADE, related_name='away', verbose_name='客队')
@@ -139,7 +144,7 @@ class MatchesData(models.Model):
     记录每一项比赛数据，实现比赛数据实时反馈
     数据由第四官员通过裁判平台录入
     """
-    id = models.PositiveIntegerField(primary_key=True, verbose_name='编号')
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     match = models.ForeignKey(Matches, on_delete=models.CASCADE, verbose_name='比赛')
     team_member = models.ForeignKey(TeamsMembers, on_delete=models.PROTECT, related_name='teammate', verbose_name='队员')
     category = models.CharField(max_length=7,

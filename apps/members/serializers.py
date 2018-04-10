@@ -20,13 +20,6 @@ class MemberRegistrationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'gender', 'mobile', 'campus', 'favorite_club', 'password')
 
 
-# 社团成员登录信息序列化
-class MemberLoginSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Members
-        fields = ('id', 'name', 'gender', 'photo')
-
-
 # 社团成员获取个人详细信息序列化
 class MemberProfileSerializer(serializers.ModelSerializer):
     class Meta:

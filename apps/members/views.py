@@ -93,33 +93,30 @@ class MemberAuthenticationAPI(APIView):
     def post(self, request, format=None):
         student_id = request.data.get('studentID')
         password = request.data.get('password')
-        # url = 'http://xk.autoisp.shu.edu.cn:8080/'
-        # img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
-        # headers = {
-        #     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        #     'Content-Type': 'application/x-www-form-urlencoded'
-        # }
-        # response = requests.get(url)
-        # img_response = requests.get(img_url, cookies=response.cookies)
-        # img = Image.open(BytesIO(img_response.content))
-        # # TODO: 验证码识别
-        # img_text = ''
-        # login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
-        # login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
-        # # TODO: 获取姓名，由姓名判断是否认证成功
-        # student_name = ''
-        # if login_response.headers.get('Content-Length') == '5650':
-        #     if Members.objects.filter(id=student_id):
-        #         return Response({'error': '您已加入社团！'})
-        #     else:
-        #         request.session['studentID'] = student_id
-        #         request.session['studentName'] = student_name
-        #         return Response({'studentID': student_id, 'studentName': student_name})
-        # else:
-        #     return Response({'error': '认证失败！'})
-        request.session['studentID'] = student_id
-        request.session['studentName'] = '黄海'
-        return Response({'studentID': student_id, 'studentName': '黄海'})
+        url = 'http://xk.autoisp.shu.edu.cn:8080/'
+        img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        response = requests.get(url)
+        img_response = requests.get(img_url, cookies=response.cookies)
+        img = Image.open(BytesIO(img_response.content))
+        # TODO: 验证码识别
+        img_text = ''
+        login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
+        login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
+        # TODO: 获取姓名，由姓名判断是否认证成功
+        student_name = ''
+        if login_response.headers.get('Content-Length') == '5650':
+            if Members.objects.filter(id=student_id):
+                return Response({'error': '您已加入社团！'})
+            else:
+                request.session['studentID'] = student_id
+                request.session['studentName'] = student_name
+                return Response({'studentID': student_id, 'studentName': student_name})
+        else:
+            return Response({'error': '认证失败！'})
 
 
 # 用户个人信息接口

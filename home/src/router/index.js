@@ -149,6 +149,9 @@ const router = new Router({
           name: 'Liaison',
           components: {
             content: Liaison
+          },
+          meta: {
+            need_log: false
           }
         },
         {
@@ -235,7 +238,7 @@ const router = new Router({
             team: FreeTeam
           },
           meta: {
-            need_log: true
+            need_log: false
           }
         }
         // TODO: 添加队伍页面，便于队伍管理及报名
@@ -283,7 +286,7 @@ const router = new Router({
             league: FreeLeagues
           },
           meta: {
-            need_log: true
+            need_log: false
           }
         }
       ]
@@ -309,7 +312,7 @@ const router = new Router({
       name: 'Activity',
       component: Activity,
       meta: {
-        need_log: true
+        need_log: false
       }
     }
   ]

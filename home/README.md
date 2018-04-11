@@ -1,6 +1,6 @@
-# sufa
+# home
 
-> A Vue.js project
+> Shanghai University WebApp Frontend
 
 ## Build Setup
 

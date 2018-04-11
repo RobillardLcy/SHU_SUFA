@@ -2,33 +2,52 @@
   <div id="home">
     <v-app>
       <v-navigation-drawer fixed :clipped="$vuetify.breakpoint.width > 1264" app v-model="drawer">
-        <v-list dense>
-          <v-list-group v-for="item in items" :value="item.active" :key="item.title">
-            <v-list-tile slot="item" @click="" router :to="item.url">
-              <v-list-tile-action>
-                <v-icon>{{ item.action }}</v-icon>
-              </v-list-tile-action>
+        <v-list>
+          <v-list-tile router to="/home">
+            <v-list-tile-action>
+              <v-icon>home</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>主页</v-list-tile-content>
+          </v-list-tile>
+          <v-list-group
+            v-model="item.active"
+            v-for="item in items"
+            :prepend-icon="item.action"
+            :key="item.title"
+            no-action>
+            <v-list-tile slot="activator" router :to="item.url">
               <v-list-tile-content>
                 <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile-content>
-              <v-list-tile-action v-if="item.items">
-                <v-icon>keyboard_arrow_down</v-icon>
-              </v-list-tile-action>
             </v-list-tile>
-            <v-list-tile v-for="subItem in item.items" :key="subItem.title" router :to="subItem.url">
-                <v-list-tile-action>
-                  <v-icon>{{ subItem.action }}</v-icon>
-                </v-list-tile-action>
+            <v-list-tile
+              v-for="subItem in item.items"
+              :key="subItem.title"
+              :prepend-icon="subItem.action"
+              router
+              :to="subItem.url">
                 <v-list-tile-content>
                   <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
                 </v-list-tile-content>
             </v-list-tile>
           </v-list-group>
+          <v-list-tile router to="/activities">
+            <v-list-tile-action>
+              <v-icon>
+                local_activity
+              </v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>活动</v-list-tile-content>
+          </v-list-tile>
         </v-list>
         <v-divider></v-divider>
         <v-subheader v-show="studentID">报名通道</v-subheader>
-        <v-list dense>
-          <v-list-tile v-for="activity in activities" :key="activity.title" router :to="activity.url">
+        <v-list>
+          <v-list-tile
+            v-for="activity in activities"
+            :key="activity.title"
+            router
+            :to="activity.url">
             <v-list-tile-content>
               <v-list-tile-title>{{ activity.name }}</v-list-tile-title>
             </v-list-tile-content>
@@ -36,8 +55,11 @@
         </v-list>
         <v-divider v-show="studentID"></v-divider>
         <v-subheader v-show="studentID">我的球队</v-subheader>
-        <v-list dense>
+        <v-list>
           <v-list-tile v-for="team in teams" :key="team.name" router :to="team.url">
+            <v-list-tile-action>
+              <img>
+            </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>{{ team.name }}</v-list-tile-title>
             </v-list-tile-content>
@@ -59,7 +81,7 @@
             {{ studentID }}
           </v-btn>
           <v-card>
-            <v-list dense>
+            <v-list>
               <v-list-tile>
                 <v-btn flat small color="primary" to="/member">个人中心</v-btn>
               </v-list-tile>
@@ -90,9 +112,7 @@
       <v-footer app>
         <v-spacer></v-spacer>
         <div class="text-xs-center">
-          © 2017-{{ new Date().getFullYear() }} <a href="https://www.shusufa.com">上海大学足球协会</a>&nbsp;&nbsp;&nbsp;&nbsp;社团所属学校：<a href="http://www.shu.edu.cn">上海大学</a>
-          <br/>
-          社团微信公众号：上大足协<br/>社团邮箱：shu_sufa@163.com
+          © 2017-{{ new Date().getFullYear() }} <a href="https://www.shusufa.com">上海大学足球协会</a><br/>社团所属学校：<a href="http://www.shu.edu.cn">上海大学</a>
         </div>
         <v-spacer></v-spacer>
       </v-footer>
@@ -112,11 +132,6 @@ export default {
     studentID: '',
     // TODO: 网站导航栏可管理，即网站导航栏由后台数据库导入
     items: [
-      {
-        action: 'home',
-        title: '主页',
-        url: '/home'
-      },
       {
         action: 'description',
         title: '简介',
@@ -162,11 +177,6 @@ export default {
           { title: '皇家马德里', url: '/fanClub/madrid' },
           { title: '曼彻斯特联', url: '/fanClub/manutd' }
         ]
-      },
-      {
-        action: 'local_activity',
-        title: '活动',
-        url: '/activities'
       }
     ],
     // TODO: 活动从数据库中读取，动态更新
@@ -198,13 +208,13 @@ export default {
     // 账户注销
     logout: function () {
       this.$axios.post('logout/')
-      .then(response => {
-        window.sessionStorage.clear()
-        this.studentID = ''
-      })
-      .catch(error => {
-        console.log(error)
-      })
+        .then(response => {
+          window.sessionStorage.clear()
+          this.studentID = ''
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
 }

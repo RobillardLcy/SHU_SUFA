@@ -3,7 +3,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import axios from 'axios'
-import VeeValidate from 'vee-validate'
 import Admin from './Admin'
 import router from './router'
 
@@ -13,8 +12,6 @@ Vue.config.productionTip = true
 Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
 import('../node_modules/material-icons/iconfont/material-icons.css')
-
-Vue.use(VeeValidate)
 
 Vue.prototype.$axios = axios.create({
   baseURL: 'http://admin.yellowsea.top:8000/api/'

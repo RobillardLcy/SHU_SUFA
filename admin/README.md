@@ -1,6 +1,6 @@
 # admin
 
-> A Vue.js project
+> Shanghai University Football Association Management Platform
 
 ## Build Setup
 

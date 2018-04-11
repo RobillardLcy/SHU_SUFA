@@ -12,12 +12,11 @@
           <v-stepper-content :step="1">
             <v-flex md6 offset-md3 text-xs-center>
               <h1>学号认证</h1>
-              <v-form v-model="certificate.active">
+              <v-form v-model="certificate.valid" ref="certificateForm" lazy-validation>
                 <v-text-field
                   label="学号"
                   v-model="certificate.studentID"
                   :rules="certificate.studentIDRules"
-                  class="text-"
                   required></v-text-field>
                 <v-text-field label="学生证密码"
                   v-model="certificate.password"
@@ -27,14 +26,16 @@
                   hint="6位~32位"
                   :type="certificate.visible ? 'text' : 'password'"
                   required></v-text-field>
-                <v-btn color="primary" @click="cer()">认证</v-btn>
+                <v-btn
+                  color="primary"
+                  @click="cer()">认证</v-btn>
               </v-form>
             </v-flex>
           </v-stepper-content>
         <v-container text-xs-center>
           <v-stepper-content :step="2" class="text-xs-center">
             <h1>社团注册</h1>
-            <v-form v-model="register.active">
+            <v-form v-model="register.valid" ref="registerForm" lazy-validation>
               <v-text-field
                 label="学号"
                 :value="certificate.studentID"
@@ -49,20 +50,16 @@
                 <v-flex xs5>
                   <v-select
                     label="性别"
-                    :items="[{text:'男',value:'male'},{text:'女',value:'female'}]"
+                    :items="genderChoices"
                     :rules="register.genderRules"
-                    v-validate="'required'"
-                    data-vv-name="gender"
                     v-model="register.gender"
                     required></v-select>
                 </v-flex>
                 <v-flex xs5>
                   <v-select
                     label="校区"
-                    :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
+                    :items="campusChoices"
                     :rules="register.campusRules"
-                    v-validate="'required'"
-                    data-vv-name="campus"
                     v-model="register.campus"
                     required></v-select>
                 </v-flex>
@@ -85,20 +82,16 @@
                 <v-flex md2>
                   <v-select
                     label="性别"
-                    :items="[{text:'男',value:'male'},{text:'女',value:'female'}]"
+                    :items="genderChoices"
                     :rules="register.genderRules"
-                    v-validate="'required'"
-                    data-vv-name="gender"
                     v-model="register.gender"
                     required></v-select>
                 </v-flex>
                 <v-flex md2 offset-md1>
                   <v-select
                     label="校区"
-                    :items="[{text:'宝山',value:'BS'},{text:'延长',value:'YC'},{text:'嘉定',value:'JD'}]"
+                    :items="campusChoices"
                     :rules="register.campusRules"
-                    v-validate="'required'"
-                    data-vv-name="campus"
                     v-model="register.campus"
                     required></v-select>
                 </v-flex>
@@ -106,10 +99,8 @@
               <v-flex lg6>
                 <v-select
                   label="学院"
-                  :items="register.collegeChoices"
+                  :items="collegeChoices"
                   :rules="register.collegeRules"
-                  v-validate="'required'"
-                  data-vv-name="college"
                   v-model="register.college"
                   autocomplete
                   required></v-select>
@@ -118,8 +109,6 @@
                 <v-text-field
                   label="电话"
                   :rules="register.mobileRules"
-                  v-validate="'required'"
-                  data-vv-name="gender"
                   v-model="register.mobile"
                   required></v-text-field>
               </v-flex>
@@ -142,8 +131,6 @@
               <v-flex lg6 md8>
                 <v-text-field
                   label="密码确认"
-                  v-validate="'required'"
-                  data-vv-name="passwordConfirm"
                   :error="register.password === register.passwordConfirm ? false : true"
                   :hint="register.password === register.passwordConfirm ? '' : '密码不一致'"
                   v-model="register.passwordConfirm"
@@ -157,24 +144,23 @@
                 <v-text-field
                   label="喜爱的球队"
                   v-model="register.favoriteClub"
-                  v-validate="'required'"
-                  data-vv-name="favoriteClub"
+                  :rules="[v => !!v || '请输入喜爱的球队']"
                   required></v-text-field>
               </v-flex>
-              <v-flex md2>
+              <!-- TODO: 收集新社团成员数据 -->
+              <!-- <v-flex md2>
                 <v-select
                   label="球龄"
                   :items="[{text:'小于两年',value:0},{text:'两年至十年',value:1},{text:'大于十年',value:2}]"
                   :v-model="register.experience"></v-select>
-              </v-flex>
+              </v-flex> -->
               <v-layout row justify-center>
                 <v-flex xl1 md2 s3 xs6>
                   <v-checkbox
                     label="我同意"
                     v-model="register.contactAgree"
-                    v-validate="'required'"
-                    data-vv-name="contact"
-                    type="checkbox"></v-checkbox>
+                    :rules="[v => !!v || '请阅读社团注册协议']"
+                    required></v-checkbox>
                 </v-flex>
                 <v-flex xl1 md2 s3 xs6>
                   <v-dialog v-model="register.contact.active" persistent max-width=1000>
@@ -191,14 +177,19 @@
                   </v-dialog>
                 </v-flex>
               </v-layout>
-              <v-btn color="success" @click="reg()">注册</v-btn>
+              <v-btn
+                color="success"
+                @click="reg()">注册</v-btn>
             </v-form>
           </v-stepper-content>
         </v-container>
         <v-stepper-content :step="3" class="text-xs-center">
           <h1>手机验证</h1>
-          <v-form>
-            <v-btn color="primary" @click="auth()">提交</v-btn>
+          <v-form v-model="authenticate.valid" ref="authenticateForm" lazy-validation>
+            <v-btn
+              color="primary"
+              :disabled="!authenticate.valid"
+              @click="auth()">提交</v-btn>
           </v-form>
         </v-stepper-content>
       </v-stepper-items>
@@ -212,7 +203,7 @@ export default {
   data: () => ({
     step: 1,
     certificate: {
-      active: true,
+      valid: true,
       studentID: null,
       studentIDRules: [
         (v) => !!v || '学号不能为空'
@@ -223,8 +214,33 @@ export default {
       ],
       visible: false
     },
+    genderChoices: [
+      {
+        text: '男',
+        value: 'male'
+      },
+      {
+        text: '女',
+        value: 'female'
+      }
+    ],
+    campusChoices: [
+      {
+        text: '宝山',
+        value: 'BS'
+      },
+      {
+        text: '延长',
+        value: 'YC'
+      },
+      {
+        text: '嘉定',
+        value: 'JD'
+      }
+    ],
+    collegeChoices: [],
     register: {
-      active: true,
+      valid: true,
       studentName: '',
       studentNameRules: [
         (v) => !!v || '姓名不能为空'
@@ -237,7 +253,6 @@ export default {
       collegeRules: [
         (v) => !!v || '学院不能为空'
       ],
-      collegeChoices: [],
       campus: null,
       campusRules: [
         (v) => !!v || '校区不能为空'
@@ -276,7 +291,7 @@ export default {
       this.$axios.get('/colleges/list/')
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
-            this.register.collegeChoices.push({
+            this.collegeChoices.push({
               text: response.data[i].name,
               value: response.data[i].id
             })
@@ -287,52 +302,41 @@ export default {
         })
     },
     cer: function () {
-      if (!this.certificate.studentID) {
-        window.alert('请填写学号！')
-        return
-      } else if (!this.certificate.password) {
-        window.alert('请填写学生证密码！')
-        return
+      if (this.$refs.certificateForm.validate()) {
+        let certificateData = JSON.stringify({
+          studentID: this.certificate.studentID,
+          password: this.certificate.password
+        })
+        this.$axios.post('authentication/', certificateData)
+          .then(response => {
+            if ('studentID' in response.data && 'studentName' in response.data) {
+              if (response.data.studentID === this.certificate.studentID) {
+                this.register.studentName = response.data.studentName
+                this.step = 2
+              } else {
+                window.alert('认证失败！')
+              }
+            } else {
+              window.alert(response.data.error)
+            }
+          })
+          .catch(error => {
+            console.log(error)
+            window.alert('网络错误，请重试！')
+          })
       }
-      let certificateData = JSON.stringify({
-        studentID: this.certificate.studentID,
-        password: this.certificate.password
-      })
-      this.$axios.post('authentication/', certificateData)
-      .then(response => {
-        if ('studentID' in response.data && 'studentName' in response.data) {
-          if (response.data.studentID === this.certificate.studentID) {
-            this.register.studentName = response.data.studentName
-            this.step = 2
-          } else {
-            window.alert('认证失败！')
-          }
-        } else {
-          window.alert(response.data.error)
-        }
-      })
-      .catch(error => {
-        console.log(error)
-        window.alert('网络错误，请重试！')
-      })
     },
     reg: function () {
-      if (!this.register.contactAgree) {
-        window.alert('请先阅读社团注册协议！')
-        return
-      }
-      this.$validator.validateAll()
-      .then(isValid => {
-        if (isValid) {
-          let info = JSON.stringify({
-            gender: this.register.gender,
-            mobile: this.register.mobile,
-            campus: this.register.campus,
-            favorite_club: this.register.favoriteClub,
-            password: this.register.password,
-            college: this.register.college
-          })
-          this.$axios.post('register/', info)
+      if (this.$refs.registerForm.validate()) {
+        let info = JSON.stringify({
+          gender: this.register.gender,
+          mobile: this.register.mobile,
+          campus: this.register.campus,
+          favorite_club: this.register.favoriteClub,
+          password: this.register.password,
+          college: this.register.college
+        })
+        this.$axios.post('register/', info)
           .then(response => {
             if (response.status === 201) {
               this.step = 3
@@ -351,13 +355,13 @@ export default {
             console.log(error)
             window.alert('网络错误，请重试！')
           })
-        } else {
-          window.alert('请完整填写信息！')
-        }
-      })
+      }
     },
     auth: function () {
       // TODO: 验证手机号码
+      if (this.$refs.authenticateForm.validate()) {
+
+      }
     }
   }
 }

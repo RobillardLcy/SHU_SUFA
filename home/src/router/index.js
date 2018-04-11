@@ -315,7 +315,6 @@ const router = new Router({
   ]
 })
 
-// TODO: 路由判断是否需要登录
 router.beforeEach((to, from, next) => {
   if (window.sessionStorage.getItem('id') === null) {
     if (to.meta.need_log) {

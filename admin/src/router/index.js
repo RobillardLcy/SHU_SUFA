@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import NotFoundPage from '@/components/NotFoundPage'
 import Dashboard from '@/components/Dashboard'
+
+import NotFoundPage from '@/components/public/NotFoundPage'
+import Login from '@/components/public/Login'
 
 import Community from '@/components/community/Community'
 import Departments from '@/components/community/Departments'
@@ -38,6 +40,11 @@ const router = new Router({
       path: '/',
       name: 'Dashboard',
       component: Dashboard
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
     },
     {
       path: '/404',
@@ -173,5 +180,18 @@ const router = new Router({
     }
   ]
 })
+
+// TODO: 验证是否登录
+// router.beforeEach((to, from, next) => {
+//   if (window.sessionStorage.getItem('id') === null) {
+//     if (to.path !== '/login') {
+//       next('/login')
+//     } else {
+//       next()
+//     }
+//   } else {
+//     next()
+//   }
+// })
 
 export default router

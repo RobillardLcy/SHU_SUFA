@@ -3,22 +3,24 @@
     <v-app>
       <v-navigation-drawer fixed :clipped="$vuetify.breakpoint.width > 1264" app v-model="drawer">
         <v-list dense>
-          <v-list-group v-for="item in items" :value="item.active" :key="item.title">
-            <v-list-tile slot="item" @click="" router :to="item.url">
-              <v-list-tile-action>
-                <v-icon>{{ item.action }}</v-icon>
-              </v-list-tile-action>
+          <v-list-tile router to="/">
+            <v-list-tile-action>
+              <v-icon>dashboard</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>控制面板</v-list-tile-content>
+          </v-list-tile>
+          <v-list-group
+            v-for="item in items"
+            :value="item.active"
+            :key="item.title"
+            :prepend-icon="item.action"
+            no-action>
+            <v-list-tile slot="activator" router :to="item.url">
               <v-list-tile-content>
                 <v-list-tile-title>{{ item.title }}</v-list-tile-title>
               </v-list-tile-content>
-              <v-list-tile-action v-if="item.items">
-                <v-icon>keyboard_arrow_down</v-icon>
-              </v-list-tile-action>
             </v-list-tile>
-            <v-list-tile v-for="subItem in item.items" :key="subItem.title" router :to="subItem.url">
-              <v-list-tile-action>
-                <v-icon>{{ subItem.action }}</v-icon>
-              </v-list-tile-action>
+            <v-list-tile v-for="subItem in item.items" :key="subItem.title" :prepend-icon="subItem.icon" router :to="subItem.url">
               <v-list-tile-content>
                 <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
               </v-list-tile-content>
@@ -44,29 +46,15 @@
         <a href="/"><img src="/static/logo/sufa_logo_website.png" alt="SUFA"></a>
         <v-spacer></v-spacer>
         <v-menu offset-x :nudge-width="150" v-model="menu">
-          <v-btn color="light-blue darken-4" dark slot="activator">
+          <v-btn color="orange" dark slot="activator">
             <v-icon left>account_circle</v-icon>
-            {{ adminProfile.studentName }}
+            {{ studentID }}
           </v-btn>
           <v-card>
             <v-list>
-              <v-list-tile avatar>
-                <v-list-tile-avatar>
-                  <img :src="adminProfile.photo">
-                </v-list-tile-avatar>
-                <v-list-tile-content>
-                  <v-list-tile-title>{{ adminProfile.studentID }} {{ adminProfile.studentName }}</v-list-tile-title>
-                  <v-list-tile-sub-title>{{ adminProfile.position }} {{ adminProfile.department }}</v-list-tile-sub-title>
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-            <v-divider></v-divider>
-            <v-list>
-              <v-card-actions>
-                <v-btn flat small color="primary" to="/">个人中心</v-btn>
-                <v-spacer></v-spacer>
+              <v-list-tile>
                 <v-btn flat small color="red" @click="logOut">注销</v-btn>
-              </v-card-actions>
+              </v-list-tile>
             </v-list>
           </v-card>
         </v-menu>
@@ -79,7 +67,7 @@
       <v-footer app>
         <v-spacer></v-spacer>
         <div class="text-xs-center">
-          © 2017-{{ new Date().getFullYear() }} <a href="https://www.shusufa.com">上海大学足球协会</a>&nbsp;&nbsp;&nbsp;&nbsp;社团所属学校：<a href="http://www.shu.edu.cn">上海大学</a>
+          © 2017-{{ new Date().getFullYear() }} <a href="https://www.shusufa.com">上海大学足球协会</a><br/>社团所属学校：<a href="http://www.shu.edu.cn">上海大学</a>
         </div>
         <v-spacer></v-spacer>
       </v-footer>
@@ -93,22 +81,10 @@ export default {
   name: 'admin',
   data: () => ({
     drawer: null,
-    login: true,
     menu: false,
     departments: [],
-    adminProfile: {
-      studentID: '15121600',
-      studentName: '黄海',
-      position: '主席',
-      department: '主席团',
-      photo: '/static/logo/sufa_logo.png'
-    },
+    studentID: '15121600',
     items: [
-      {
-        action: 'dashboard',
-        title: '控制面板',
-        url: '/'
-      },
       {
         action: 'account_balance',
         title: '社团管理',
@@ -161,12 +137,15 @@ export default {
   props: {
 
   },
+  mounted: () => {
+    this.studentID = window.sessionStorage.getItem('id')
+  },
   computed: {
 
   },
   methods: {
     logOut: function () {
-      this.login.active = false
+      // 注销
     }
   }
 }

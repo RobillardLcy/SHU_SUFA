@@ -338,17 +338,16 @@ export default {
         })
         this.$axios.post('register/', info)
           .then(response => {
-            if (response.status === 201) {
-              this.step = 3
-            } else if ('error' in response.data) {
-              if (response.data.error === 'not_auth') {
+            if ('error' in response.data) {
+              if (response.data.error === 6) {
                 window.alert('未认证或认证已失效！')
                 this.step = 1
-              } else {
-                window.alert(response.data.error)
+              } else if (response.data.error === 7) {
+                window.alert('注册出错，请重试！')
               }
             } else {
-              window.alert('注册出错，请重试！')
+              this.$cookie.set('id', this.certificate.studentID, { expires: 14 })
+              this.step = 3
             }
           })
           .catch(error => {

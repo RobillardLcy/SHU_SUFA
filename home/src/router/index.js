@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import vueCookie from 'vue-cookie'
 
 import NotFoundPage from '@/components/public/NotFoundPage'
 import Home from '@/components/Home'
@@ -23,14 +24,17 @@ import Manager from '@/components/about/Manager'
 import Team from '@/components/team/Team'
 import ManTeam from '@/components/team/ManTeam'
 import WomanTeam from '@/components/team/WomanTeam'
+import CollegeTeam from '@/components/team/CollegeTeam'
 import GradeTeam from '@/components/team/GradeTeam'
 import FreeTeam from '@/components/team/FreeTeam'
+import FreeTeamProfile from '@/components/team/FreeTeamProfile'
 
 import Leagues from '@/components/leagues/Leagues'
 import CollegeCup from '@/components/leagues/CollegeCup'
 import AssociationCup from '@/components/leagues/AssociationCup'
 import NewStudentCup from '@/components/leagues/NewStudentCup'
 import FreeLeagues from '@/components/leagues/FreeLeagues'
+import FreeLeaguesProfile from '@/components/leagues/FreeLeaguesProfile'
 
 import FanClub from '@/components/fanClub/FanClub'
 
@@ -48,18 +52,12 @@ const router = new Router({
     {
       path: '/home',
       name: 'Home',
-      component: Home,
-      meta: {
-        need_log: false
-      }
+      component: Home
     },
     {
       path: '/404',
       name: '404',
-      component: NotFoundPage,
-      meta: {
-        need_log: false
-      }
+      component: NotFoundPage
     },
     {
       path: '*',
@@ -68,26 +66,17 @@ const router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login,
-      meta: {
-        need_log: false
-      }
+      component: Login
     },
     {
       path: '/register',
       name: 'Register',
-      component: Register,
-      meta: {
-        need_log: false
-      }
+      component: Register
     },
     {
       path: '/member',
       name: 'Member',
-      component: Member,
-      meta: {
-        need_log: true
-      }
+      component: Member
     },
     {
       path: '/about',
@@ -99,9 +88,6 @@ const router = new Router({
           name: 'Community',
           components: {
             content: Community
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -109,9 +95,6 @@ const router = new Router({
           name: 'Teacher',
           components: {
             content: Teacher
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -119,9 +102,6 @@ const router = new Router({
           name: 'President',
           components: {
             content: President
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -129,9 +109,6 @@ const router = new Router({
           name: 'Affair',
           components: {
             content: Affair
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -139,9 +116,6 @@ const router = new Router({
           name: 'Publicity',
           components: {
             content: Publicity
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -149,9 +123,6 @@ const router = new Router({
           name: 'Liaison',
           components: {
             content: Liaison
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -159,9 +130,6 @@ const router = new Router({
           name: 'Finance',
           components: {
             content: Finance
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -169,9 +137,6 @@ const router = new Router({
           name: 'Technology',
           components: {
             content: Technology
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -179,9 +144,6 @@ const router = new Router({
           name: 'Referee',
           components: {
             content: Referee
-          },
-          meta: {
-            need_log: false
           }
         },
         {
@@ -189,9 +151,6 @@ const router = new Router({
           name: 'Manager',
           components: {
             content: Manager
-          },
-          meta: {
-            need_log: false
           }
         }
       ]
@@ -202,46 +161,47 @@ const router = new Router({
       component: Team,
       children: [
         {
-          path: 'man_team',
+          path: 'man-team',
           name: 'ManTeam',
           components: {
             team: ManTeam
-          },
-          meta: {
-            need_log: false
           }
         },
         {
-          path: 'woman_team',
+          path: 'woman-team',
           name: 'WomanTeam',
           components: {
             team: WomanTeam
-          },
-          meta: {
-            need_log: false
           }
         },
         {
-          path: 'grade_team',
+          path: 'college-team',
+          name: 'CollegeTeam',
+          componets: {
+            team: CollegeTeam
+          }
+        },
+        {
+          path: 'grade-team',
           name: 'GradeTeam',
           components: {
             team: GradeTeam
-          },
-          meta: {
-            need_log: false
           }
         },
         {
-          path: 'free_team',
+          path: 'free-team',
           name: 'FreeTeam',
           components: {
             team: FreeTeam
-          },
-          meta: {
-            need_log: false
+          }
+        },
+        {
+          path: 'free-team/:team-id',
+          name: 'FreeTeamProfile',
+          components: {
+            team: FreeTeamProfile
           }
         }
-        // TODO: 添加队伍页面，便于队伍管理及报名
       ]
     },
     {
@@ -250,43 +210,38 @@ const router = new Router({
       component: Leagues,
       children: [
         {
-          path: 'college_cup',
+          path: 'college-cup',
           name: 'CollegeCup',
           components: {
             league: CollegeCup
-          },
-          meta: {
-            need_log: false
           }
         },
         {
-          path: 'association_cup',
+          path: 'association-cup',
           name: 'AssociationCup',
           components: {
             league: AssociationCup
-          },
-          meta: {
-            need_log: false
           }
         },
         {
-          path: 'newStudent_cup',
+          path: 'newStudent-cup',
           name: 'NewStudentCup',
           components: {
             league: NewStudentCup
-          },
-          meta: {
-            need_log: false
           }
         },
         {
-          path: 'free_leagues',
+          path: 'free-leagues',
           name: 'FreeLeagues',
           components: {
             league: FreeLeagues
-          },
-          meta: {
-            need_log: false
+          }
+        },
+        {
+          path: 'free-leagues/:leagues-id',
+          name: 'FreeLeaguesProfile',
+          components: {
+            league: FreeLeaguesProfile
           }
         }
       ]
@@ -294,38 +249,25 @@ const router = new Router({
     {
       path: '/fanClub/:club',
       name: 'FanClub',
-      component: FanClub,
-      meta: {
-        need_log: false
-      }
+      component: FanClub
     },
     {
       path: '/activities',
       name: 'ActivitiesList',
-      component: ActivitiesList,
-      meta: {
-        need_log: false
-      }
+      component: ActivitiesList
     },
     {
       path: '/activity/:activity',
       name: 'Activity',
-      component: Activity,
-      meta: {
-        need_log: false
-      }
+      component: Activity
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  if (window.sessionStorage.getItem('id') === null) {
+  if (!vueCookie.get('id')) {
     if (to.meta.need_log) {
-      if (to.path !== '/login') {
-        next('/login')
-      } else {
-        next()
-      }
+      next('/login')
     } else {
       next()
     }

@@ -74,13 +74,16 @@ export default {
         })
         this.$axios.post('login/', loginInfo)
           .then(response => {
-            if ('id' in response.data && response.data.id === this.loginData.studentID) {
-              window.sessionStorage.setItem('id', response.data.id)
+            if ('success' in response.data) {
+              this.$cookie.set('id', this.loginData.studentID)
               if ('error' in response.data) {
                 if (response.data.error === 2) {
                   // 用户手机未激活, 登录后重定向到激活界面
+                  window.sessionStorage.setItem('active', true)
+                  window.sessionStorage.setItem('auth', true)
+                  this.$router.push('/register/auth')
                 } else if (response.data.error === 3) {
-                  // 用户本学期未认证，登录后重定向到认证页面，并提交课表信息
+                  window.sessionStorage.setItem('auth', true)
                 }
                 this.$emit('closeLoginDialog')
               } else {

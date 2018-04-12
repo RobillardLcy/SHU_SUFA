@@ -152,20 +152,21 @@ export default {
         action: 'group',
         title: '队伍',
         items: [
-          { title: '上海大学男子足球队', url: '/team/man_team' },
-          { title: '上海大学女子足球队', url: '/team/woman_team' },
-          { title: '年级梯队', url: '/team/grade_team' },
-          { title: '自由队伍', url: '/team/free_team' }
+          { title: '上海大学男子足球队', url: '/team/man-team' },
+          { title: '上海大学女子足球队', url: '/team/woman-team' },
+          { title: '学院队伍', url: '/team/college-team' },
+          { title: '年级梯队', url: '/team/grade-team' },
+          { title: '自由队伍', url: '/team/free-team' }
         ]
       },
       {
         action: 'whatshot',
         title: '比赛',
         items: [
-          { title: '上海大学学院杯', url: '/leagues/college_cup' },
-          { title: '上海大学足球协会杯', url: '/leagues/association_cup' },
-          { title: '上海大学足球协会新生杯', url: '/leagues/newStudent_cup' },
-          { title: '自由组织赛事', url: '/leagues/free_leagues' }
+          { title: '上海大学学院杯', url: '/leagues/college-cup' },
+          { title: '上海大学足球协会杯', url: '/leagues/association-cup' },
+          { title: '上海大学足球协会新生杯', url: '/leagues/newStudent-cup' },
+          { title: '自由组织赛事', url: '/leagues/free-leagues' }
         ]
       },
       {
@@ -194,13 +195,13 @@ export default {
   computed: {
   },
   updated: function () {
-    if (window.sessionStorage.getItem('id')) {
-      this.mountProfile()
+    if (this.$cookie.get('id')) {
+      this.redirectLogin()
     }
   },
   methods: {
-    mountProfile: function () {
-      this.studentID = window.sessionStorage.getItem('id')
+    redirectLogin: function () {
+      this.studentID = this.$cookie.get('id')
       if (window.location.hash === '#/register' || window.location.hash === '#/login') {
         this.$router.push('/')
       }
@@ -209,7 +210,9 @@ export default {
     logout: function () {
       this.$axios.post('logout/')
         .then(response => {
-          window.sessionStorage.clear()
+          this.$cookie.delete('id')
+          window.sessionStorage.removeItem('auth')
+          window.sessionStorage.removeItem('active')
           this.studentID = ''
         })
         .catch(error => {

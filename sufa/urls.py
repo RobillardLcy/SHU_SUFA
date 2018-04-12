@@ -28,9 +28,9 @@ urlpatterns = [
     path('api/logout/', MemberLogoutAPI.as_view(), name='logout'),
     # 用户学生证认证(POST)
     path('api/authentication/', MemberAuthenticationAPI.as_view(), name='authentication'),
-    # 学院队伍列表
+    # 学院队伍列表(GET)
     path('api/colleges/list/', CollegeTeamsListAPI.as_view(), name='colleges-list'),
-    # 学院队伍详细信息
+    # 学院队伍详细信息(GET)
     path('api/colleges/profile/', CollegeTeamsProfileAPI.as_view(), name='colleges-profile'),
     # 近期赛事列表(GET)
     path('api/leagues/list/recently/', RecentlyLeaguesListAPI.as_view(), name='leagues-list-recently'),

@@ -25,6 +25,7 @@ import Team from '@/components/team/Team'
 import ManTeam from '@/components/team/ManTeam'
 import WomanTeam from '@/components/team/WomanTeam'
 import CollegeTeam from '@/components/team/CollegeTeam'
+import CollegeTeamProfile from '@/components/team/CollegeTeamProfile'
 import GradeTeam from '@/components/team/GradeTeam'
 import FreeTeam from '@/components/team/FreeTeam'
 import FreeTeamProfile from '@/components/team/FreeTeamProfile'
@@ -177,8 +178,16 @@ const router = new Router({
         {
           path: 'college-team',
           name: 'CollegeTeam',
-          componets: {
+          components: {
             team: CollegeTeam
+          }
+        },
+        {
+          path: 'college-team/:college_id',
+          name: 'CollegeTeamProfile',
+          props: true,
+          components: {
+            team: CollegeTeamProfile
           }
         },
         {

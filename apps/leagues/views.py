@@ -19,8 +19,13 @@ class CollegeTeamsListAPI(APIView):
 # 学院队伍详细信息接口(GET)及队长更改队伍信息接口(POST)
 class CollegeTeamsProfileAPI(APIView):
 
-    def get(self, request, format=None):
-        pass
+    def get(self, request, college_id, format=None):
+        if Teams.objects.filter(id=college_id).exists():
+            college = Teams.objects.get(id=college_id)
+            college_info = TeamProfileSerializer(college).data
+            return Response(college_info)
+        else:
+            return Response(college_id)
 
     def post(self, request, format=None):
         pass

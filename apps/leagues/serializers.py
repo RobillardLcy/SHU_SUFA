@@ -6,14 +6,14 @@ from .models import (Teams, TeamsMembers, Leagues, LeaguesSignup, Matches, Match
 class TeamListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teams
-        fields = ('id', 'name', 'logo', 'status')
+        fields = ('id', 'name', 'logo')
 
 
 # 队伍详细信息
 class TeamProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teams
-        fields = ('id', 'name', 'logo', 'description', 'captain', 'create_at', 'status')
+        fields = ('id', 'name', 'logo', 'description', 'captain', 'create_at')
 
 
 # 队伍成员

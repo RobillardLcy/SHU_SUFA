@@ -18,7 +18,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest-framework')),
-    re_path('api/media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
+    re_path('media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
 
     # 用户注册(POST)
     path('api/register/', MemberRegistrationAPI.as_view(), name='register'),
@@ -31,7 +31,7 @@ urlpatterns = [
     # 学院队伍列表(GET)
     path('api/colleges/list/', CollegeTeamsListAPI.as_view(), name='colleges-list'),
     # 学院队伍详细信息(GET)
-    path('api/colleges/profile/', CollegeTeamsProfileAPI.as_view(), name='colleges-profile'),
+    path('api/colleges/profile/<int:college_id>/', CollegeTeamsProfileAPI.as_view(), name='colleges-profile'),
     # 近期赛事列表(GET)
     path('api/leagues/list/recently/', RecentlyLeaguesListAPI.as_view(), name='leagues-list-recently'),
     # 赛事列表(GET)

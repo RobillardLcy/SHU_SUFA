@@ -10,17 +10,37 @@ class TeamListSerializer(serializers.ModelSerializer):
 
 
 # 队伍详细信息
-class TeamProfileSerializer(serializers.ModelSerializer):
+class TeamProfileSerializer(serializers.HyperlinkedModelSerializer):
+    captain_id = serializers.ReadOnlyField(source='captain.id')
+    captain_name = serializers.ReadOnlyField(source='captain.name')
+    captain_mobile = serializers.ReadOnlyField(source='captain.mobile')
+
     class Meta:
         model = Teams
-        fields = ('id', 'name', 'logo', 'description', 'captain', 'create_at')
+        fields = ('id', 'name', 'logo', 'description', 'captain_id', 'captain_name', 'captain_mobile', 'create_at')
 
 
-# 队伍成员
-class TeamMemberSerializer(serializers.ModelSerializer):
+# 队伍信息成员列表
+class TeamProfileMemberListSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField(source='member.id')
+    name = serializers.ReadOnlyField(source='member.name')
+    gender = serializers.ReadOnlyField(source='member.gender')
+
     class Meta:
         model = TeamsMembers
-        fields = ('id', 'member', 'team', 'num', 'join', 'leave', 'status')
+        fields = ('id', 'name', 'gender', 'num')
+
+
+# 队伍成员详细信息列表
+class TeamMemberListSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField(source='member.id')
+    name = serializers.ReadOnlyField(source='member.name')
+    gender = serializers.ReadOnlyField(source='member.gender')
+    mobile = serializers.ReadOnlyField(source='member.mobile')
+
+    class Meta:
+        model = TeamsMembers
+        fields = ('id', 'name', 'gender', 'mobile', 'num', 'join', 'status')
 
 
 # 赛事列表

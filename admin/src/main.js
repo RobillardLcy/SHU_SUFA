@@ -14,8 +14,10 @@ import('../node_modules/vuetify/dist/vuetify.min.css')
 import('../node_modules/material-icons/iconfont/material-icons.css')
 
 Vue.prototype.$axios = axios.create({
-  baseURL: 'http://admin.yellowsea.top:8000/api/'
-  // baseURL: 'https://admin.shusufa.com/api/'
+  baseURL: 'http://admin.shusufa.com/api/',
+  timeout: 5000,
+  headers: {'Content-Type': 'application/json;Charset=utf-8'},
+  withCredentials: true
 })
 
 /* eslint-disable no-new */

@@ -30,7 +30,7 @@ urlpatterns = [
     path('api/authentication/', MemberAuthenticationAPI.as_view(), name='authentication'),
     # 学院队伍列表(GET)
     path('api/colleges/list/', CollegeTeamsListAPI.as_view(), name='colleges-list'),
-    # 学院队伍详细信息(GET)
+    # 学院队伍详细信息(GET、POST)
     path('api/colleges/profile/<int:college_id>/', CollegeTeamsProfileAPI.as_view(), name='colleges-profile'),
     # 近期赛事列表(GET)
     path('api/leagues/list/recently/', RecentlyLeaguesListAPI.as_view(), name='leagues-list-recently'),

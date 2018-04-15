@@ -17,7 +17,7 @@ import('../node_modules/material-icons/iconfont/material-icons.css')
 Axios.defaults.xsrfCookieName = 'csrftoken'
 Axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 Vue.prototype.$axios = Axios.create({
-  baseURL: 'http://www.yellowsea.top/api/',
+  baseURL: 'http://www.shusufa.com/api/',
   timeout: 5000,
   headers: {'Content-Type': 'application/json;Charset=utf-8'},
   withCredentials: true

@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from .models import (Leagues, LeaguesSignup, Matches, MatchesData, Teams, TeamsMembers)
 from .serializers import (LeaguesListSerializer, LeagueProfileSerializer, LeagueSignupSerializer,
                           MatchesSerializer, MatchesDataSerializer,
-                          TeamListSerializer, TeamProfileSerializer, TeamMemberSerializer)
+                          TeamListSerializer, TeamProfileSerializer,
+                          TeamProfileMemberListSerializer, TeamMemberListSerializer)
 
 
 # 学院队伍列表接口
@@ -23,9 +24,11 @@ class CollegeTeamsProfileAPI(APIView):
         if Teams.objects.filter(id=college_id).exists():
             college = Teams.objects.get(id=college_id)
             college_info = TeamProfileSerializer(college).data
-            return Response(college_info)
+            members = TeamsMembers.objects.all().filter(team=college, status__gte=0, leave=None)
+            members_info = TeamProfileMemberListSerializer(members, many=True, context={'request': request}).data
+            return Response({'info': college_info, 'members': members_info})
         else:
-            return Response(college_id)
+            return Response()
 
     def post(self, request, format=None):
         pass

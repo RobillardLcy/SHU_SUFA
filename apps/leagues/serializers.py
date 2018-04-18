@@ -47,32 +47,42 @@ class TeamMemberListSerializer(serializers.HyperlinkedModelSerializer):
 class LeaguesListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leagues
-        fields = ('id', 'name', 'reg_start', 'reg_end', 'start', 'category', 'status')
+        fields = ('name', 'reg_start', 'reg_end', 'start', 'category', 'status')
 
 
 # 赛事信息
 class LeagueProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leagues
-        fields = ('id', 'name', 're_start', 'reg_end', 'start', 'description', 'photo', 'category', 'status')
+        fields = ('name', 'reg_start', 'reg_end', 'start', 'description', 'photo', 'category', 'status')
 
 
 # 赛事报名
 class LeagueSignupSerializer(serializers.ModelSerializer):
+    league_name = serializers.ReadOnlyField(source='league.name')
+    team_name = serializers.ReadOnlyField(source='team.name')
+
     class Meta:
         model = LeaguesSignup
-        fields = ('league', 'team', 'status')
+        fields = ('league_name', 'team_name', 'status')
 
 
 # 比赛
 class MatchesSerializer(serializers.ModelSerializer):
+    league_name = serializers.ReadOnlyField(source='league.name')
+    home_team_name = serializers.ReadOnlyField(source='home_team.name')
+    away_team_name = serializers.ReadOnlyField(source='away_team.name')
+
     class Meta:
         model = Matches
-        fields = ('id', 'league', 'home_team', 'away_team', 'time', 'place', 'result', 'category')
+        fields = ('league_name', 'home_team', 'away_team', 'time', 'place', 'result', 'category')
 
 
 # 比赛数据
 class MatchesDataSerializer(serializers.ModelSerializer):
+    team_member_name = serializers.ReadOnlyField(source='team_member.name')
+    team_member_team = serializers.ReadOnlyField(source='team_member.team.name')
+
     class Meta:
         model = MatchesData
-        fields = ('id', 'match', 'team_member', 'category', 'sub', 'time', 'remind')
+        fields = ('match', 'team_member_name', 'team_member_team', 'category', 'sub', 'time', 'remind')

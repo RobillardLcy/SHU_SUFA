@@ -36,6 +36,7 @@ class MemberRegistrationAPI(APIView):
                                             join=datetime.date.today().strftime('%Y-%m-%d'))
                 try:
                     del request.session['studentID']
+                    del request.session['studentName']
                 except KeyError:
                     pass
                 request.session['id'] = member.id

@@ -75,7 +75,7 @@ export default {
         this.$axios.post('login/', loginInfo)
           .then(response => {
             if ('success' in response.data) {
-              this.$cookie.set('id', this.loginData.studentID)
+              this.$cookie.set('id', this.loginData.studentID, { expires: 14 })
               if ('error' in response.data) {
                 if (response.data.error === 2) {
                   // 用户手机未激活, 登录后重定向到激活界面

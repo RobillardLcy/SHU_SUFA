@@ -6,6 +6,7 @@ from .serializers import (LeaguesListSerializer, LeagueProfileSerializer, League
                           MatchesSerializer, MatchesDataSerializer,
                           TeamListSerializer, TeamProfileSerializer,
                           TeamProfileMemberListSerializer, TeamMemberListSerializer)
+from apps.members.models import Members
 
 
 # 学院队伍列表接口
@@ -36,6 +37,10 @@ class CollegeTeamsProfileAPI(APIView):
 
 # 自由队伍建队申请接口
 class FreeTeamApplyAPI(APIView):
+    def get(self, request, format=None):
+        id = request.session.get('id')
+        member = Members.objects.get(id=id)
+        return Response({'id': member.id, 'name': member.name, 'mobile': member.name})
 
     def post(self, request, format=None):
         pass

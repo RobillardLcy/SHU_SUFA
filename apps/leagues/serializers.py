@@ -21,7 +21,7 @@ class TeamProfileSerializer(serializers.HyperlinkedModelSerializer):
 
 
 # 队伍信息成员列表
-class TeamProfileMemberListSerializer(serializers.HyperlinkedModelSerializer):
+class TeamMemberListSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField(source='member.id')
     name = serializers.ReadOnlyField(source='member.name')
     gender = serializers.ReadOnlyField(source='member.gender')
@@ -32,7 +32,7 @@ class TeamProfileMemberListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 # 队伍成员详细信息列表
-class TeamMemberListSerializer(serializers.HyperlinkedModelSerializer):
+class TeamProfileMemberListSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField(source='member.id')
     name = serializers.ReadOnlyField(source='member.name')
     gender = serializers.ReadOnlyField(source='member.gender')

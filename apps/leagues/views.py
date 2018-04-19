@@ -65,8 +65,15 @@ class FreeTeamsListAPI(APIView):
 # 自由队伍详细信息接口(GET)及队长更改队伍信息接口(POST)
 class FreeTeamsProfileAPI(APIView):
 
-    def get(self, request, format=None):
-        pass
+    def get(self, request, team_id, format=None):
+        if Teams.objects.filter(id=team_id).exists():
+            team = Teams.objects.get(id=team_id)
+            team_profile = TeamProfileSerializer(team)
+            members = TeamsMembers.objects.all().filter(team=team, status__gte=0, leave=None)
+            members_info = TeamProfileMemberListSerializer(members)
+            return Response({'info': team_profile, 'members': members_info})
+        else:
+            return Response()
 
     def post(self, request, format=None):
         pass
@@ -85,7 +92,7 @@ class LeaguesListAPI(APIView):
 class RecentlyLeaguesListAPI(APIView):
 
     def get(self, request, format=None):
-        if Leagues.objects.filter(status__in=[0, 1]):
+        if Leagues.objects.filter(status__in=[0, 1]).exists():
             leagues = Leagues.objects.all().filter(status__in=[0, 1])
             leagues_list = LeaguesListSerializer(leagues, many=True).data
             return Response(leagues_list)
@@ -96,8 +103,13 @@ class RecentlyLeaguesListAPI(APIView):
 # 赛事详细信息接口
 class LeaguesProfileAPI(APIView):
 
-    def get(self, request, format=None):
-        pass
+    def get(self, request, league_id, format=None):
+        if Leagues.objects.filter(id=league_id):
+            league = Leagues.objects.get(id=league_id)
+            league_profile = LeagueProfileSerializer(league).data
+            return Response(league_profile)
+        else:
+            return Response()
 
 
 # 队员赛事报名接口

@@ -29,6 +29,7 @@ class CollegeTeamsProfileAPI(APIView):
             members_info = TeamProfileMemberListSerializer(members, many=True, context={'request': request}).data
             return Response({'info': college_info, 'members': members_info})
         else:
+            # TODO: Error tag
             return Response()
 
     def post(self, request, format=None):
@@ -73,6 +74,7 @@ class FreeTeamsProfileAPI(APIView):
             members_info = TeamProfileMemberListSerializer(members)
             return Response({'info': team_profile, 'members': members_info})
         else:
+            # TODO: Error tag
             return Response()
 
     def post(self, request, format=None):
@@ -97,6 +99,7 @@ class RecentlyLeaguesListAPI(APIView):
             leagues_list = LeaguesListSerializer(leagues, many=True).data
             return Response(leagues_list)
         else:
+            # TODO: Error tag
             return Response()
 
 
@@ -109,6 +112,7 @@ class LeaguesProfileAPI(APIView):
             league_profile = LeagueProfileSerializer(league).data
             return Response(league_profile)
         else:
+            # TODO: Error tag
             return Response()
 
 

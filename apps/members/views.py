@@ -58,7 +58,9 @@ class MemberLoginAPI(APIView):
         try:
             user = Members.objects.get(id=id)
             if user.check_password(password):
+                # TODO: 添加记住用户功能
                 request.session['id'] = user.id
+                request.session.set_expiry(86400)
                 if user.is_active:
                     if user.is_auth:
                         return Response({'detail': 0})
@@ -134,6 +136,7 @@ class MemberAuthenticationAPI(APIView):
             if Members.objects.filter(id=student_id).exists():
                 return Response({'detail': 6})
             else:
+                request.session.set_expiry(900)
                 request.session['studentID'] = student_id
                 request.session['studentName'] = student_name
                 return Response({'studentID': student_id, 'studentName': student_name})

@@ -76,11 +76,11 @@ export default {
           .then(response => {
             if ('detail' in response.data) {
               if (response.data.detail === 0 || response.data.detail === 3 || response.data.detail === 4) {
-                this.$cookie.set('id', this.loginData.studentID, { expires: 14 })
+                this.$cookie.set('id', this.loginData.studentID, { expires: 1 })
                 if (response.data.detail === 3) {
                   window.sessionStorage.setItem('active', true)
                   window.sessionStorage.setItem('auth', true)
-                  this.$router.push('/register/3')
+                  this.$router.push('/register')
                 } else if (response.data.detail === 3) {
                   window.sessionStorage.setItem('auth', true)
                 }

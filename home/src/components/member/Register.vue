@@ -284,7 +284,20 @@ export default {
     }
   }),
   mounted: function () {
-    this.getColleges()
+    if (this.$cookie.get('studentID')) {
+      this.getColleges()
+      this.certificate.studentID = this.$cookie.get('studentID')
+      this.register.studentName = this.$cookie.get('studentName')
+      this.step = 2
+    } else if (this.$cookie.get('id')) {
+      if (window.sessionStorage.getItem('active')) {
+        this.step = 3
+      } else {
+        this.$router.push('/')
+      }
+    } else {
+      this.getColleges()
+    }
   },
   methods: {
     getColleges: function () {
@@ -312,6 +325,8 @@ export default {
             if ('studentID' in response.data && 'studentName' in response.data) {
               if (response.data.studentID === this.certificate.studentID) {
                 this.register.studentName = response.data.studentName
+                this.$cookie.set('studentID', response.data.studentID, { expires: '15m' })
+                this.$cookie.set('studentName', response.data.studentName, { expires: '15m' })
                 this.step = 2
               } else {
                 window.alert('认证失败！')

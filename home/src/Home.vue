@@ -202,7 +202,7 @@ export default {
   methods: {
     redirectLogin: function () {
       this.studentID = this.$cookie.get('id')
-      if (window.location.hash === '#/register' || window.location.hash === '#/login') {
+      if (window.location.hash === '#/login') {
         this.$router.push('/')
       }
     },

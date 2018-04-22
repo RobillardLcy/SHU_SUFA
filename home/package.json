@@ -19,7 +19,7 @@
     "vue": "^2.5.2",
     "vue-cookie": "^1.1.4",
     "vue-router": "^3.0.1",
-    "vuetify": "^1.0.14",
+    "vuetify": "^1.0.16",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

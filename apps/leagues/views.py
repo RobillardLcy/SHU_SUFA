@@ -7,6 +7,7 @@ from .serializers import (LeaguesListSerializer, LeagueProfileSerializer, League
                           TeamListSerializer, TeamProfileSerializer,
                           TeamProfileMemberListSerializer, TeamMemberListSerializer)
 from apps.members.models import Members
+from apps.members.permissions import (MemberLoginPermission,)
 
 
 # 学院队伍列表接口
@@ -18,7 +19,7 @@ class CollegeTeamsListAPI(APIView):
         return Response(college_teams_list)
 
 
-# 学院队伍详细信息接口(GET)及队长更改队伍信息接口(POST)
+# 学院队伍详细信息接口(GET)及队伍交接接口(POST)
 class CollegeTeamsProfileAPI(APIView):
 
     def get(self, request, college_id, format=None):
@@ -38,9 +39,11 @@ class CollegeTeamsProfileAPI(APIView):
 
 # 自由队伍建队申请接口
 class FreeTeamApplyAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
+
     def get(self, request, format=None):
-        id = request.session.get('id')
-        member = Members.objects.get(id=id)
+        member_id = request.session.get('id')
+        member = Members.objects.get(id=member_id)
         return Response({'id': member.id, 'name': member.name, 'mobile': member.name})
 
     def post(self, request, format=None):
@@ -49,9 +52,19 @@ class FreeTeamApplyAPI(APIView):
 
 # 自由队伍入队申请接口
 class FreeTeamMemberApplyAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
-        pass
+        member_id = request.session.get('id')
+        member = Members.objects.get(id=member_id)
+        team_id = request.data['team_id']
+        try:
+            team = Teams.objects.get(id=team_id)
+            TeamsMembers.objects.create(member=member, team=team)
+            return Response()
+        except Exception as e:
+            # TODO: Add Error Tag
+            return Response()
 
 
 # 自由队伍列表接口

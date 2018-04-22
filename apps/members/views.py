@@ -7,6 +7,7 @@ from io import BytesIO
 
 from .models import Members
 from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer, MemberClassesSerializer)
+from .permissions import (MemberLoginPermission,)
 
 import datetime
 from apps.leagues.models import Teams, TeamsMembers
@@ -43,9 +44,9 @@ class MemberRegistrationAPI(APIView):
                 request.session['active'] = True
                 request.session['auth'] = True
                 return Response(status=status.HTTP_201_CREATED)
-            return Response({'error': 7})
+            return Response({'detail': 8})
         else:
-            return Response({'error': 6})
+            return Response({'detail': 7})
 
 
 # 用户登录接口
@@ -60,26 +61,27 @@ class MemberLoginAPI(APIView):
                 request.session['id'] = user.id
                 if user.is_active:
                     if user.is_auth:
-                        return Response({'success': True})
+                        return Response({'detail': 0})
                     else:
                         # 本学期未认证及提交课表
                         request.session['auth'] = True
-                        return Response({'success': True, 'error': 3})
+                        return Response({'detail': 4})
                 else:
                     # 未激活
                     request.session['active'] = True
                     request.session['auth'] = True
-                    return Response({'success': True, 'error': 2})
+                    return Response({'detail': 3})
             else:
                 # 密码错误
-                return Response({"error": 1})
+                return Response({"detail": 2})
         except Exception as e:
             # 未注册
-            return Response({"error": 1})
+            return Response({"detail": 2})
 
 
 # 用户注销接口
 class MemberLogoutAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
         if request.session.get('id', False):
@@ -89,11 +91,12 @@ class MemberLogoutAPI(APIView):
                 pass
             return Response()
         else:
-            return Response({'error': 0})
+            return Response({'detail': 1})
 
 
 # 用户手机激活接口
 class MemberActiveMobileAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
         # TODO: 验证码验证
@@ -102,8 +105,8 @@ class MemberActiveMobileAPI(APIView):
                 del request.session['active']
             except KeyError:
                 pass
-            return Response({"active": True})
-        return Response({"active": False})
+            return Response({"detail": 0})
+        return Response({"detail": 9})
 
 
 # 学生证认证接口
@@ -129,17 +132,18 @@ class MemberAuthenticationAPI(APIView):
         student_name = ''
         if login_response.headers.get('Content-Length') == '5650':
             if Members.objects.filter(id=student_id).exists():
-                return Response({'error': 5})
+                return Response({'detail': 6})
             else:
                 request.session['studentID'] = student_id
                 request.session['studentName'] = student_name
                 return Response({'studentID': student_id, 'studentName': student_name})
         else:
-            return Response({'error': 4})
+            return Response({'detail': 5})
 
 
 # 用户个人信息接口
 class MemberProfileAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
 
     def get(self, request, format=None):
         # RSA解密：sessionID + studentID
@@ -152,6 +156,7 @@ class MemberProfileAPI(APIView):
 
 # 用户重置密码接口
 class MemberResetPasswordAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
         pass
@@ -159,6 +164,10 @@ class MemberResetPasswordAPI(APIView):
 
 # 用户重置手机接口
 class MemberResetMobileAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
+
+    def get(self, request, format=None):
+        pass
 
     def post(self, request, format=None):
         pass
@@ -167,6 +176,7 @@ class MemberResetMobileAPI(APIView):
 # 用户在校认证（获取课程时间）接口
 # TODO: 限制验证次数<=5
 class MemberActiveAuthAPI(APIView):
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
         student_id = request.data.get('id')
@@ -189,4 +199,4 @@ class MemberActiveAuthAPI(APIView):
             classes = ''
             return Response({'id': student_id, 'classes': classes})
         else:
-            return Response({'error': '认证失败！'})
+            return Response({'detail': '5'})

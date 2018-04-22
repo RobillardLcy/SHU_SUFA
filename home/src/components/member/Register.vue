@@ -317,7 +317,7 @@ export default {
                 window.alert('认证失败！')
               }
             } else {
-              window.alert(response.data.error)
+              window.alert('认证失败！')
             }
           })
           .catch(error => {
@@ -338,11 +338,11 @@ export default {
         })
         this.$axios.post('register/', info)
           .then(response => {
-            if ('error' in response.data) {
-              if (response.data.error === 6) {
+            if ('detail' in response.data) {
+              if (response.data.detail === 7) {
                 window.alert('未认证或认证已失效！')
                 this.step = 1
-              } else if (response.data.error === 7) {
+              } else if (response.data.detail === 8) {
                 window.alert('注册出错，请重试！')
               }
             } else {

@@ -9,7 +9,8 @@ from apps.members.views import (MemberRegistrationAPI, MemberActiveMobileAPI, Me
                                 MemberProfileAPI, MemberActiveAuthAPI)
 from apps.leagues.views import (LeaguesListAPI, RecentlyLeaguesListAPI, LeaguesProfileAPI,
                                 LeaguesSignupAPI, LeaguesSignupStatusAPI,
-                                CollegeTeamsListAPI, CollegeTeamsProfileAPI, FreeTeamsListAPI, FreeTeamsProfileAPI)
+                                CollegeTeamsListAPI, CollegeTeamsProfileAPI,
+                                FreeTeamsListAPI, FreeTeamsProfileAPI, FreeTeamApplyAPI, FreeTeamMemberApplyAPI)
 
 # API路由接口（统一在域名后跟api）
 router = routers.DefaultRouter()
@@ -36,4 +37,6 @@ urlpatterns = [
     path('api/leagues/list/recently/', RecentlyLeaguesListAPI.as_view(), name='leagues-list-recently'),
     # 赛事列表(GET)
     path('api/leagues/list/all/', LeaguesListAPI.as_view(), name='leagues-list-all'),
+    # 自由队伍入队申请(POST)
+    path('api/free-team/join/', FreeTeamMemberApplyAPI.as_view(), name='free-team-join'),
 ]

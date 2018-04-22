@@ -74,29 +74,25 @@ export default {
         })
         this.$axios.post('login/', loginInfo)
           .then(response => {
-            if ('success' in response.data) {
-              this.$cookie.set('id', this.loginData.studentID, { expires: 14 })
-              if ('error' in response.data) {
-                if (response.data.error === 2) {
-                  // 用户手机未激活, 登录后重定向到激活界面
+            if ('detail' in response.data) {
+              if (response.data.detail === 0 || response.data.detail === 3 || response.data.detail === 4) {
+                this.$cookie.set('id', this.loginData.studentID, { expires: 14 })
+                if (response.data.detail === 3) {
                   window.sessionStorage.setItem('active', true)
                   window.sessionStorage.setItem('auth', true)
-                  this.$router.push('/register/auth')
-                } else if (response.data.error === 3) {
+                  this.$router.push('/register/3')
+                } else if (response.data.detail === 3) {
                   window.sessionStorage.setItem('auth', true)
                 }
-                this.$emit('closeLoginDialog')
-              } else {
                 if (this.loginDialog) {
                   this.$emit('closeLoginDialog')
                 } else {
                   this.$router.go(-1)
                 }
+              } else if (response.data.detail === 2) {
+                this.loginData.errorAlert = true
+                this.loginData.error = '学号或密码错误'
               }
-            } else if ('error' in response.data && response.data.error === 1) {
-              // 用户未注册或密码错误
-              this.loginData.errorAlert = true
-              this.loginData.error = '学号错误或密码错误'
             } else {
               this.loginData.errorAlert = true
               this.loginData.error = '网络错误，请重试'

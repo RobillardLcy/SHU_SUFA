@@ -2,6 +2,22 @@ from django.db import models
 from django.conf import settings
 
 
+class Referee(models.Model):
+    """
+    裁判
+    记录裁判协会成员裁判等级
+    """
+    member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='成员')
+    # TODO: 裁判等级划分
+    level = models.SmallIntegerField(default=0, verbose_name='裁判等级')
+    status = models.BooleanField(default=True, verbose_name='状态')
+
+    class Meta:
+        db_table = 'referee'
+        verbose_name = '裁判'
+        verbose_name_plural = verbose_name
+
+
 class Teams(models.Model):
     """
     社团注册队伍
@@ -128,6 +144,10 @@ class Matches(models.Model):
                                     ('group', '小组赛'),
                                     ('knockout', '淘汰赛')
                                 ))
+    master_referee = models.ForeignKey(Referee, on_delete=models.SET_NULL, null=True, related_name='master', verbose_name='主裁')
+    second_referee = models.ForeignKey(Referee, on_delete=models.SET_NULL, null=True, related_name='second', verbose_name='第二助理裁判')
+    third_referee = models.ForeignKey(Referee, on_delete=models.SET_NULL, null=True, related_name='third', verbose_name='第三助理裁判')
+    fourth_referee = models.ForeignKey(Referee, on_delete=models.SET_NULL, null=True, related_name='forth', verbose_name='第四助理裁判')
 
     class Meta:
         db_table = 'matches'

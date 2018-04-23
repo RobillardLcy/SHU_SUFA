@@ -1,5 +1,16 @@
 from rest_framework import serializers
-from .models import (Teams, TeamsMembers, Leagues, LeaguesSignup, Matches, MatchesData)
+from .models import (Referee, Teams, TeamsMembers, Leagues, LeaguesSignup, Matches, MatchesData)
+
+
+# 裁判
+class RefereeSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField(source='member.id')
+    name = serializers.ReadOnlyField(source='member.name')
+    gender = serializers.ReadOnlyField(source='member.gender')
+
+    class Meta:
+        model = Referee
+        fields = ('id', 'name', 'gender', 'level', 'status')
 
 
 # 队伍列表
@@ -72,10 +83,14 @@ class MatchesSerializer(serializers.ModelSerializer):
     league_name = serializers.ReadOnlyField(source='league.name')
     home_team_name = serializers.ReadOnlyField(source='home_team.name')
     away_team_name = serializers.ReadOnlyField(source='away_team.name')
+    master_referee_name = serializers.ReadOnlyField(source='master_referee.name')
+    second_referee_name = serializers.ReadOnlyField(source='second_referee.name')
+    third_referee_name = serializers.ReadOnlyField(source='third_referee.name')
+    fourth_referee_name = serializers.ReadOnlyField(source='fourth_referee.name')
 
     class Meta:
         model = Matches
-        fields = ('league_name', 'home_team', 'away_team', 'time', 'place', 'result', 'category')
+        fields = ('league_name', 'home_team', 'away_team', 'time', 'place', 'result', 'category', 'master_referee_name', 'second_referee_name', 'third_referee_name', 'fourth_referee_name')
 
 
 # 比赛数据

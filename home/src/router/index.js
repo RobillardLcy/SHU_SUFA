@@ -207,6 +207,7 @@ const router = new Router({
         {
           path: 'free-team/:team-id',
           name: 'FreeTeamProfile',
+          props: true,
           components: {
             team: FreeTeamProfile
           }

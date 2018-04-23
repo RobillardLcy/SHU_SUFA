@@ -51,7 +51,7 @@ class FreeTeamApplyAPI(APIView):
 
 
 # 自由队伍入队申请接口
-class FreeTeamMemberApplyAPI(APIView):
+class FreeTeamJoinAPI(APIView):
     permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):

@@ -10,11 +10,12 @@ from apps.members.views import (MemberRegistrationAPI, MemberActiveMobileAPI, Me
 from apps.leagues.views import (LeaguesListAPI, RecentlyLeaguesListAPI, LeaguesProfileAPI,
                                 LeaguesSignupAPI, LeaguesSignupStatusAPI,
                                 CollegeTeamsListAPI, CollegeTeamsProfileAPI,
-                                FreeTeamsListAPI, FreeTeamsProfileAPI, FreeTeamApplyAPI, FreeTeamMemberApplyAPI)
+                                FreeTeamsListAPI, FreeTeamsProfileAPI, FreeTeamApplyAPI, FreeTeamJoinAPI)
 
 # API路由接口（统一在域名后跟api）
 router = routers.DefaultRouter()
 
+# TODO: 路由加密防爬虫
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('api/', include(router.urls)),
@@ -37,6 +38,12 @@ urlpatterns = [
     path('api/leagues/list/recently/', RecentlyLeaguesListAPI.as_view(), name='leagues-list-recently'),
     # 赛事列表(GET)
     path('api/leagues/list/all/', LeaguesListAPI.as_view(), name='leagues-list-all'),
+    # 自由队伍列表(GET)
+    path('api/free-team/list/', FreeTeamsListAPI.as_view(), name='free-team-list'),
+    # 自由队伍详细信息(POST)
+    path('api/free-team/profile/<int:team_id>/', FreeTeamsProfileAPI.as_view(), name='free-team-profile'),
+    # 自由队伍建队申请(GET、POST)
+    path('api/free-team/apply/', FreeTeamApplyAPI.as_view(), name='free-team-apply'),
     # 自由队伍入队申请(POST)
-    path('api/free-team/join/', FreeTeamMemberApplyAPI.as_view(), name='free-team-join'),
+    path('api/free-team/join/', FreeTeamJoinAPI.as_view(), name='free-team-join'),
 ]

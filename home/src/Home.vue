@@ -203,7 +203,7 @@ export default {
     redirectLogin: function () {
       this.studentID = this.$cookie.get('id')
       if (window.location.hash === '#/login') {
-        this.$router.push('/')
+        this.$router.go('/')
       }
     },
     // 账户注销

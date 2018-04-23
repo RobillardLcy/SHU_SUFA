@@ -80,7 +80,7 @@ export default {
                 if (response.data.detail === 3) {
                   window.sessionStorage.setItem('active', true)
                   window.sessionStorage.setItem('auth', true)
-                  this.$router.push('/register')
+                  this.$router.go('/register')
                 } else if (response.data.detail === 3) {
                   window.sessionStorage.setItem('auth', true)
                 }
@@ -107,7 +107,7 @@ export default {
     },
     // 用户注册页面跳转
     register: function () {
-      this.$router.push('/register')
+      this.$router.go('/register')
       this.$emit('closeLoginDialog')
     }
   }

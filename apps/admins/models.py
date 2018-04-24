@@ -43,7 +43,7 @@ class Positions(models.Model):
     """
     id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=10, verbose_name='名称')
-    remind = models.CharField(max_length=200, verbose_name='提醒事项')
+    remind = models.CharField(max_length=200, blank=True, verbose_name='提醒事项')
     department = models.ForeignKey(Departments, on_delete=models.CASCADE, verbose_name='所属部门')
     permission = models.ManyToManyField(Permissions, through='PermissionToPosition', verbose_name='职位权限')
 

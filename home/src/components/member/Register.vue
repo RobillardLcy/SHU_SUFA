@@ -354,15 +354,19 @@ export default {
         this.$axios.post('register/', info)
           .then(response => {
             if ('detail' in response.data) {
-              if (response.data.detail === 7) {
+              if (response.data.detail === 0) {
+                this.$cookie.set('id', this.certificate.studentID, { expires: 14 })
+                this.$cookie.delete('studentID')
+                this.$cookie.delete('studentName')
+                this.step = 3
+              } else if (response.data.detail === 7) {
                 window.alert('未认证或认证已失效！')
                 this.step = 1
               } else if (response.data.detail === 8) {
                 window.alert('注册出错，请重试！')
               }
             } else {
-              this.$cookie.set('id', this.certificate.studentID, { expires: 14 })
-              this.step = 3
+              window.alert('网络错误，请重试！')
             }
           })
           .catch(error => {

@@ -33,9 +33,8 @@ class MemberAuthenticationAPI(APIView):
         login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
         login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
         # TODO: 获取姓名，由姓名判断是否认证成功
-        student_name = '黄海'
-        # if login_response.headers.get('Content-Length') == '5650':
-        if True:
+        student_name = 'TEST'
+        if student_name.__len__() > 0:
             if Members.objects.filter(id=student_id).exists():
                 return Response({'detail': 6})
             else:
@@ -53,7 +52,9 @@ class MemberRegistrationAPI(APIView):
     def post(self, request, format=None):
         if request.session.get('studentID', False):
             if request.data['college'] not in range(1, 101):
-                return Response({'error': '学院错误！'})
+                return Response({'detail': 8})
+            if Members.objects.filter(mobile=request.data['mobile']).exists():
+                return Response({'detail': 9})
             member_info = {
                 'id': request.session.get('studentID'),
                 'name': request.session.get('studentName'),

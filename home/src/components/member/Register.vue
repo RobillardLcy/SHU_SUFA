@@ -7,6 +7,8 @@
         <v-stepper-step step="2">社团注册</v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step step="3">手机验证</v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="4">注册成功</v-stepper-step>
       </v-stepper-header>
       <v-stepper-items>
           <v-stepper-content :step="1">
@@ -186,11 +188,22 @@
         <v-stepper-content :step="3" class="text-xs-center">
           <h1>手机验证</h1>
           <v-form v-model="authenticate.valid" ref="authenticateForm" lazy-validation>
+            <v-text-field
+             label="手机号码"
+             :value="authenticate.verificationMobile"
+             disabled></v-text-field>
+            <v-text-field
+             label="验证码"
+             :value="authenticate.verificationCode"></v-text-field>
             <v-btn
               color="primary"
               :disabled="!authenticate.valid"
               @click="auth()">提交</v-btn>
           </v-form>
+        </v-stepper-content>
+        <v-stepper-content :step="4" class="text-xs-center">
+          <h1>欢迎加入上海大学足球协会</h1>
+          <!-- TODO:欢迎图像 -->
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
@@ -280,7 +293,9 @@ export default {
       }
     },
     authenticate: {
-      active: true
+      active: true,
+      verificationMobile: null,
+      verificationCode: null
     }
   }),
   mounted: function () {
@@ -291,9 +306,10 @@ export default {
       this.step = 2
     } else if (this.$cookie.get('id')) {
       if (window.sessionStorage.getItem('active')) {
+        this.authenticate.verificationMobile = this.$cookie.get('mobile')
         this.step = 3
       } else {
-        this.$router.push('/')
+        this.step = 4
       }
     } else {
       this.getColleges()
@@ -355,9 +371,10 @@ export default {
           .then(response => {
             if ('detail' in response.data) {
               if (response.data.detail === 0) {
-                this.$cookie.set('id', this.certificate.studentID, { expires: 14 })
+                this.$cookie.set('mobile', this.register.mobile, { expires: '15m' })
                 this.$cookie.delete('studentID')
                 this.$cookie.delete('studentName')
+                this.authenticate.verificationMobile = this.register.mobile
                 this.step = 3
               } else if (response.data.detail === 7) {
                 window.alert('未认证或认证已失效！')
@@ -378,7 +395,8 @@ export default {
     auth: function () {
       // TODO: 验证手机号码
       if (this.$refs.authenticateForm.validate()) {
-
+        this.$cookie.delete('mobile')
+        this.step = 4
       }
     }
   }

@@ -70,8 +70,12 @@ export default {
     }
   }),
   mounted: function () {
-    this.collegeProfile.id = this.$route.params.college_id
-    this.getCollegeTeamProfile()
+    if (this.$route.params.college_id > 1000) {
+      this.$router.push('/team/college-team')
+    } else {
+      this.collegeProfile.id = this.$route.params.college_id
+      this.getCollegeTeamProfile()
+    }
   },
   methods: {
     getCollegeTeamProfile: function () {

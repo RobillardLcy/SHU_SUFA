@@ -75,7 +75,7 @@ class MemberRegistrationAPI(APIView):
                     del request.session['studentName']
                 except KeyError:
                     pass
-                request.session['id'] = member.id
+                request.session['mobile'] = member.mobile
                 request.session['active'] = True
                 request.session['auth'] = True
                 return Response({'detail': 0})
@@ -105,9 +105,10 @@ class MemberLoginAPI(APIView):
                         return Response({'detail': 4})
                 else:
                     # 未激活
-                    request.session['active'] = True
                     request.session['auth'] = True
-                    return Response({'detail': 3})
+                    mobile = user.mobile
+                    request.session['mobile'] = mobile
+                    return Response({'detail': 3, 'mobile': mobile})
             else:
                 # 密码错误
                 return Response({"detail": 2})

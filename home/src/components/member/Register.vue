@@ -304,13 +304,11 @@ export default {
       this.certificate.studentID = this.$cookie.get('studentID')
       this.register.studentName = this.$cookie.get('studentName')
       this.step = 2
+    } else if (this.$cookie.get('mobile')) {
+      this.authenticate.verificationMobile = this.$cookie.get('mobile')
+      this.step = 3
     } else if (this.$cookie.get('id')) {
-      if (window.sessionStorage.getItem('active')) {
-        this.authenticate.verificationMobile = this.$cookie.get('mobile')
-        this.step = 3
-      } else {
-        this.step = 4
-      }
+      this.step = 4
     } else {
       this.getColleges()
     }

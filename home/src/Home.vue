@@ -213,16 +213,14 @@ export default {
           this.$cookie.delete('id')
           this.$cookie.delete('mobile')
           window.sessionStorage.removeItem('auth')
-          window.sessionStorage.removeItem('active')
-          this.studentID = ''
+          this.studentID = null
         })
         .catch(error => {
           console.log(error)
           this.$cookie.delete('id')
           this.$cookie.delete('mobile')
           window.sessionStorage.removeItem('auth')
-          window.sessionStorage.removeItem('active')
-          this.studentID = ''
+          this.studentID = null
         })
     }
   }

@@ -98,7 +98,7 @@
           <v-btn color="success" dark slot="activator">
             登录
           </v-btn>
-          <login-card :loginDialog="loginDialog" @closeLoginDialog="loginDialog = false"></login-card>
+          <login-dialog :loginDialog="loginDialog" @closeLoginDialog="loginDialog = false"></login-dialog>
         </v-dialog>
         <v-btn color="success" dark v-show="!studentID && $vuetify.breakpoint.width > 1264" router :to="register">
           社团注册
@@ -106,7 +106,7 @@
       </v-toolbar>
       <v-content>
         <v-container fluid>
-          <router-view/>
+          <router-view :studentID="studentID"></router-view>
         </v-container>
       </v-content>
       <v-footer app>
@@ -190,7 +190,7 @@ export default {
   props: {
   },
   components: {
-    'login-card': Login
+    'login-dialog': Login
   },
   computed: {
   },
@@ -211,12 +211,18 @@ export default {
       this.$axios.post('logout/')
         .then(response => {
           this.$cookie.delete('id')
+          this.$cookie.delete('mobile')
           window.sessionStorage.removeItem('auth')
           window.sessionStorage.removeItem('active')
           this.studentID = ''
         })
         .catch(error => {
           console.log(error)
+          this.$cookie.delete('id')
+          this.$cookie.delete('mobile')
+          window.sessionStorage.removeItem('auth')
+          window.sessionStorage.removeItem('active')
+          this.studentID = ''
         })
     }
   }

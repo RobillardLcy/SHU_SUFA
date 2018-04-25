@@ -70,8 +70,12 @@ export default {
     }
   }),
   mounted: function () {
-    this.teamProfile.id = this.$route.params.team_id
-    this.getFreeTeamProfile()
+    if (this.$route.params.team_id <= 1000) {
+      this.$router.push('/team/free-team')
+    } else {
+      this.teamProfile.id = this.$route.params.team_id
+      this.getFreeTeamProfile()
+    }
   },
   methods: {
     getFreeTeamProfile: function () {

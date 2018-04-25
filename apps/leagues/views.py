@@ -72,7 +72,7 @@ class FreeTeamsListAPI(APIView):
 
     def get(self, request, format=None):
         teams = Teams.objects.all().filter(id__gt=1000)
-        teams_list = TeamListSerializer(teams)
+        teams_list = TeamListSerializer(teams, many=True).data
         return Response(teams_list)
 
 
@@ -82,9 +82,9 @@ class FreeTeamsProfileAPI(APIView):
     def get(self, request, team_id, format=None):
         if Teams.objects.filter(id=team_id).exists():
             team = Teams.objects.get(id=team_id)
-            team_profile = TeamProfileSerializer(team)
+            team_profile = TeamProfileSerializer(team).data
             members = TeamsMembers.objects.all().filter(team=team, status__gte=0, leave=None)
-            members_info = TeamProfileMemberListSerializer(members)
+            members_info = TeamProfileMemberListSerializer(members).data
             return Response({'info': team_profile, 'members': members_info})
         else:
             # TODO: Error tag

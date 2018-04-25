@@ -81,7 +81,7 @@ export default {
                   window.sessionStorage.setItem('active', true)
                   window.sessionStorage.setItem('auth', true)
                   this.$router.push('/register')
-                } else if (response.data.detail === 3) {
+                } else if (response.data.detail === 4) {
                   window.sessionStorage.setItem('auth', true)
                 }
                 if (this.loginDialog) {

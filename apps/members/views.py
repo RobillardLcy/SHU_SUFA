@@ -13,13 +13,48 @@ import datetime
 from apps.leagues.models import Teams, TeamsMembers
 
 
+# 学生证认证接口
+class MemberAuthenticationAPI(APIView):
+
+    def post(self, request, format=None):
+        student_id = request.data.get('studentID', None)
+        password = request.data.get('password', None)
+        url = 'http://xk.autoisp.shu.edu.cn:8080/'
+        img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        response = requests.get(url)
+        img_response = requests.get(img_url, cookies=response.cookies)
+        img = Image.open(BytesIO(img_response.content))
+        # TODO: 验证码识别
+        img_text = ''
+        login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
+        login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
+        # TODO: 获取姓名，由姓名判断是否认证成功
+        student_name = 'TEST'
+        if student_name.__len__() > 0:
+            if Members.objects.filter(id=student_id).exists():
+                return Response({'detail': 6})
+            else:
+                request.session.set_expiry(900)
+                request.session['studentID'] = student_id
+                request.session['studentName'] = student_name
+                return Response({'studentID': student_id, 'studentName': student_name})
+        else:
+            return Response({'detail': 5})
+
+
 # 用户注册接口
 class MemberRegistrationAPI(APIView):
 
     def post(self, request, format=None):
         if request.session.get('studentID', False):
             if request.data['college'] not in range(1, 101):
-                return Response({'error': '学院错误！'})
+                return Response({'detail': 8})
+            if Members.objects.filter(mobile=request.data['mobile']).exists():
+                return Response({'detail': 9})
             member_info = {
                 'id': request.session.get('studentID'),
                 'name': request.session.get('studentName'),
@@ -43,7 +78,7 @@ class MemberRegistrationAPI(APIView):
                 request.session['id'] = member.id
                 request.session['active'] = True
                 request.session['auth'] = True
-                return Response(status=status.HTTP_201_CREATED)
+                return Response({'detail': 0})
             return Response({'detail': 8})
         else:
             return Response({'detail': 7})
@@ -109,39 +144,6 @@ class MemberActiveMobileAPI(APIView):
                 pass
             return Response({"detail": 0})
         return Response({"detail": 9})
-
-
-# 学生证认证接口
-class MemberAuthenticationAPI(APIView):
-
-    def post(self, request, format=None):
-        student_id = request.data.get('studentID', None)
-        password = request.data.get('password', None)
-        url = 'http://xk.autoisp.shu.edu.cn:8080/'
-        img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
-        headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-        response = requests.get(url)
-        img_response = requests.get(img_url, cookies=response.cookies)
-        img = Image.open(BytesIO(img_response.content))
-        # TODO: 验证码识别
-        img_text = ''
-        login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
-        login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
-        # TODO: 获取姓名，由姓名判断是否认证成功
-        student_name = ''
-        if login_response.headers.get('Content-Length') == '5650':
-            if Members.objects.filter(id=student_id).exists():
-                return Response({'detail': 6})
-            else:
-                request.session.set_expiry(900)
-                request.session['studentID'] = student_id
-                request.session['studentName'] = student_name
-                return Response({'studentID': student_id, 'studentName': student_name})
-        else:
-            return Response({'detail': 5})
 
 
 # 用户个人信息接口

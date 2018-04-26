@@ -24,11 +24,10 @@ class TeamListSerializer(serializers.ModelSerializer):
 class TeamProfileSerializer(serializers.HyperlinkedModelSerializer):
     captain_id = serializers.ReadOnlyField(source='captain.id')
     captain_name = serializers.ReadOnlyField(source='captain.name')
-    captain_mobile = serializers.ReadOnlyField(source='captain.mobile')
 
     class Meta:
         model = Teams
-        fields = ('id', 'name', 'logo', 'description', 'captain_id', 'captain_name', 'captain_mobile', 'create_at')
+        fields = ('id', 'name', 'logo', 'description', 'captain_id', 'captain_name', 'create_at')
 
 
 # 队伍信息成员列表
@@ -58,14 +57,14 @@ class TeamProfileMemberListSerializer(serializers.HyperlinkedModelSerializer):
 class LeaguesListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leagues
-        fields = ('name', 'reg_start', 'reg_end', 'start', 'category', 'status')
+        fields = ('id', 'name', 'reg_start', 'reg_end', 'start', 'category')
 
 
 # 赛事信息
 class LeagueProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leagues
-        fields = ('name', 'reg_start', 'reg_end', 'start', 'description', 'photo', 'category', 'status')
+        fields = ('id', 'name', 'reg_start', 'reg_end', 'start', 'description', 'photo', 'category')
 
 
 # 赛事报名

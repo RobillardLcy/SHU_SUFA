@@ -336,15 +336,11 @@ export default {
         })
         this.$axios.post('authentication/', certificateData)
           .then(response => {
-            if ('studentID' in response.data && 'studentName' in response.data) {
-              if (response.data.studentID === this.certificate.studentID) {
-                this.register.studentName = response.data.studentName
-                this.$cookie.set('studentID', response.data.studentID, { expires: '15m' })
-                this.$cookie.set('studentName', response.data.studentName, { expires: '15m' })
-                this.step = 2
-              } else {
-                window.alert('认证失败！')
-              }
+            if ('studentName' in response.data) {
+              this.register.studentName = response.data.studentName
+              this.$cookie.set('studentID', this.certificate.studentID, { expires: '15m' })
+              this.$cookie.set('studentName', response.data.studentName, { expires: '15m' })
+              this.step = 2
             } else {
               window.alert('认证失败！')
             }

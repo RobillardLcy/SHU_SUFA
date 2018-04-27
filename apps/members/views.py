@@ -117,6 +117,14 @@ class MemberLoginAPI(APIView):
     }
     Response: {
         'detail': <状态码>
+        'college': {
+            'id': <学院编号>,
+            'name': <学院名称>
+        },
+        'team': {
+            'id': <队伍编号>,
+            'name': <队名>
+        }
     }
     """
 

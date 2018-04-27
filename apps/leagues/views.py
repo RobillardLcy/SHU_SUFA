@@ -251,7 +251,7 @@ class LeaguesProfileAPI(APIView):
             return Response(league_profile)
         else:
             # TODO: Error tag
-            return Response()
+            return Response({'detail': ...})
 
 
 class LeaguesSignupTeamMembersAPI(APIView):
@@ -262,6 +262,8 @@ class LeaguesSignupTeamMembersAPI(APIView):
         'detail': <状态码>
     }
     """
+
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
         pass
@@ -278,6 +280,8 @@ class LeaguesSignupTeamMembersStatusAPI(APIView):
     }
     """
 
+    permission_classes = (MemberLoginPermission,)
+
     def get(self, request, format=None):
         pass
 
@@ -293,6 +297,8 @@ class LeaguesTeamSignupAPI(APIView):
         'detail': <状态码>
     }
     """
+
+    permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
         pass

@@ -101,6 +101,7 @@ class Leagues(models.Model):
         db_table = 'leagues'
         verbose_name = '赛事'
         verbose_name_plural = verbose_name
+        get_latest_by = 'id'
 
     def __str__(self):
         return self.name

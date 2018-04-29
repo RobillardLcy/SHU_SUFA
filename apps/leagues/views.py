@@ -7,7 +7,7 @@ from .serializers import (LeaguesListSerializer, LeagueProfileSerializer, League
                           TeamListSerializer, TeamProfileSerializer,
                           TeamProfileMemberListSerializer, TeamMemberListSerializer)
 from apps.members.models import Members
-from apps.members.permissions import (MemberLoginPermission,)
+from apps.members.permissions import (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
 
 
 class CollegeTeamsListAPI(APIView):
@@ -84,7 +84,7 @@ class FreeTeamApplyAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission,)
 
     def get(self, request, format=None):
         member_id = request.session.get('id')
@@ -106,7 +106,7 @@ class FreeTeamJoinAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission,)
 
     def post(self, request, format=None):
         member_id = request.session.get('id')
@@ -183,6 +183,8 @@ class FreeTeamsCaptainChangeAPI(APIView):
         'detail': <状态码>
     }
     """
+
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission,)
 
     def post(self, request, format=None):
         pass
@@ -263,7 +265,7 @@ class LeaguesSignupTeamMembersAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission,)
 
     def post(self, request, format=None):
         pass
@@ -280,7 +282,7 @@ class LeaguesSignupTeamMembersStatusAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission,)
 
     def get(self, request, format=None):
         pass
@@ -298,7 +300,7 @@ class LeaguesTeamSignupAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission,)
 
     def post(self, request, format=None):
         pass

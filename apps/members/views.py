@@ -140,11 +140,15 @@ class MemberLoginAPI(APIView):
                 request.session.set_expiry(86400)
                 if user.is_active:
                     if user.is_auth:
-                        college_id = TeamsMembers.objects.get(team__id__lte=1000, status__gte=0).team_id
+                        college_id = TeamsMembers.objects.get(team__id__lte=1000,
+                                                              status__gte=0,
+                                                              leave__isnull=True).team_id
                         college = TeamListSerializer(Teams.objects.get(id=college_id)).data
                         request.session['college'] = college_id
                         try:
-                            team_id = TeamsMembers.objects.get(team__id__gt=1000, status__gte=0).team_id
+                            team_id = TeamsMembers.objects.get(team__id__gt=1000,
+                                                               status__gte=0,
+                                                               leave__isnull=True).team_id
                             team = TeamListSerializer(Teams.objects.get(id=team_id)).data
                             request.session['team'] = team_id
                             return Response({'detail': 0,

@@ -4,11 +4,12 @@ from django.views.static import serve
 from sufa.settings import MEDIA_ROOT
 from rest_framework import routers
 
-from apps.members.views import (MemberRegistrationAPI, MemberActiveMobileAPI, MemberAuthenticationAPI,
+from apps.members.views import (MemberRegisterAuthenticationAPI, MemberRegistrationAPI, MemberActiveMobileAPI,
                                 MemberLoginAPI, MemberLogoutAPI, MemberResetMobileAPI, MemberResetPasswordAPI,
-                                MemberProfileAPI, MemberActiveAuthAPI)
+                                MemberProfileAPI, MemberAuthenticationAPI)
 from apps.leagues.views import (LeaguesListAPI, RecentlyLeaguesListAPI, LeaguesProfileAPI,
-                                LeaguesSignupAPI, LeaguesSignupStatusAPI,
+                                LeaguesTeamSignupAPI, LeaguesTeamSignupStatusAPI,
+                                LeaguesSignupTeamMembersAPI, LeaguesSignupTeamMembersStatusAPI,
                                 CollegeTeamsListAPI, CollegeTeamsProfileAPI,
                                 FreeTeamsListAPI, FreeTeamsProfileAPI, FreeTeamApplyAPI, FreeTeamJoinAPI)
 
@@ -22,14 +23,18 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest-framework')),
     re_path('media/(?P<path>.*)', serve, {"document_root": MEDIA_ROOT}),
 
+    # 用户注册学生证认证(POST)
+    path('api/register/authentication/', MemberRegisterAuthenticationAPI.as_view(), name='register-authentication'),
     # 用户注册(POST)
     path('api/register/', MemberRegistrationAPI.as_view(), name='register'),
+    # 手机认证(GET、POST)
+    path('api/register/active/', MemberActiveMobileAPI.as_view(), name='register-active'),
+    # 用户学生证认证(POST)
+    path('api/authentication/', MemberAuthenticationAPI.as_view(), name='authentication'),
     # 用户登录(POST)
     path('api/login/', MemberLoginAPI.as_view(), name='login'),
     # 用户注销(POST)
     path('api/logout/', MemberLogoutAPI.as_view(), name='logout'),
-    # 用户学生证认证(POST)
-    path('api/authentication/', MemberAuthenticationAPI.as_view(), name='authentication'),
     # 学院队伍列表(GET)
     path('api/colleges/list/', CollegeTeamsListAPI.as_view(), name='colleges-list'),
     # 学院队伍详细信息(GET、POST)

@@ -11,9 +11,10 @@ from .permissions import (MemberLoginPermission,)
 
 import datetime
 from apps.leagues.models import Teams, TeamsMembers
+from apps.leagues.serializers import TeamListSerializer
 
 
-class MemberAuthenticationAPI(APIView):
+class MemberRegisterAuthenticationAPI(APIView):
     """
     学生证认证接口(POST)
     Request: {
@@ -102,6 +103,7 @@ class MemberRegistrationAPI(APIView):
                 request.session['mobile'] = member.mobile
                 request.session['active'] = True
                 request.session['auth'] = True
+                # TODO: 生成验证码
                 return Response({'detail': 0})
             return Response({'detail': 8})
         else:
@@ -134,12 +136,23 @@ class MemberLoginAPI(APIView):
         try:
             user = Members.objects.get(id=id)
             if user.check_password(password):
-                # TODO: 添加记住用户功能
                 request.session['id'] = user.id
                 request.session.set_expiry(86400)
                 if user.is_active:
                     if user.is_auth:
-                        return Response({'detail': 0})
+                        college_id = TeamsMembers.objects.get(team__id__lte=1000, status__gte=0).team_id
+                        college = TeamListSerializer(Teams.objects.get(id=college_id)).data
+                        request.session['college'] = college_id
+                        try:
+                            team_id = TeamsMembers.objects.get(team__id__gt=1000, status__gte=0).team_id
+                            team = TeamListSerializer(Teams.objects.get(id=team_id)).data
+                            request.session['team'] = team_id
+                            return Response({'detail': 0,
+                                             'college': college,
+                                             'team': team})
+                        except Exception as e:
+                            return Response({'detail': 0,
+                                             'college': college})
                     else:
                         # 本学期未认证及提交课表
                         request.session['auth'] = True
@@ -173,6 +186,8 @@ class MemberLogoutAPI(APIView):
         if request.session.get('id', False):
             try:
                 del request.session['id']
+                del request.session['college']
+                del request.session['team']
             except KeyError:
                 pass
             return Response({'detail': 0})
@@ -195,14 +210,14 @@ class MemberActiveMobileAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
-
     def get(self, request, format=None):
         pass
 
     def post(self, request, format=None):
         # TODO: 验证码验证
+        member_id = request.session.get('id')
         if True:
+            Members.objects.filter(id=member_id).update(is_active=True)
             try:
                 del request.session['active']
             except KeyError:
@@ -281,12 +296,10 @@ class MemberResetMobileAPI(APIView):
         pass
 
 
-# TODO: 限制验证次数<=5
-class MemberActiveAuthAPI(APIView):
+class MemberAuthenticationAPI(APIView):
     """
     用户在校认证（获取课程时间）接口(POST)
     Request: {
-        'id': <学生证号>,
         'password': <学生证密码>
     }
     Response: {
@@ -297,7 +310,7 @@ class MemberActiveAuthAPI(APIView):
     permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
-        student_id = request.data.get('id')
+        member_id = request.session.get('id')
         password = request.data.get('password')
         url = 'http://xk.autoisp.shu.edu.cn:8080/'
         img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
@@ -310,11 +323,12 @@ class MemberActiveAuthAPI(APIView):
         img = Image.open(BytesIO(img_response.content))
         # TODO: 验证码识别
         img_text = ''
-        login_data = 'txtUserName=' + student_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
+        login_data = 'txtUserName=' + member_id + '&txtPassword=' + password + '&txtValiCode=' + img_text
         login_response = requests.post(url, data=login_data, headers=headers, cookies=response.cookies)
-        if login_response.headers.get('Content-Length') == '5650':
-            # TODO: (1)验证学号与用户学号是否匹配; (2)获取课程信息
-            classes = ''
-            return Response({'id': student_id, 'classes': classes})
+        classes = 'TEST'
+        if classes.__len__() > 0:
+            # TODO: 获取课程信息
+            Members.objects.filter(id=member_id).update(is_auth=True)
+            return Response({'detail': 0})
         else:
             return Response({'detail': '5'})

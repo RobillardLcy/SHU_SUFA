@@ -59,7 +59,7 @@ class TeamsMembers(models.Model):
     leave = models.DateField(null=True, verbose_name='离队时间')
     # -1:待审核
     #  0：通过审核（队伍成员）
-    # >0:成员等级
+    # >=0:成员等级
     status = models.SmallIntegerField(default=-1, verbose_name='状态')
 
     class Meta:

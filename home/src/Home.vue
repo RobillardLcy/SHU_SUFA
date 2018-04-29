@@ -40,6 +40,26 @@
             <v-list-tile-content>活动</v-list-tile-content>
           </v-list-tile>
         </v-list>
+        <v-divider v-show="college.id"></v-divider>
+        <v-subheader v-show="college.id">我的球队</v-subheader>
+        <v-list>
+          <v-list-tile v-show="college.id" router :to="college.url">
+            <v-list-tile-avatar>
+              <img :src="college.logo">
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ college.name }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile v-show="team.id" router :to="team.url">
+            <v-list-tile-avatar>
+              <img :src="team.logo">
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ team.name }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
         <v-divider></v-divider>
         <v-subheader v-show="studentID">报名通道</v-subheader>
         <v-list>
@@ -50,18 +70,6 @@
             :to="activity.url">
             <v-list-tile-content>
               <v-list-tile-title>{{ activity.name }}</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-        <v-divider v-show="studentID"></v-divider>
-        <v-subheader v-show="studentID">我的球队</v-subheader>
-        <v-list>
-          <v-list-tile v-for="team in teams" :key="team.name" router :to="team.url">
-            <v-list-tile-action>
-              <img>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ team.name }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -98,7 +106,7 @@
           <v-btn color="success" dark slot="activator">
             登录
           </v-btn>
-          <login-dialog :loginDialog="loginDialog" @closeLoginDialog="loginDialog = false"></login-dialog>
+          <login-dialog :loginDialog="loginDialog" @closeLoginDialog="loginDialog = false" @loginSuccess="updateInfo"></login-dialog>
         </v-dialog>
         <v-btn color="success" dark v-show="!studentID && $vuetify.breakpoint.width > 1264" router :to="register">
           社团注册
@@ -183,9 +191,10 @@ export default {
     // TODO: 活动从数据库中读取，动态更新
     activities: [
     ],
-    // TODO: 队伍通过查询登录用户的信息，确认用户已加入的队伍显示，未加入这提供未加入队伍提示，并显示加入队伍的URL
-    teams: [
-    ]
+    college: {
+    },
+    team: {
+    }
   }),
   props: {
   },
@@ -202,6 +211,7 @@ export default {
   methods: {
     redirectLogin: function () {
       this.studentID = this.$cookie.get('id')
+      this.updateInfo()
       if (window.location.hash === '#/login') {
         this.$router.push('/')
       }
@@ -213,6 +223,8 @@ export default {
           this.$cookie.delete('id')
           this.$cookie.delete('mobile')
           window.sessionStorage.removeItem('auth')
+          this.college = {}
+          this.team = {}
           this.studentID = null
         })
         .catch(error => {
@@ -220,8 +232,26 @@ export default {
           this.$cookie.delete('id')
           this.$cookie.delete('mobile')
           window.sessionStorage.removeItem('auth')
+          this.college = {}
+          this.team = {}
           this.studentID = null
         })
+    },
+    updateInfo: function () {
+      let collegeInfo = JSON.parse(window.localStorage.getItem('college'))
+      if (collegeInfo) {
+        this.college.id = collegeInfo.id
+        this.college.name = collegeInfo.name
+        this.college.logo = collegeInfo.logo
+        this.college.url = '/team/college-team/' + collegeInfo.id
+      }
+      let teamInfo = JSON.parse(window.localStorage.getItem('team'))
+      if (teamInfo) {
+        this.team.id = teamInfo.id
+        this.team.name = teamInfo.name
+        this.team.logo = teamInfo.logo
+        this.team.url = '/team/free-team/' + teamInfo.id
+      }
     }
   }
 }

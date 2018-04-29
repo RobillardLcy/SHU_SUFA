@@ -187,17 +187,17 @@
         </v-container>
         <v-stepper-content :step="3" class="text-xs-center">
           <h1>手机验证</h1>
-          <v-form v-model="authenticate.valid" ref="authenticateForm" lazy-validation>
+          <v-form v-model="activeMobile.valid" ref="activeMobileForm" lazy-validation>
             <v-text-field
              label="手机号码"
-             :value="authenticate.verificationMobile"
+             :value="activeMobile.verificationMobile"
              disabled></v-text-field>
             <v-text-field
              label="验证码"
-             :value="authenticate.verificationCode"></v-text-field>
+             :value="activeMobile.verificationCode"></v-text-field>
             <v-btn
               color="primary"
-              :disabled="!authenticate.valid"
+              :disabled="!activeMobile.valid"
               @click="auth()">提交</v-btn>
           </v-form>
         </v-stepper-content>
@@ -292,7 +292,7 @@ export default {
         content: ''
       }
     },
-    authenticate: {
+    activeMobile: {
       active: true,
       verificationMobile: null,
       verificationCode: null
@@ -305,7 +305,7 @@ export default {
       this.register.studentName = this.$cookie.get('studentName')
       this.step = 2
     } else if (this.$cookie.get('mobile')) {
-      this.authenticate.verificationMobile = this.$cookie.get('mobile')
+      this.activeMobile.verificationMobile = this.$cookie.get('mobile')
       this.step = 3
     } else if (this.$cookie.get('id')) {
       this.step = 4
@@ -334,7 +334,7 @@ export default {
           studentID: this.certificate.studentID,
           password: this.certificate.password
         })
-        this.$axios.post('authentication/', certificateData)
+        this.$axios.post('register/authentication/', certificateData)
           .then(response => {
             if ('studentName' in response.data) {
               this.register.studentName = response.data.studentName
@@ -368,7 +368,7 @@ export default {
                 this.$cookie.set('mobile', this.register.mobile, { expires: '15m' })
                 this.$cookie.delete('studentID')
                 this.$cookie.delete('studentName')
-                this.authenticate.verificationMobile = this.register.mobile
+                this.activeMobile.verificationMobile = this.register.mobile
                 this.step = 3
               } else if (response.data.detail === 7) {
                 window.alert('未认证或认证已失效！')
@@ -388,9 +388,22 @@ export default {
     },
     auth: function () {
       // TODO: 验证手机号码
-      if (this.$refs.authenticateForm.validate()) {
-        this.$cookie.delete('mobile')
-        this.step = 4
+      if (this.$refs.activeMobileForm.validate()) {
+        let activeMobileCode = JSON.stringify({
+          'code': this.activeMobile.verificationCode
+        })
+        this.$axios.post('register/active/', activeMobileCode)
+          .then(response => {
+            if (response.data.detail === 0) {
+              this.$cookie.delete('mobile')
+              this.step = 4
+            } else {
+              window.alert('验证码错误')
+            }
+          })
+          .catch(error => {
+            console.log(error)
+          })
       }
     }
   }

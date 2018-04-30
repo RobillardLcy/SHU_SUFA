@@ -189,7 +189,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='leagueteammembersignup',
-            name='league_signup',
+            name='team_signup',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='league.LeagueTeamSignup', verbose_name='赛事队伍报名'),
         ),
         migrations.AddField(
@@ -203,6 +203,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='leagueteammembersignup',
-            unique_together={('league_signup', 'team_member')},
+            unique_together={('team_signup', 'team_member')},
         ),
     ]

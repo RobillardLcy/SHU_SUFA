@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import (League, LeagueTeamSignup, Match, MatchData, Team, TeamMember)
+from .models import (League, LeagueTeamSignup, LeagueTeamMemberSignup, Match, MatchData, Team, TeamMember)
 from .serializers import (LeagueListSerializer, LeagueProfileSerializer, LeagueTeamSignupSerializer,
                           MatchSerializer, MatchDataSerializer,
                           TeamListSerializer, TeamProfileSerializer,
@@ -56,14 +56,23 @@ class CollegeTeamProfileAPI(APIView):
 
 class CollegeTeamCaptainChangeAPI(APIView):
     """
-    学院队长交接(POST)
+    学院队长交接
+    (GET)
+    Response: {}
+    (POST)
     Request: {
+        'new_captain': <新任队长学号>,
+        'code': <手机验证码>
     }
     Response: {
+        'detail': <状态码>
     }
     """
 
-    def post(self, request, college_id, format=None):
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
         pass
 
 
@@ -178,14 +187,23 @@ class FreeTeamProfileAPI(APIView):
 
 class FreeTeamCaptainChangeAPI(APIView):
     """
-    自由队伍队长交接(POST)
-    Request: {}
+    自由队伍队长交接
+    (GET)
+    Response: {}
+    (POST)
+    Request: {
+        'new_captain': <新任队长>,
+        'code': <手机验证码>
+    }
     Response: {
         'detail': <状态码>
     }
     """
 
     permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamCaptainPermission,)
+
+    def get(self, request, format=None):
+        pass
 
     def post(self, request, format=None):
         pass
@@ -246,7 +264,7 @@ class LeagueProfileAPI(APIView):
 
     def get(self, request, league_id, format=None):
         try:
-            league = League.objects.all().filter(id=league_id)
+            league = League.objects.get(id=league_id)
             league_profile = LeagueProfileSerializer(league).data
             return Response(league_profile)
         except Exception as e:
@@ -322,7 +340,9 @@ class LeagueTeamSignupStatusAPI(APIView):
 class LeagueSignupTeamMemberAPI(APIView):
     """
     队员赛事报名接口(POST)
-    Request: {}
+    Request: {
+        'league': <赛事编号>
+    }
     Response: {
         'detail': <状态码>
     }
@@ -331,7 +351,17 @@ class LeagueSignupTeamMemberAPI(APIView):
     permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamMemberPermission)
 
     def post(self, request, format=None):
-        pass
+        league_id = request.data.get('league', False)
+        if league_id:
+            team_id = request.session.get('team')
+            try:
+                team_signup = LeagueTeamSignup.objects.get(team__id=team_id)
+                member_id = request.session.get('id')
+                LeagueTeamMemberSignup.objects.get_or_create(team_signup=team_signup, team_member_id=member_id)
+                return Response({'detail': 0})
+            except Exception as e:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeagueSignupTeamMemberStatusAPI(APIView):

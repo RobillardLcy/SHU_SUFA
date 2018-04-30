@@ -99,7 +99,9 @@ class MatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        fields = ('league_name', 'home_team', 'away_team', 'time', 'place', 'result', 'category', 'master_referee_name', 'second_referee_name', 'third_referee_name', 'fourth_referee_name')
+        fields = ('league_name', 'home_team', 'away_team',
+                  'time', 'place', 'result', 'category',
+                  'master_referee_name', 'second_referee_name', 'third_referee_name', 'fourth_referee_name')
 
 
 # 比赛数据

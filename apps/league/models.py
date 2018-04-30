@@ -132,12 +132,12 @@ class LeagueTeamMemberSignup(models.Model):
     赛事队内报名情况
     队内报名记录
     """
-    league_signup = models.ForeignKey(LeagueTeamSignup, on_delete=models.CASCADE, verbose_name='赛事队伍报名')
+    team_signup = models.ForeignKey(LeagueTeamSignup, on_delete=models.CASCADE, verbose_name='赛事队伍报名')
     team_member = models.ForeignKey(TeamMember, on_delete=models.CASCADE, verbose_name='队伍成员')
     status = models.BooleanField(default=False, verbose_name='报名审核结果')
 
     class Meta:
-        unique_together = ('league_signup', 'team_member')
+        unique_together = ('team_signup', 'team_member')
         db_table = 'league_team_member_signup'
         verbose_name = '赛事队员报名'
         verbose_name_plural = verbose_name

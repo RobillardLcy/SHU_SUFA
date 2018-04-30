@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import (NewsPosition, News, NewsContent, NewsReviews)
+from .models import (NewsPosition, News, NewsContent, NewsReview)
 
 
 # 管理新闻板块位置使用
@@ -24,7 +24,7 @@ class NewsContentSerializer(serializers.ModelSerializer):
 
 
 # 新闻评论
-class NewsReviewsSerializer(serializers.ModelSerializer):
+class NewsReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = NewsReviews
+        model = NewsReview
         fields = ('id', 'member', 'news', 'content')

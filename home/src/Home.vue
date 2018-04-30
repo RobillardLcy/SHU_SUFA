@@ -171,10 +171,10 @@ export default {
         action: 'whatshot',
         title: '比赛',
         items: [
-          { title: '上海大学学院杯', url: '/leagues/college-cup' },
-          { title: '上海大学足球协会杯', url: '/leagues/association-cup' },
-          { title: '上海大学足球协会新生杯', url: '/leagues/newStudent-cup' },
-          { title: '自由组织赛事', url: '/leagues/free-leagues' }
+          { title: '上海大学学院杯', url: '/league/college-cup' },
+          { title: '上海大学足球协会杯', url: '/league/association-cup' },
+          { title: '上海大学足球协会新生杯', url: '/league/newStudent-cup' },
+          { title: '自由组织赛事', url: '/league/free-league' }
         ]
       },
       {

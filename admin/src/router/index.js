@@ -16,22 +16,22 @@ import NewsList from '@/components/news/NewsList'
 import NewsForum from '@/components/news/NewsForum'
 import NewsEditor from '@/components/news/NewsEditor'
 
-import Teams from '@/components/teams/Teams'
-import ManTeam from '@/components/teams/ManTeam'
-import WomanTeam from '@/components/teams/WomanTeam'
-import GradeTeam from '@/components/teams/GradeTeam'
-import FreeTeam from '@/components/teams/FreeTeam'
+import Teams from '@/components/team/Teams'
+import ManTeam from '@/components/team/ManTeam'
+import WomanTeam from '@/components/team/WomanTeam'
+import GradeTeam from '@/components/team/GradeTeam'
+import FreeTeam from '@/components/team/FreeTeam'
 
-import Leagues from '@/components/leagues/Leagues'
-import LeaguesList from '@/components/leagues/LeaguesList'
-import LeaguesCalendar from '@/components/leagues/LeaguesCalendar'
-import LeaguesData from '@/components/leagues/LeaguesData'
-import LeagueSignup from '@/components/leagues/LeagueSignup'
+import Leagues from '@/components/league/Leagues'
+import LeaguesList from '@/components/league/LeaguesList'
+import LeaguesCalendar from '@/components/league/LeaguesCalendar'
+import LeaguesData from '@/components/league/LeaguesData'
+import LeagueSignup from '@/components/league/LeagueSignup'
 
-import Activities from '@/components/activities/Activities'
-import ActivitiesList from '@/components/activities/ActivitiesList'
-import ActivitiesCalendar from '@/components/activities/ActivitiesCalendar'
-import ActivitySignup from '@/components/activities/ActivitySignup'
+import Activities from '@/components/activity/Activities'
+import ActivitiesList from '@/components/activity/ActivitiesList'
+import ActivitiesCalendar from '@/components/activity/ActivitiesCalendar'
+import ActivitySignup from '@/components/activity/ActivitySignup'
 
 Vue.use(Router)
 
@@ -104,7 +104,7 @@ const router = new Router({
       ]
     },
     {
-      path: '/teams',
+      path: '/team',
       name: 'Teams',
       component: Teams,
       children: [
@@ -131,7 +131,7 @@ const router = new Router({
       ]
     },
     {
-      path: '/leagues',
+      path: '/league',
       name: 'Leagues',
       component: Leagues,
       children: [
@@ -158,7 +158,7 @@ const router = new Router({
       ]
     },
     {
-      path: '/activities',
+      path: '/activity',
       name: 'Activities',
       component: Activities,
       children: [

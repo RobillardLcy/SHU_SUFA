@@ -30,17 +30,17 @@ import GradeTeam from '@/components/team/GradeTeam'
 import FreeTeam from '@/components/team/FreeTeam'
 import FreeTeamProfile from '@/components/team/FreeTeamProfile'
 
-import Leagues from '@/components/leagues/Leagues'
-import CollegeCup from '@/components/leagues/CollegeCup'
-import AssociationCup from '@/components/leagues/AssociationCup'
-import NewStudentCup from '@/components/leagues/NewStudentCup'
-import FreeLeagues from '@/components/leagues/FreeLeagues'
-import FreeLeaguesProfile from '@/components/leagues/FreeLeaguesProfile'
+import Leagues from '@/components/league/Leagues'
+import CollegeCup from '@/components/league/CollegeCup'
+import AssociationCup from '@/components/league/AssociationCup'
+import NewStudentCup from '@/components/league/NewStudentCup'
+import FreeLeagues from '@/components/league/FreeLeagues'
+import FreeLeaguesProfile from '@/components/league/FreeLeaguesProfile'
 
 import FanClub from '@/components/fanClub/FanClub'
 
-import ActivitiesList from '@/components/activities/ActivitiesList'
-import Activity from '@/components/activities/Activity'
+import ActivitiesList from '@/components/activity/ActivitiesList'
+import Activity from '@/components/activity/Activity'
 
 Vue.use(Router)
 
@@ -215,7 +215,7 @@ const router = new Router({
       ]
     },
     {
-      path: '/leagues',
+      path: '/league',
       name: 'Leagues',
       component: Leagues,
       children: [
@@ -248,7 +248,7 @@ const router = new Router({
           }
         },
         {
-          path: 'free-leagues/:leagues-id',
+          path: 'free-league/:league-id',
           name: 'FreeLeaguesProfile',
           components: {
             league: FreeLeaguesProfile
@@ -262,7 +262,7 @@ const router = new Router({
       component: FanClub
     },
     {
-      path: '/activities',
+      path: '/activity',
       name: 'ActivitiesList',
       component: ActivitiesList
     },

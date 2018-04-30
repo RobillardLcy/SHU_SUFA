@@ -4,14 +4,14 @@ from django.views.static import serve
 from sufa.settings import MEDIA_ROOT
 from rest_framework import routers
 
-from apps.members.views import (MemberRegisterAuthenticationAPI, MemberRegistrationAPI, MemberActiveMobileAPI,
-                                MemberLoginAPI, MemberLogoutAPI, MemberResetMobileAPI, MemberResetPasswordAPI,
-                                MemberProfileAPI, MemberAuthenticationAPI)
-from apps.leagues.views import (LeaguesListAPI, RecentlyLeaguesListAPI, LeaguesProfileAPI,
-                                LeaguesTeamSignupAPI, LeaguesTeamSignupStatusAPI,
-                                LeaguesSignupTeamMembersAPI, LeaguesSignupTeamMembersStatusAPI,
-                                CollegeTeamsListAPI, CollegeTeamsProfileAPI,
-                                FreeTeamsListAPI, FreeTeamsProfileAPI, FreeTeamApplyAPI, FreeTeamJoinAPI)
+from apps.member.views import (MemberRegisterAuthenticationAPI, MemberRegistrationAPI, MemberActiveMobileAPI,
+                               MemberLoginAPI, MemberLogoutAPI, MemberResetMobileAPI, MemberResetPasswordAPI,
+                               MemberProfileAPI, MemberAuthenticationAPI)
+from apps.league.views import (LeagueListAPI, RecentlyLeagueListAPI, LeagueProfileAPI,
+                               LeagueTeamSignupAPI, LeagueTeamSignupStatusAPI,
+                               LeagueSignupTeamMemberAPI, LeagueSignupTeamMemberStatusAPI,
+                               CollegeTeamListAPI, CollegeTeamProfileAPI,
+                               FreeTeamListAPI, FreeTeamProfileAPI, FreeTeamApplyAPI, FreeTeamJoinAPI)
 
 # API路由接口（统一在域名后跟api）
 router = routers.DefaultRouter()
@@ -36,17 +36,17 @@ urlpatterns = [
     # 用户注销(POST)
     path('api/logout/', MemberLogoutAPI.as_view(), name='logout'),
     # 学院队伍列表(GET)
-    path('api/colleges/list/', CollegeTeamsListAPI.as_view(), name='colleges-list'),
+    path('api/colleges/list/', CollegeTeamListAPI.as_view(), name='colleges-list'),
     # 学院队伍详细信息(GET、POST)
-    path('api/colleges/profile/<int:college_id>/', CollegeTeamsProfileAPI.as_view(), name='colleges-profile'),
+    path('api/colleges/profile/<int:college_id>/', CollegeTeamProfileAPI.as_view(), name='colleges-profile'),
     # 近期赛事列表(GET)
-    path('api/leagues/list/recently/', RecentlyLeaguesListAPI.as_view(), name='leagues-list-recently'),
+    path('api/league/list/recently/', RecentlyLeagueListAPI.as_view(), name='league-list-recently'),
     # 赛事列表(GET)
-    path('api/leagues/list/all/', LeaguesListAPI.as_view(), name='leagues-list-all'),
+    path('api/league/list/all/', LeagueListAPI.as_view(), name='league-list-all'),
     # 自由队伍列表(GET)
-    path('api/free-team/list/', FreeTeamsListAPI.as_view(), name='free-team-list'),
+    path('api/free-team/list/', FreeTeamListAPI.as_view(), name='free-team-list'),
     # 自由队伍详细信息(POST)
-    path('api/free-team/profile/<int:team_id>/', FreeTeamsProfileAPI.as_view(), name='free-team-profile'),
+    path('api/free-team/profile/<int:team_id>/', FreeTeamProfileAPI.as_view(), name='free-team-profile'),
     # 自由队伍建队申请(GET、POST)
     path('api/free-team/apply/', FreeTeamApplyAPI.as_view(), name='free-team-apply'),
     # 自由队伍入队申请(POST)

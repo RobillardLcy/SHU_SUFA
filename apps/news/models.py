@@ -47,7 +47,7 @@ class NewsContent(models.Model):
         verbose_name_plural = verbose_name
 
 
-class NewsReviews(models.Model):
+class NewsReview(models.Model):
     """
     新闻评论
     """

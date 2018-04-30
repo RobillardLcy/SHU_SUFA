@@ -93,8 +93,8 @@ export default {
         title: '社团管理',
         items: [
           { title: '部门管理', url: '/community/departments' },
-          { title: '社团骨干', url: '/community/admins' },
-          { title: '社团成员', url: '/community/members' }
+          { title: '社团骨干', url: '/community/administrator' },
+          { title: '社团成员', url: '/community/member' }
         ]
       },
       {
@@ -110,29 +110,29 @@ export default {
         action: 'group',
         title: '队伍管理',
         items: [
-          { title: '男子足球队', url: '/teams/man_team' },
-          { title: '女子足球队', url: '/teams/woman_team' },
-          { title: '年级梯队', url: '/teams/grade_team' },
-          { title: '自由队伍', url: '/teams/free_team' }
+          { title: '男子足球队', url: '/team/man_team' },
+          { title: '女子足球队', url: '/team/woman_team' },
+          { title: '年级梯队', url: '/team/grade_team' },
+          { title: '自由队伍', url: '/team/free_team' }
         ]
       },
       {
         action: 'whatshot',
         title: '赛事管理',
         items: [
-          { title: '赛事信息', url: '/leagues/list' },
-          { title: '赛事赛程', url: '/leagues/calendar' },
-          { title: '赛事数据', url: '/leagues/data' },
-          { title: '赛事报名', url: '/leagues/signup' }
+          { title: '赛事信息', url: '/league/list' },
+          { title: '赛事赛程', url: '/league/calendar' },
+          { title: '赛事数据', url: '/league/data' },
+          { title: '赛事报名', url: '/league/signup' }
         ]
       },
       {
         action: 'assistant_photo',
         title: '活动管理',
         items: [
-          { title: '活动信息', url: '/activities/list' },
-          { title: '活动日历', url: '/activities/calendar' },
-          { title: '活动报名', url: '/activities/signup' }
+          { title: '活动信息', url: '/activity/list' },
+          { title: '活动日历', url: '/activity/calendar' },
+          { title: '活动报名', url: '/activity/signup' }
         ]
       }
     ]

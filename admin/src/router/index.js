@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import vueCookie from 'vue-cookie'
 import Dashboard from '@/components/Dashboard'
 
 import NotFoundPage from '@/components/public/NotFoundPage'
@@ -182,16 +183,16 @@ const router = new Router({
 })
 
 // TODO: 验证是否登录
-// router.beforeEach((to, from, next) => {
-//   if (window.sessionStorage.getItem('id') === null) {
-//     if (to.path !== '/login') {
-//       next('/login')
-//     } else {
-//       next()
-//     }
-//   } else {
-//     next()
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  if (vueCookie.get('id') && vueCookie.get('admin')) {
+    next()
+  } else {
+    if (to.path !== '/login') {
+      next('/login')
+    } else {
+      next()
+    }
+  }
+})
 
 export default router

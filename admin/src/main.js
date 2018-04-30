@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import axios from 'axios'
+import vueCookie from 'vue-cookie'
 import Admin from './Admin'
 import router from './router'
 
@@ -19,6 +20,8 @@ Vue.prototype.$axios = axios.create({
   headers: {'Content-Type': 'application/json;Charset=utf-8'},
   withCredentials: true
 })
+
+Vue.prototype.$cookie = vueCookie
 
 /* eslint-disable no-new */
 new Vue({

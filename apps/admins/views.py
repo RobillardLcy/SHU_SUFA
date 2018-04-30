@@ -1,45 +1,65 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import login, logout
 
 
-from django.conf.global_settings import AUTH_USER_MODEL
-from .models import Admins
-from .serializers import AdminSerializer
+from .models import (Admins, Departments, Positions,
+                     Permissions, PermissionToDepartment, PermissionToPosition)
+from .serializers import (AdminSerializer,)
+from apps.members.models import Members
 
 
-class MemberLogin(APIView):
+class AdminLogin(APIView):
+    """
+       管理平台登录接口(POST)
+       Request: {
+           'id': <学生证号>,
+           'password': <密码>
+       }
+       Response: {
+           'detail': <状态码>
+       }
+       """
 
     def post(self, request, format=None):
-        id = request.data.get('id')
+        id = request.data.get('id', None)
         password = request.data.get('password')
         try:
-            member = AUTH_USER_MODEL.objects.get(id=id)
-            if member.check_password(password):
-                if member.is_active:
-                    if member.is_auth:
-                        if member.is_admin:
-                            login(request, member)
-                            return Response(AdminSerializer(member).data)
+            user = Members.objects.get(id=id)
+            if user.check_password(password):
+                request.session['id'] = user.id
+                request.session['admin'] = True
+                request.session.set_expiry(86400)
+                if user.is_active:
+                    if user.is_auth:
+                        if user.is_admin:
+                            return Response({'detail': 0})
                         else:
-                            return Response({"error": 4})
+                            return Response({'detail': 15})
                     else:
-                        return Response({"error": 3})
+                        return Response({'detail': 15})
                 else:
-                    return Response({"error": 2})
+                    return Response({'detail': 15})
             else:
-                return Response({"error": 1})
-        except AUTH_USER_MODEL.DoesNotExist:
-            return Response({"error": 1})
+                # 密码错误
+                return Response({"detail": 2})
+        except Exception as e:
+            # 未注册
+            return Response({"detail": 2})
 
 
-class MemberLogout(APIView):
+class AdminLogout(APIView):
+    """
+    管理平台注销接口(POST)
+    Request: {}
+    Response: {
+        'detail': 0
+    }
+    """
 
     def post(self, request, format=None):
         try:
-            logout(request)
-            return Response({"status": 1})
-        except Exception as e:
-            return Response({"status": 2})
+            del request.session['id']
+            del request.session['admin']
+        except KeyError:
+            pass
+        return Response({'detail': 0})

@@ -1,6 +1,6 @@
 <template>
   <div id="admin">
-    <v-app>
+    <v-app v-show="studentID">
       <v-navigation-drawer fixed :clipped="$vuetify.breakpoint.width > 1264" app v-model="drawer">
         <v-list dense>
           <v-list-tile router to="/">
@@ -72,6 +72,9 @@
         <v-spacer></v-spacer>
       </v-footer>
     </v-app>
+    <v-app v-show="!studentID">
+      <router-view/>
+    </v-app>
   </div>
 </template>
 
@@ -83,7 +86,7 @@ export default {
     drawer: null,
     menu: false,
     departments: [],
-    studentID: '15121600',
+    studentID: null,
     items: [
       {
         action: 'account_balance',
@@ -138,14 +141,23 @@ export default {
 
   },
   mounted: () => {
-    this.studentID = window.sessionStorage.getItem('id')
+  },
+  updated: function () {
+    this.studentID = this.$cookie.get('id')
   },
   computed: {
-
   },
   methods: {
     logOut: function () {
       // 注销
+      this.$axios.post('logout/')
+        .then(response => {
+          this.$cookie.delete('id')
+          this.$cookie.delete('admin')
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
 }

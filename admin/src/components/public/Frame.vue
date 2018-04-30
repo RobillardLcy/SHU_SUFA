@@ -1,5 +1,5 @@
 <template>
-  <div id="admin">
+  <div class="Frame">
     <v-app>
       <v-navigation-drawer fixed :clipped="$vuetify.breakpoint.width > 1264" app v-model="drawer">
         <v-list dense>
@@ -61,7 +61,7 @@
       </v-toolbar>
       <v-content>
         <v-container>
-          <router-view/>
+          <router-view name="content"/>
         </v-container>
       </v-content>
       <v-footer app>
@@ -76,9 +76,8 @@
 </template>
 
 <script>
-
 export default {
-  name: 'admin',
+  name: 'Frame',
   data: () => ({
     drawer: null,
     menu: false,

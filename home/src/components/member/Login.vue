@@ -77,7 +77,6 @@ export default {
             if ('detail' in response.data) {
               if (response.data.detail === 0 || response.data.detail === 3 || response.data.detail === 4) {
                 this.$cookie.set('id', this.loginData.studentID, { expires: 1 })
-                // TODO: 设置学院及队伍名称
                 if (response.data.detail === 0) {
                   this.$cookie.set('college', response.data.college.id)
                   window.localStorage.setItem('college', JSON.stringify(response.data.college))

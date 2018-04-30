@@ -118,7 +118,7 @@ class MemberLoginAPI(APIView):
         'password': <密码>
     }
     Response: {
-        'detail': <状态码>
+        'detail': <状态码>,
         'college': {
             'id': <学院编号>,
             'name': <学院名称>
@@ -180,23 +180,20 @@ class MemberLogoutAPI(APIView):
     用户注销接口(POST)
     Request: {}
     Response: {
-        'detail': <状态码>
+        'detail': 0
     }
     """
 
     permission_classes = (MemberLoginPermission,)
 
     def post(self, request, format=None):
-        if request.session.get('id', False):
-            try:
-                del request.session['id']
-                del request.session['college']
-                del request.session['team']
-            except KeyError:
-                pass
-            return Response({'detail': 0})
-        else:
-            return Response({'detail': 1})
+        try:
+            del request.session['id']
+            del request.session['college']
+            del request.session['team']
+        except KeyError:
+            pass
+        return Response({'detail': 0})
 
 
 class MemberActiveMobileAPI(APIView):

@@ -62,7 +62,7 @@ class TeamCaptainPermission(BasePermission):
 
     def has_permission(self, request, view):
         member_id = request.session.get('id', False)
-        team_id = request.session.get('college', False)
+        team_id = request.session.get('team', False)
         if member_id and team_id and team_id > 1000:
             if Team.objects.get(id=team_id).captain.id == member_id:
                 return True

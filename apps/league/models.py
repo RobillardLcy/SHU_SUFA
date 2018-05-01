@@ -132,6 +132,7 @@ class LeagueTeamMemberSignup(models.Model):
     赛事队内报名情况
     队内报名记录
     """
+    id = models.AutoField(primary_key=True, verbose_name='编号')
     team_signup = models.ForeignKey(LeagueTeamSignup, on_delete=models.CASCADE, verbose_name='赛事队伍报名')
     team_member = models.ForeignKey(TeamMember, on_delete=models.CASCADE, verbose_name='队伍成员')
     status = models.BooleanField(default=False, verbose_name='报名审核结果')

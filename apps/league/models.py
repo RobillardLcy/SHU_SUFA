@@ -189,7 +189,8 @@ class MatchData(models.Model):
     """
     id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     match = models.ForeignKey(Match, on_delete=models.CASCADE, verbose_name='比赛')
-    team_member = models.ForeignKey(TeamMember, on_delete=models.PROTECT, related_name='teammate', verbose_name='队员')
+    team_member = models.ForeignKey(LeagueTeamMemberSignup, on_delete=models.PROTECT,
+                                    related_name='team_member', verbose_name='队员')
     category = models.CharField(max_length=7,
                                 choices=(
                                     ('debut',   '首发'),
@@ -200,7 +201,8 @@ class MatchData(models.Model):
                                     ('yellow',  '黄牌'),
                                     ('red',     '红牌'),
                                 ), verbose_name='类别')
-    sub = models.ForeignKey(TeamMember, on_delete=models.PROTECT, related_name='sub', null=True, default=None, verbose_name='替换队员')
+    sub = models.ForeignKey(TeamMember, on_delete=models.PROTECT, related_name='sub_team_member',
+                            null=True, default=None, verbose_name='替换队员')
     time = models.CharField(max_length=3, verbose_name='时间')
     remind = models.CharField(max_length=20, verbose_name='备注')
 

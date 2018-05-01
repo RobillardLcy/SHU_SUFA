@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import (League, LeagueTeamSignup, LeagueTeamMemberSignup, Match, MatchData, Team, TeamMember)
+from .models import (League, LeagueTeamSignup, LeagueTeamMemberSignup, Match, MatchData, Team, TeamMember, Referee)
 from .serializers import (LeagueListSerializer, LeagueProfileSerializer,
                           LeagueTeamSignupSerializer, LeagueTeamMemberSignupSerializer,
                           MatchSerializer, MatchDataSerializer,
@@ -125,8 +125,12 @@ class LeagueSignupCollegeMemberAPI(APIView):
                         < datetime.datetime.now() <\
                         LeagueTeamSignup.objects.filter(id=team_signup_id).values('league__reg_end'):
                     member_id = request.session.get('id')
-                    LeagueTeamMemberSignup.objects.get_or_create(team_signup__id=team_signup_id, team_member__id=member_id)
-                    return Response({'detail': 0})
+                    team_member_signup = LeagueTeamMemberSignup.objects.get_or_create(team_signup__id=team_signup_id, team_member__id=member_id)
+                    if team_member_signup:
+                        return Response({'detail': 0})
+                    else:
+                        # TODO: Add Error Tag
+                        return Response({'detail': ...})
                 else:
                     # TODO: Add Error Tag
                     return Response({'detail': ...})
@@ -164,14 +168,31 @@ class LeagueSignupCollegeMemberStatusAPI(APIView):
 class LeagueSignupCollegeMemberStatusCheck(APIView):
     """
     学院赛事参赛队员审核接口(POST)
-    Request: {}
-    Response: {}
+    Request: {
+        'league': <学院赛事报名编码>,
+        'pass': [<队员报名编号>]
+    }
+    Response: {
+        'detail': <状态码>
+    }
     """
 
     permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, CollegeCaptainPermission)
 
     def post(self, request, format=None):
-        pass
+        team_signup_id = request.data.get('league')
+        college_id = request.session.get('college')
+        try:
+            team_signup = LeagueTeamSignup.objects.get(id=team_signup_id)
+            if college_id == team_signup.team.id:
+                member_pass = request.data.get('pass')
+                for member_signup_id in member_pass:
+                    LeagueTeamMemberSignup.objects.filter(id=member_signup_id, team_member__team__id=college_id)\
+                        .update(status=True)
+                return Response({'detail': 0})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class FreeTeamApplyAPI(APIView):
@@ -201,7 +222,25 @@ class FreeTeamApplyAPI(APIView):
         return Response({'name': member.name, 'mobile': member.mobile})
 
     def post(self, request, format=None):
-        pass
+        member_id = request.session.get('id')
+        if TeamMember.objects.filter(member__id=member_id, leave__isnull=True):
+            # TODO: Add Error Tag
+            return Response({'detail': ...})
+        else:
+            name = request.data.get('name')
+            logo = request.data.get('logo')
+            description = request.data.get('description')
+            if Team.objects.filter(name=name).exists():
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+            else:
+                member = Member.objects.get(id=member_id)
+                team = Team.objects.create(name=name, logo=logo, description=description, captain=member)
+                if team:
+                    return Response({'detail': 0, 'team_id': team.id})
+                else:
+                    # TODO: Add Error Tag
+                    return Response({'detail': ...})
 
 
 class FreeTeamJoinAPI(APIView):
@@ -230,6 +269,24 @@ class FreeTeamJoinAPI(APIView):
                 return Response({'detail': 0})
             except Exception as e:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class FreeTeamLeaveAPI(APIView):
+    """
+    自由队伍离队接口(POST)
+    Request: {}
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamMemberPermission)
+
+    def post(self, request, format=None):
+        member_id = request.session.get('id')
+        team_id = request.session.get('team')
+        TeamMember.objects.filter(member__id=member_id, team__id=team_id).update(leave=datetime.date.today())
+        return Response({'detail': 0})
 
 
 class FreeTeamListAPI(APIView):
@@ -424,7 +481,21 @@ class LeagueTeamSignupAPI(APIView):
     permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
-        pass
+        league_id = request.data.get('league')
+        try:
+            league = League.objects.get(id=league_id)
+            if league.reg_start < datetime.datetime.now() < league.reg_end:
+                team_id = request.session.get('team')
+                team = Team.objects.get(id=team_id)
+                team_signup = LeagueTeamSignup.objects.get_or_create(team=team, league=league)
+                if team_signup:
+                    return Response({'detail': 0})
+                else:
+                    # TODO: Add Error Tag
+                    return Response({'detail': ...})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeagueTeamSignupStatusAPI(APIView):
@@ -464,9 +535,13 @@ class LeagueSignupTeamMemberAPI(APIView):
             if team_id == team_signup.team.id:
                 if team_signup.league.reg_start < datetime.datetime.now() < team_signup.league.reg_end:
                     member_id = request.session.get('id')
-                    LeagueTeamMemberSignup.objects.get_or_create(team_signup__id=team_signup_id,
-                                                                 team_member__id=member_id)
-                    return Response({'detail': 0})
+                    team_member_signup = LeagueTeamMemberSignup.objects.get_or_create(team_signup__id=team_signup_id,
+                                                                                      team_member__id=member_id)
+                    if team_member_signup:
+                        return Response({'detail': 0})
+                    else:
+                        # TODO: Add Error Tag
+                        return Response({'detail': ...})
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -520,7 +595,8 @@ class LeagueSignupTeamMemberStatusCheckAPI(APIView):
             if team_id == team_signup.team.id:
                 member_pass = request.data.get('pass')
                 for member_signup_id in member_pass:
-                    LeagueTeamMemberSignup.objects.filter(id=member_signup_id).update(status=True)
+                    LeagueTeamMemberSignup.objects.filter(id=member_signup_id, team_member__team__id=team_id)\
+                        .update(status=True)
                 return Response({'detail': 0})
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:

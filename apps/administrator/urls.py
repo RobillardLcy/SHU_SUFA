@@ -10,7 +10,7 @@ from .views import (AdminLogin, AdminLogout,)
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='admin.html'), name='administrator'),
+    path('', TemplateView.as_view(template_name='admin.html'), name='admin'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest-framework')),
     re_path('media/(?P<path>.*)', serve, {'document_root': MEDIA_ROOT}),

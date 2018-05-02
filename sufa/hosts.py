@@ -4,5 +4,5 @@ from django_hosts import patterns, host
 
 host_patterns = patterns('',
                          host(r'www', settings.ROOT_URLCONF, name='home'),
-                         host(r'administrator', urls, name='administrator'),
+                         host(r'admin', urls, name='admin'),
 )

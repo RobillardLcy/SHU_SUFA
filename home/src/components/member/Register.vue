@@ -133,7 +133,7 @@
               <v-flex lg6 md8>
                 <v-text-field
                   label="密码确认"
-                  :error="register.password === register.passwordConfirm ? false : true"
+                  :error="register.password !== register.passwordConfirm"
                   :hint="register.password === register.passwordConfirm ? '' : '密码不一致'"
                   v-model="register.passwordConfirm"
                   type="password"
@@ -317,7 +317,7 @@ export default {
     getColleges: function () {
       this.$axios.get('/colleges/list/')
         .then(response => {
-          for (var i = 0; i < response.data.length; i++) {
+          for (let i = 0; i < response.data.length; i++) {
             this.collegeChoices.push({
               text: response.data[i].name,
               value: response.data[i].id

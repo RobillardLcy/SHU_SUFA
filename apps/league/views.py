@@ -1,4 +1,5 @@
 import datetime
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,13 +7,13 @@ from rest_framework import status
 from .models import (League, LeagueTeamSignup, LeagueTeamMemberSignup, Match, MatchData, Team, TeamMember, Referee)
 from .serializers import (LeagueListSerializer, LeagueProfileSerializer,
                           LeagueTeamSignupSerializer, LeagueTeamMemberSignupSerializer,
-                          MatchSerializer, MatchDataSerializer,
+                          RefereeSerializer, MatchSerializer, MatchDataSerializer,
                           TeamListSerializer, TeamProfileSerializer,
                           TeamMemberProfileListSerializer, TeamMemberListSerializer)
 from .permissions import (CollegeMemberPermission, CollegeCaptainPermission,
                           TeamMemberPermission, TeamCaptainPermission,)
 from apps.member.models import Member
-from apps.member.permissions import (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
+from apps.member.permissions import (MemberPermission, MemberAuthPermission)
 
 
 class CollegeTeamListAPI(APIView):
@@ -64,7 +65,7 @@ class CollegeTeamProfileAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission)
 
     def get(self, request, college_id, format=None):
         try:
@@ -113,7 +114,7 @@ class LeagueSignupCollegeMemberAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, CollegeMemberPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, CollegeMemberPermission)
 
     def post(self, request, format=None):
         team_signup_id = request.data.get('league')
@@ -143,13 +144,13 @@ class LeagueSignupCollegeMemberStatusAPI(APIView):
     """
     学院赛事学院队员报名情况接口(GET)
     Response(array): {
-        'member_id': <队员学号>,
-        'member_name': <队员姓名>,
+        'id': <队员学号>,
+        'name': <队员姓名>,
         'status': <状态>
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, CollegeMemberPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, CollegeMemberPermission)
 
     def get(self, request, league, format=None):
         try:
@@ -177,7 +178,7 @@ class LeagueSignupCollegeMemberStatusCheck(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, CollegeCaptainPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, CollegeCaptainPermission)
 
     def post(self, request, format=None):
         team_signup_id = request.data.get('league')
@@ -214,7 +215,7 @@ class FreeTeamApplyAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission)
 
     def get(self, request, format=None):
         member_id = request.session.get('id')
@@ -254,7 +255,7 @@ class FreeTeamJoinAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission)
 
     def post(self, request, format=None):
         member_id = request.session.get('id')
@@ -280,7 +281,7 @@ class FreeTeamLeaveAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamMemberPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamMemberPermission)
 
     def post(self, request, format=None):
         member_id = request.session.get('id')
@@ -338,7 +339,7 @@ class FreeTeamProfileAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission)
 
     def get(self, request, team_id, format=None):
         try:
@@ -367,7 +368,7 @@ class FreeTeamProfileChangeAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamCaptainPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
         name = request.data.get('name')
@@ -396,7 +397,7 @@ class FreeTeamCaptainChangeAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamCaptainPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def get(self, request, format=None):
         pass
@@ -478,7 +479,7 @@ class LeagueTeamSignupAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamCaptainPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
         league_id = request.data.get('league')
@@ -502,8 +503,8 @@ class LeagueTeamSignupStatusAPI(APIView):
     """
     赛事队伍报名情况接口(GET)
     Response(array): {
-        'team_id': <队伍编号>,
-        'team_name': <队伍名称>,
+        'id': <队伍编号>,
+        'name': <队伍名称>,
         'status': <状态>
     }
     """
@@ -525,7 +526,7 @@ class LeagueSignupTeamMemberAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamMemberPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamMemberPermission)
 
     def post(self, request, format=None):
         team_signup_id = request.data.get('league', False)
@@ -551,13 +552,13 @@ class LeagueSignupTeamMemberStatusAPI(APIView):
     """
     赛事队伍队员报名情况接口(GET)
     Response(array): {
-        'member_id': <队员学号>,
-        'member_name': <队员姓名>,
+        'id': <队员学号>,
+        'name': <队员姓名>,
         'status': <状态>
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamMemberPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamMemberPermission)
 
     def get(self, request, league, format=None):
         try:
@@ -585,7 +586,7 @@ class LeagueSignupTeamMemberStatusCheckAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission, MemberActivePermission, MemberAuthPermission, TeamCaptainPermission)
+    permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
         team_signup_id = request.data.get('league')
@@ -601,3 +602,122 @@ class LeagueSignupTeamMemberStatusCheckAPI(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class LeagueMatchLeagueAPI(APIView):
+    """
+    赛事赛程接口(GET)
+    Response: (array){
+        'home_team': <主队队名>,
+        'away_team': <客队队名>,
+        'time': <比赛时间>,
+        'place': <比赛地点>,
+        'result': <比赛结果>,
+        'category': <比赛类型>,
+        'master_referee_name': <主裁姓名>,
+        'second_referee_name': <第二助理裁判姓名>,
+        'third_referee_name': <第三助理裁判姓名>,
+        'forth_referee_name': <第四助理裁判姓名>
+    }
+    """
+
+    permission_classes = (MemberPermission,)
+
+    def get(self, request, league_id, format=None):
+        matches = Match.objects.all().filter(league__id=league_id)
+        matches_list = MatchSerializer(matches, many=True).data
+        return Response(matches_list)
+
+
+class LeagueMatchCollegeAPI(APIView):
+    """
+    赛事学院赛程接口(GET)
+    Response: (array){
+        'home_team': <主队队名>,
+        'away_team': <客队队名>,
+        'time': <比赛时间>,
+        'place': <比赛地点>,
+        'result': <比赛结果>,
+        'category': <比赛类型>,
+        'master_referee_name': <主裁姓名>,
+        'second_referee_name': <第二助理裁判姓名>,
+        'third_referee_name': <第三助理裁判姓名>,
+        'forth_referee_name': <第四助理裁判姓名>
+    }
+    """
+
+    permission_classes = (MemberPermission, CollegeMemberPermission)
+
+    def get(self, request, league_id, format=None):
+        college_id = request.session.get('college')
+        matches = Match.objects.all().filter(league__id=league_id)\
+            .filter(Q(home_team__id=college_id) | Q(away_team__id=college_id))
+        matches_list = MatchSerializer(matches, many=True).data
+        return Response(matches_list)
+
+
+class LeagueMatchTeamAPI(APIView):
+    """
+    赛事队伍赛程接口(GET)
+    Response: (array){
+        'home_team': <主队队名>,
+        'away_team': <客队队名>,
+        'time': <比赛时间>,
+        'place': <比赛地点>,
+        'result': <比赛结果>,
+        'category': <比赛类型>,
+        'master_referee_name': <主裁姓名>,
+        'second_referee_name': <第二助理裁判姓名>,
+        'third_referee_name': <第三助理裁判姓名>,
+        'forth_referee_name': <第四助理裁判姓名>
+    }
+    """
+
+    permission_classes = (MemberPermission, TeamMemberPermission)
+
+    def get(self, request, league_id, format=None):
+        team_id = request.session.get('team')
+        matches = Match.objects.all().filter(league__id=league_id)\
+            .filter(Q(home_team__id=team_id) | Q(away_team__id=team_id))
+        matches_list = MatchSerializer(matches, many=True).data
+        return Response(matches_list)
+
+
+class LeagueMatchDataAPI(APIView):
+    """
+    赛事比赛数据接口(GET)
+    Response: (array){
+        'team_name': <队伍名称>,
+        'team_member_name': <队员姓名>,
+        'category': <类型>,
+        'sub_team_member_name': <替补队员姓名>,
+        'time': <时间>,
+        'remind': <备注>
+    }
+    """
+
+    permission_classes = (MemberPermission,)
+
+    def get(self, request, match_id, format=None):
+        match_data = MatchData.objects.all().filter(match__id=match_id)
+        match_data_list = MatchDataSerializer(match_data).data
+        return Response(match_data_list)
+
+
+class RefereeListAPI(APIView):
+    """
+    裁判列表接口(GET)
+    Response: {
+        'id': <学号>,
+        'name': <姓名>,
+        'gender': <性别>,
+        'level': <等级>
+    }
+    """
+
+    permission_classes = (MemberPermission,)
+
+    def get(self, request, format=None):
+        referee = Referee.objects.all().filter(status=True)
+        referee_list = RefereeSerializer(referee).data
+        return Response(referee_list)

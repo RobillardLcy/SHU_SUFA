@@ -10,7 +10,7 @@ class RefereeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Referee
-        fields = ('id', 'name', 'gender', 'level', 'status')
+        fields = ('id', 'name', 'gender', 'level')
 
 
 # 队伍列表
@@ -69,27 +69,26 @@ class LeagueProfileSerializer(serializers.ModelSerializer):
 
 # 赛事队伍报名
 class LeagueTeamSignupSerializer(serializers.ModelSerializer):
-    team_id = serializers.ReadOnlyField(source='team.id')
-    team_name = serializers.ReadOnlyField(source='team.name')
+    id = serializers.ReadOnlyField(source='team.id')
+    name = serializers.ReadOnlyField(source='team.name')
 
     class Meta:
         model = LeagueTeamSignup
-        fields = ('team_id', 'team_name', 'status')
+        fields = ('id', 'name', 'status')
 
 
 # 赛事队员报名
 class LeagueTeamMemberSignupSerializer(serializers.ModelSerializer):
-    team_member_id = serializers.ReadOnlyField(source='team_member.id')
-    team_member_name = serializers.ReadOnlyField(source='team_member.name')
+    id = serializers.ReadOnlyField(source='team_member.id')
+    name = serializers.ReadOnlyField(source='team_member.name')
 
     class Meta:
         model = LeagueTeamMemberSignup
-        fields = ('team_member_id', 'team_member_name', 'status')
+        fields = ('id', 'name', 'status')
 
 
 # 比赛
 class MatchSerializer(serializers.ModelSerializer):
-    league_name = serializers.ReadOnlyField(source='league.name')
     home_team_name = serializers.ReadOnlyField(source='home_team.name')
     away_team_name = serializers.ReadOnlyField(source='away_team.name')
     master_referee_name = serializers.ReadOnlyField(source='master_referee.name')
@@ -99,16 +98,17 @@ class MatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        fields = ('league_name', 'home_team', 'away_team',
+        fields = ('home_team', 'away_team',
                   'time', 'place', 'result', 'category',
                   'master_referee_name', 'second_referee_name', 'third_referee_name', 'fourth_referee_name')
 
 
 # 比赛数据
 class MatchDataSerializer(serializers.ModelSerializer):
-    team_member_name = serializers.ReadOnlyField(source='team_member.name')
-    team_member_team = serializers.ReadOnlyField(source='team_member.team.name')
+    team_name = serializers.ReadOnlyField(source='team_member.team_member.team.name')
+    team_member_name = serializers.ReadOnlyField(source='team_member.team_member.name')
+    sub_team_member_name = serializers.ReadOnlyField(source='sub.team_member.name')
 
     class Meta:
         model = MatchData
-        fields = ('match', 'team_member_name', 'team_member_team', 'category', 'sub', 'time', 'remind')
+        fields = ('team_name', 'team_member_name', 'category', 'sub_team_member_name', 'time', 'remind')

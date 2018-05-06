@@ -42,12 +42,12 @@ export default {
     getTeams: function () {
       this.$axios.get('colleges/list/')
         .then(response => {
-          for (var i = 0; i < response.data.length; i++) {
+          for (let i = 0; i < response.data.length; i++) {
             this.teams.push({
               url: '/team/college-team/' + response.data[i].id,
               name: response.data[i].name,
               logo: response.data[i].logo,
-              color: (i % 3) === 0 ? 'orange lighten-1' : ((i % 3) === 1 ? 'lime lighten-1' : 'indigo ligthten-1')
+              color: (i % 3) === 0 ? 'orange lighten-1' : ((i % 3) === 1 ? 'lime lighten-1' : 'indigo lighten-1')
             })
           }
         })

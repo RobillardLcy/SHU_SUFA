@@ -24,14 +24,11 @@ class MemberRegistrationSerializer(serializers.ModelSerializer):
 class MemberProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ('id', 'name', 'gender', 'mobile', 'campus', 'favorite_club', 'photo')
-
-
-# 社团成员重置密码序列化
-class MemberResetPasswordSerializer(serializers.ModelSerializer):
-    pass
+        fields = ('name', 'gender', 'mobile', 'campus', 'favorite_club')
 
 
 # 社团成员课程序列化
 class MemberClassSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = MemberClasses
+        fields = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday')

@@ -89,7 +89,7 @@ export default {
           this.collegeProfile.captain.id = response.data['info'].captain_id
           this.collegeProfile.captain.name = response.data['info'].captain_name
           this.collegeProfile.captain.mobile = response.data['info'].captain_mobile
-          for (var i = 0; i < response.data['members'].length; i++) {
+          for (let i = 0; i < response.data['members'].length; i++) {
             this.collegeProfile.members.push({
               id: response.data['members'][i].id,
               name: response.data['members'][i].name,

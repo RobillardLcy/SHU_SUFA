@@ -6,7 +6,7 @@ from io import BytesIO
 
 from .models import Member
 from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer, MemberClassSerializer)
-from .permissions import (MemberLoginPermission, MemberActivePermission, MemberAuthPermission)
+from .permissions import (MemberPermission, MemberAuthPermission)
 
 import datetime
 from apps.league.models import Team, TeamMember
@@ -183,7 +183,7 @@ class MemberLogoutAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberPermission,)
 
     def post(self, request, format=None):
         try:
@@ -229,23 +229,42 @@ class MemberActiveMobileAPI(APIView):
 class MemberProfileAPI(APIView):
     """
     用户个人信息接口(GET)
-    Response: {}
+    Response: {
+        'name': <姓名>,
+        'gender': <性别>,
+        'mobile': <手机号码>,
+        'campus': <校区>,
+        'favorite_club': <喜爱的球队>
+    }
     (POST)
-    Request: {}
+    Request: {
+        'campus': <校区>,
+        'favorite_club': <喜爱的俱乐部>
+    }
     Response: {
         'detail': '状态码'
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberPermission,)
 
     def get(self, request, format=None):
-        # RSA解密：sessionID + studentID
-        pass
+        member_id = request.session.get('id')
+        member = Member.objects.get(id=member_id)
+        member_info = MemberProfileSerializer(member).data
+        return Response(member_info)
 
     def post(self, request, format=None):
-        # RSA解密：sessionID + {info(json)}
-        pass
+        member_id = request.session.get('id')
+        campus = request.data.get('campus')
+        favorite_club = request.data.get('favorite_club')
+        if campus and favorite_club:
+            Member.objects.filter(id=member_id).update(campus=campus, favorite_club=favorite_club)
+        elif campus:
+            Member.objects.filter(id=member_id).update(campus=campus)
+        elif favorite_club:
+            Member.objects.filter(id=member_id).update(favorite_club=favorite_club)
+        return Response({'detail': 0})
 
 
 class MemberResetPasswordAPI(APIView):
@@ -261,7 +280,7 @@ class MemberResetPasswordAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberPermission,)
 
     def get(self, request, format=None):
         pass
@@ -287,7 +306,7 @@ class MemberResetMobileAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberPermission,)
 
     def get(self, request, format=None):
         pass
@@ -307,7 +326,7 @@ class MemberAuthenticationAPI(APIView):
     }
     """
 
-    permission_classes = (MemberLoginPermission,)
+    permission_classes = (MemberPermission,)
 
     def post(self, request, format=None):
         member_id = request.session.get('id')

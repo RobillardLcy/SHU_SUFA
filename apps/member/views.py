@@ -5,7 +5,7 @@ from PIL import Image
 from io import BytesIO
 
 from .models import Member
-from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer, MemberClassSerializer)
+from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer,)
 from .permissions import (MemberPermission, MemberAuthPermission)
 
 import datetime
@@ -219,7 +219,7 @@ class MemberActiveMobileAPI(APIView):
         if True:
             Member.objects.filter(id=member_id).update(is_active=True)
             try:
-                del request.session['active']
+                del request.session['mobile']
             except KeyError:
                 pass
             return Response({"detail": 0})

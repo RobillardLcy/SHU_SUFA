@@ -218,7 +218,7 @@ export default {
     },
     // 账户注销
     logout: function () {
-      this.$axios.post('logout/')
+      this.$axios.post('member/logout/')
         .then(response => {
           this.$cookie.delete('id')
           this.$cookie.delete('mobile')

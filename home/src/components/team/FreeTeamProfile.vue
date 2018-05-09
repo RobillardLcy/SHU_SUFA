@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     getFreeTeamProfile: function () {
-      let url = 'free-team/profile/' + this.teamProfile.id
+      let url = 'league/free-team/profile/' + this.teamProfile.id + '/'
       this.$axios.get(url)
         .then(response => {
           this.teamProfile.name = response.data['info'].name
@@ -100,6 +100,9 @@ export default {
         })
         .catch(error => {
           console.log(error)
+          if ('detail' in error.data && error.data['detail'] === 4) {
+            this.$route.push('/auth')
+          }
         })
     }
   }

@@ -315,7 +315,7 @@ export default {
   },
   methods: {
     getColleges: function () {
-      this.$axios.get('/colleges/list/')
+      this.$axios.get('league/colleges/list/')
         .then(response => {
           for (let i = 0; i < response.data.length; i++) {
             this.collegeChoices.push({
@@ -334,7 +334,7 @@ export default {
           studentID: this.certificate.studentID,
           password: this.certificate.password
         })
-        this.$axios.post('register/authentication/', certificateData)
+        this.$axios.post('member/register/authentication/', certificateData)
           .then(response => {
             if ('studentName' in response.data) {
               this.register.studentName = response.data.studentName
@@ -361,7 +361,7 @@ export default {
           password: this.register.password,
           college: this.register.college
         })
-        this.$axios.post('register/', info)
+        this.$axios.post('member/register/', info)
           .then(response => {
             if ('detail' in response.data) {
               if (response.data.detail === 0) {
@@ -392,7 +392,7 @@ export default {
         let activeMobileCode = JSON.stringify({
           'code': this.activeMobile.verificationCode
         })
-        this.$axios.post('register/active/', activeMobileCode)
+        this.$axios.post('member/register/active/', activeMobileCode)
           .then(response => {
             if (response.data.detail === 0) {
               this.$cookie.delete('mobile')

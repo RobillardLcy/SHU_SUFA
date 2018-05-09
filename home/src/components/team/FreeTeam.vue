@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     getTeams: function () {
-      this.$axios.get('free-team/list/')
+      this.$axios.get('league/free-team/list/')
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.teams.push({

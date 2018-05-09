@@ -8,6 +8,7 @@ import Home from '@/components/Home'
 import Member from '@/components/member/Member'
 import Login from '@/components/member/Login'
 import Register from '@/components/member/Register'
+import Auth from '@/components/member/Auth'
 
 import About from '@/components/about/About'
 import Community from '@/components/about/Community'
@@ -78,6 +79,11 @@ const router = new Router({
       path: '/member',
       name: 'Member',
       component: Member
+    },
+    {
+      path: '/auth',
+      name: 'Auth',
+      component: Auth
     },
     {
       path: '/about',

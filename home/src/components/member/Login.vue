@@ -72,7 +72,7 @@ export default {
           id: this.loginData.studentID,
           password: this.loginData.password
         })
-        this.$axios.post('login/', loginInfo)
+        this.$axios.post('member/login/', loginInfo)
           .then(response => {
             if ('detail' in response.data) {
               if (response.data.detail === 0 || response.data.detail === 3 || response.data.detail === 4) {

@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     getTeams: function () {
-      this.$axios.get('colleges/list/')
+      this.$axios.get('league/colleges/list/')
         .then(response => {
           for (let i = 0; i < response.data.length; i++) {
             this.teams.push({

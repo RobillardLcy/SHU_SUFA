@@ -85,7 +85,9 @@ class CollegeTeamCaptainChangeAPI(APIView):
     """
     学院队长交接
     (GET)
-    Response: {}
+    Response: {
+        'detail': <状态码>
+    }
     (POST)
     Request: {
         'new_captain': <新任队长学号>,
@@ -95,6 +97,8 @@ class CollegeTeamCaptainChangeAPI(APIView):
         'detail': <状态码>
     }
     """
+
+    permission_classes = (MemberPermission, MemberAuthPermission, CollegeCaptainPermission)
 
     def get(self, request, format=None):
         pass
@@ -166,7 +170,7 @@ class LeagueSignupCollegeMemberStatusAPI(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class LeagueSignupCollegeMemberStatusCheck(APIView):
+class LeagueSignupCollegeMemberStatusCheckAPI(APIView):
     """
     学院赛事参赛队员审核接口(POST)
     Request: {
@@ -386,7 +390,9 @@ class FreeTeamCaptainChangeAPI(APIView):
     """
     自由队伍队长交接
     (GET)
-    Response: {}
+    Response: {
+        'detail': <状态码>
+    }
     (POST)
     Request: {
         'new_captain': <新任队长>,

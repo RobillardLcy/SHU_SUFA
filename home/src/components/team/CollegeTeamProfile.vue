@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     getCollegeTeamProfile: function () {
-      let url = 'colleges/profile/' + this.collegeProfile.id
+      let url = 'league/colleges/profile/' + this.collegeProfile.id + '/'
       this.$axios.get(url)
         .then(response => {
           this.collegeProfile.name = response.data['info'].name

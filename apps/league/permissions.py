@@ -4,6 +4,7 @@ from .models import (Team, TeamMember, )
 
 
 class NotCollegeMember(APIException):
+    status_code = 200
     default_detail = 11
 
 
@@ -22,6 +23,7 @@ class CollegeMemberPermission(BasePermission):
 
 
 class NotCollegeCaptain(APIException):
+    status_code = 200
     default_detail = 12
 
 
@@ -37,6 +39,7 @@ class CollegeCaptainPermission(BasePermission):
 
 
 class NotTeamMember(APIException):
+    status_code = 200
     default_detail = 13
 
 
@@ -55,6 +58,7 @@ class TeamMemberPermission(BasePermission):
 
 
 class NotTeamCaptain(APIException):
+    status_code = 200
     default_detail = 14
 
 

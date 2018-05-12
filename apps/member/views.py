@@ -15,7 +15,8 @@ from apps.league.serializers import TeamListSerializer
 
 class MemberRegisterAuthenticationAPI(APIView):
     """
-    学生证认证接口(POST)
+    学生证认证接口
+    (POST)
     Request: {
         'studentID': <学生证号>
         'password': <学生证密码>
@@ -60,7 +61,8 @@ class MemberRegisterAuthenticationAPI(APIView):
 
 class MemberRegistrationAPI(APIView):
     """
-    用户注册接口(POST)
+    用户注册接口
+    (POST)
     Request: {
         'gender': <性别>,
         'mobile': <电话>,
@@ -111,7 +113,8 @@ class MemberRegistrationAPI(APIView):
 
 class MemberLoginAPI(APIView):
     """
-    用户登录接口(POST)
+    用户登录接口
+    (POST)
     Request: {
         'id': <学生证号>,
         'password': <密码>
@@ -197,7 +200,8 @@ class MemberLogoutAPI(APIView):
 
 class MemberActiveMobileAPI(APIView):
     """
-    用户手机激活接口(GET)
+    用户手机激活接口
+    (GET)
     Response: {
         'detail': <状态码>
     }
@@ -228,7 +232,8 @@ class MemberActiveMobileAPI(APIView):
 
 class MemberProfileAPI(APIView):
     """
-    用户个人信息接口(GET)
+    用户个人信息接口
+    (GET)
     Response: {
         'name': <姓名>,
         'gender': <性别>,
@@ -269,7 +274,8 @@ class MemberProfileAPI(APIView):
 
 class MemberResetPasswordAPI(APIView):
     """
-    用户重置密码接口(GET)
+    用户重置密码接口
+    (GET)
     Response: {
         'detail': <状态码>
     }
@@ -291,7 +297,8 @@ class MemberResetPasswordAPI(APIView):
 
 class MemberResetMobileAPI(APIView):
     """
-    用户重置手机接口(GET)
+    用户重置手机接口
+    (GET)
     Response: {
         'mobile': <手机号码(中间４位不显示)>
         'detail': <状态码>
@@ -317,7 +324,8 @@ class MemberResetMobileAPI(APIView):
 
 class MemberAuthenticationAPI(APIView):
     """
-    用户在校认证（获取课程时间）接口(POST)
+    用户在校认证（获取课程时间）接口
+    (POST)
     Request: {
         'password': <学生证密码>
     }

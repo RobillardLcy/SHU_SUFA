@@ -4,10 +4,12 @@ from .models import Member
 
 
 class MemberNotLogin(APIException):
+    status_code = 200
     default_detail = 1
 
 
 class MemberNotActive(APIException):
+    status_code = 200
     default_detail = 3
 
 
@@ -28,6 +30,7 @@ class MemberPermission(BasePermission):
 
 
 class MemberNotAuth(APIException):
+    status_code = 200
     default_detail = 4
 
 

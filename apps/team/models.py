@@ -79,7 +79,7 @@ class ManTeamMatch(models.Model):
     """
     id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     league = models.CharField(max_length=20, verbose_name='赛事')
-    against = models.CharField(max_length=20, verbose_name='对手')
+    opponent = models.CharField(max_length=20, verbose_name='对手')
     time = models.DateTimeField(verbose_name='时间')
     place = models.CharField(max_length=50, verbose_name='地点')
     result = models.CharField(max_length=5, default='-:-', verbose_name='赛果')
@@ -96,7 +96,7 @@ class WomanTeamMatch(models.Model):
     """
     id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     league = models.CharField(max_length=20, verbose_name='赛事')
-    against = models.CharField(max_length=20, verbose_name='对手')
+    opponent = models.CharField(max_length=20, verbose_name='对手')
     time = models.DateTimeField(verbose_name='时间')
     place = models.CharField(max_length=50, verbose_name='地点')
     result = models.CharField(max_length=5, default='-:-', verbose_name='赛果')

@@ -18,7 +18,8 @@ from apps.member.permissions import (MemberPermission, MemberAuthPermission)
 
 class CollegeTeamListAPI(APIView):
     """
-    学院队伍列表接口(GET)
+    学院队伍列表接口
+    (GET)
     Response(array): {
         'id': <学院队伍编号>,
         'name': <学院名称>,
@@ -34,7 +35,8 @@ class CollegeTeamListAPI(APIView):
 
 class CollegeTeamProfileAPI(APIView):
     """
-    学院队伍详细信息接口(GET)
+    学院队伍详细信息接口
+    (GET)
     Response: {
         'info': {
             'id': <学院队伍编号>,
@@ -109,7 +111,8 @@ class CollegeTeamCaptainChangeAPI(APIView):
 
 class LeagueSignupCollegeMemberAPI(APIView):
     """
-    学院赛事队员报名接口(API)
+    学院赛事队员报名接口
+    (API)
     Request: {
         'league': <赛事队伍报名编号>
     }
@@ -146,7 +149,8 @@ class LeagueSignupCollegeMemberAPI(APIView):
 
 class LeagueSignupCollegeMemberStatusAPI(APIView):
     """
-    学院赛事学院队员报名情况接口(GET)
+    学院赛事学院队员报名情况接口
+    (GET)
     Response(array): {
         'id': <队员学号>,
         'name': <队员姓名>,
@@ -172,7 +176,8 @@ class LeagueSignupCollegeMemberStatusAPI(APIView):
 
 class LeagueSignupCollegeMemberStatusCheckAPI(APIView):
     """
-    学院赛事参赛队员审核接口(POST)
+    学院赛事参赛队员审核接口
+    (POST)
     Request: {
         'league': <学院赛事报名编码>,
         'pass': [<队员报名编号>]
@@ -202,7 +207,8 @@ class LeagueSignupCollegeMemberStatusCheckAPI(APIView):
 
 class FreeTeamApplyAPI(APIView):
     """
-    自由队伍建队申请接口(GET)
+    自由队伍建队申请接口
+    (GET)
     Response: {
         'name': <申请人姓名>,
         'mobile': <申请人电话>
@@ -250,7 +256,8 @@ class FreeTeamApplyAPI(APIView):
 
 class FreeTeamJoinAPI(APIView):
     """
-    自由队伍入队申请接口(POST)
+    自由队伍入队申请接口
+    (POST)
     Request: {
         'team_id': <队伍编号>
     }
@@ -278,7 +285,8 @@ class FreeTeamJoinAPI(APIView):
 
 class FreeTeamLeaveAPI(APIView):
     """
-    自由队伍离队接口(POST)
+    自由队伍离队接口
+    (POST)
     Request: {}
     Response: {
         'detail': <状态码>
@@ -296,7 +304,8 @@ class FreeTeamLeaveAPI(APIView):
 
 class FreeTeamListAPI(APIView):
     """
-    自由队伍列表接口(GET)
+    自由队伍列表接口
+    (GET)
     Response(array): {
         'id': <队伍编号>,
         'name': <队名>,
@@ -312,7 +321,8 @@ class FreeTeamListAPI(APIView):
 
 class FreeTeamProfileAPI(APIView):
     """
-    自由队伍详细信息接口(GET)
+    自由队伍详细信息接口
+    (GET)
     Response: {
         'info': {
             'id': <队伍编号>,
@@ -361,7 +371,8 @@ class FreeTeamProfileAPI(APIView):
 
 class FreeTeamProfileChangeAPI(APIView):
     """
-    自由队伍信息更改接口(POST)
+    自由队伍信息更改接口
+    (POST)
     Request: {
         'name': <队名>,
         'logo': <队徽>,
@@ -414,7 +425,8 @@ class FreeTeamCaptainChangeAPI(APIView):
 
 class LeagueListAPI(APIView):
     """
-    所有赛事列表接口(GET)
+    所有赛事列表接口
+    (GET)
     Response(array): {
         'id': <赛事编号>,
         'name': <赛事名称>,
@@ -433,7 +445,8 @@ class LeagueListAPI(APIView):
 
 class RecentlyLeagueListAPI(APIView):
     """
-    近期赛事列表接口(GET)
+    近期赛事列表接口
+    (GET)
     Response: {
         'id': <赛事编号>,
         'name': <赛事名称>,
@@ -452,7 +465,8 @@ class RecentlyLeagueListAPI(APIView):
 
 class LeagueProfileAPI(APIView):
     """
-    赛事详细信息接口(GET)
+    赛事详细信息接口
+    (GET)
     Response: {
         'id': <赛事编号>,
         'name': <赛事名称>,
@@ -476,7 +490,8 @@ class LeagueProfileAPI(APIView):
 
 class LeagueTeamSignupAPI(APIView):
     """
-    队伍赛事报名接口(POST)
+    队伍赛事报名接口
+    (POST)
     Request: {
         'league': <赛事编号>
     }
@@ -507,7 +522,8 @@ class LeagueTeamSignupAPI(APIView):
 
 class LeagueTeamSignupStatusAPI(APIView):
     """
-    赛事队伍报名情况接口(GET)
+    赛事队伍报名情况接口
+    (GET)
     Response(array): {
         'id': <队伍编号>,
         'name': <队伍名称>,
@@ -523,7 +539,8 @@ class LeagueTeamSignupStatusAPI(APIView):
 
 class LeagueSignupTeamMemberAPI(APIView):
     """
-    队员赛事报名接口(POST)
+    队员赛事报名接口
+    (POST)
     Request: {
         'league': <队伍赛事报名编号>
     }
@@ -556,7 +573,8 @@ class LeagueSignupTeamMemberAPI(APIView):
 
 class LeagueSignupTeamMemberStatusAPI(APIView):
     """
-    赛事队伍队员报名情况接口(GET)
+    赛事队伍队员报名情况接口
+    (GET)
     Response(array): {
         'id': <队员学号>,
         'name': <队员姓名>,
@@ -582,7 +600,8 @@ class LeagueSignupTeamMemberStatusAPI(APIView):
 
 class LeagueSignupTeamMemberStatusCheckAPI(APIView):
     """
-    赛事队伍队员报名审核接口(POST)
+    赛事队伍队员报名审核接口
+    (POST)
     Request: {
         'league': <队伍赛事报名编号>,
         'pass': [<队员赛事报名编号>]
@@ -612,7 +631,8 @@ class LeagueSignupTeamMemberStatusCheckAPI(APIView):
 
 class LeagueMatchLeagueAPI(APIView):
     """
-    赛事赛程接口(GET)
+    赛事赛程接口
+    (GET)
     Response: (array){
         'home_team': <主队队名>,
         'away_team': <客队队名>,
@@ -637,7 +657,8 @@ class LeagueMatchLeagueAPI(APIView):
 
 class LeagueMatchCollegeAPI(APIView):
     """
-    赛事学院赛程接口(GET)
+    赛事学院赛程接口
+    (GET)
     Response: (array){
         'home_team': <主队队名>,
         'away_team': <客队队名>,
@@ -664,7 +685,8 @@ class LeagueMatchCollegeAPI(APIView):
 
 class LeagueMatchTeamAPI(APIView):
     """
-    赛事队伍赛程接口(GET)
+    赛事队伍赛程接口
+    (GET)
     Response: (array){
         'home_team': <主队队名>,
         'away_team': <客队队名>,
@@ -691,7 +713,8 @@ class LeagueMatchTeamAPI(APIView):
 
 class LeagueMatchDataAPI(APIView):
     """
-    赛事比赛数据接口(GET)
+    赛事比赛数据接口
+    (GET)
     Response: (array){
         'team_name': <队伍名称>,
         'team_member_name': <队员姓名>,
@@ -712,7 +735,8 @@ class LeagueMatchDataAPI(APIView):
 
 class RefereeListAPI(APIView):
     """
-    裁判列表接口(GET)
+    裁判列表接口
+    (GET)
     Response: {
         'id': <学号>,
         'name': <姓名>,

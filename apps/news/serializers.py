@@ -4,6 +4,7 @@ from .models import (NewsPosition, News, NewsContent, NewsReview)
 
 # 管理新闻板块位置使用
 class NewsPositionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = NewsPosition
         fields = ('id', 'name', 'description', 'status')
@@ -11,20 +12,18 @@ class NewsPositionSerializer(serializers.ModelSerializer):
 
 # 新闻
 class NewsSerializer(serializers.ModelSerializer):
+    writer_name = serializers.ReadOnlyField(source='writer.name')
+    position_id = serializers.ReadOnlyField(source='position.id')
+
     class Meta:
         model = News
-        fields = ('id', 'title', 'writer', 'position', 'thumb_up', 'status')
-
-
-# 新闻内容
-class NewsContentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NewsContent
-        fields = ('news', 'content')
+        fields = ('id', 'title', 'writer_name', 'position_id', 'datetime', 'thumb_up')
 
 
 # 新闻评论
 class NewsReviewSerializer(serializers.ModelSerializer):
+    member_name = serializers.ReadOnlyField(source='member.name')
+
     class Meta:
         model = NewsReview
-        fields = ('id', 'member', 'news', 'content')
+        fields = ('member_name', 'content')

@@ -24,6 +24,7 @@ class News(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     title = models.CharField(max_length=20, verbose_name='标题')
     writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='作者')
+    datetime = models.DateTimeField(auto_now_add=True, verbose_name='创作时间')
     position = models.ForeignKey(NewsPosition, on_delete=models.SET_NULL, null=True, default=None, verbose_name='板块')
     thumb_up = models.PositiveSmallIntegerField(default=0, verbose_name='好评')
     status = models.SmallIntegerField(default=-1, verbose_name='状态')

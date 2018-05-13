@@ -14,7 +14,8 @@ class Activity(models.Model):
     place = models.CharField(max_length=50, verbose_name='地点')
     # -1：待审核
     #  0：审核通过（报名阶段）
-    #  1：正在举行或已结束
+    #  1：正在举行
+    #  2：已结束
     status = models.SmallIntegerField(default=-1, verbose_name='状态')
 
     class Meta:

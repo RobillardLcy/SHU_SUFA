@@ -3,7 +3,7 @@ from .views import (CollegeTeamListAPI, CollegeTeamProfileAPI, CollegeTeamCaptai
                     LeagueSignupCollegeMemberAPI, LeagueSignupCollegeMemberStatusAPI,
                     LeagueSignupCollegeMemberStatusCheckAPI, FreeTeamApplyAPI, FreeTeamJoinAPI,
                     FreeTeamLeaveAPI, FreeTeamListAPI, FreeTeamProfileAPI, FreeTeamProfileChangeAPI,
-                    FreeTeamCaptainChangeAPI, LeagueListAPI, RecentlyLeagueListAPI, LeagueProfileAPI,
+                    FreeTeamCaptainChangeAPI, LeagueAllListAPI, LeagueRecentlyListAPI, LeagueProfileAPI,
                     LeagueTeamSignupAPI, LeagueTeamSignupStatusAPI, LeagueSignupTeamMemberAPI,
                     LeagueSignupTeamMemberStatusAPI, LeagueSignupTeamMemberStatusCheckAPI,
                     LeagueMatchLeagueAPI, LeagueMatchCollegeAPI, LeagueMatchTeamAPI, LeagueMatchDataAPI,
@@ -16,9 +16,9 @@ urlpatterns = [
     # 学院队伍详细信息(GET、POST)
     path('colleges/profile/<int:college_id>/', CollegeTeamProfileAPI.as_view(), name='colleges-profile'),
     # 近期赛事列表(GET)
-    path('league/list/recently/', RecentlyLeagueListAPI.as_view(), name='league-list-recently'),
+    path('league/list/recently/', LeagueRecentlyListAPI.as_view(), name='league-list-recently'),
     # 赛事列表(GET)
-    path('league/list/all/', LeagueListAPI.as_view(), name='league-list-all'),
+    path('league/list/all/', LeagueAllListAPI.as_view(), name='league-list-all'),
     # 自由队伍列表(GET)
     path('free-team/list/', FreeTeamListAPI.as_view(), name='free-team-list'),
     # 自由队伍详细信息(POST)

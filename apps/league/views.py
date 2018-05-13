@@ -423,7 +423,7 @@ class FreeTeamCaptainChangeAPI(APIView):
         pass
 
 
-class LeagueListAPI(APIView):
+class LeagueAllListAPI(APIView):
     """
     所有赛事列表接口
     (GET)
@@ -443,7 +443,7 @@ class LeagueListAPI(APIView):
         return Response(leagues_list)
 
 
-class RecentlyLeagueListAPI(APIView):
+class LeagueRecentlyListAPI(APIView):
     """
     近期赛事列表接口
     (GET)

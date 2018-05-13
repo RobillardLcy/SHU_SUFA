@@ -365,7 +365,8 @@ export default {
           .then(response => {
             if ('detail' in response.data) {
               if (response.data.detail === 0) {
-                this.$cookie.set('mobile', this.register.mobile, { expires: '15m' })
+                this.$cookie.set('id', this.certificate.studentID)
+                this.$cookie.set('mobile', this.register.mobile)
                 this.$cookie.delete('studentID')
                 this.$cookie.delete('studentName')
                 this.activeMobile.verificationMobile = this.register.mobile

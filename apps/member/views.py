@@ -101,9 +101,8 @@ class MemberRegistrationAPI(APIView):
                     del request.session['studentName']
                 except KeyError:
                     pass
+                request.session['id'] = member.id
                 request.session['mobile'] = member.mobile
-                request.session['active'] = True
-                request.session['auth'] = True
                 # TODO: 生成验证码
                 return Response({'detail': 0})
             return Response({'detail': 8})

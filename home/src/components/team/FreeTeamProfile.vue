@@ -89,13 +89,15 @@ export default {
           this.teamProfile.captain.id = response.data['info'].captain_id
           this.teamProfile.captain.name = response.data['info'].captain_name
           this.teamProfile.captain.mobile = response.data['info'].captain_mobile
-          for (var i = 0; i < response.data['members'].length; i++) {
-            this.teamProfile.members.push({
-              id: response.data['members'][i].id,
-              name: response.data['members'][i].name,
-              gender: (response.data['members'][i].gender === 'male') ? '男' : '女',
-              number: response.data['members'][i].num
-            })
+          if ('members' in response.data) {
+            for (var i = 0; i < response.data['members'].length; i++) {
+              this.teamProfile.members.push({
+                id: response.data['members'][i].id,
+                name: response.data['members'][i].name,
+                gender: (response.data['members'][i].gender === 'male') ? '男' : '女',
+                number: response.data['members'][i].num
+              })
+            }
           }
         })
         .catch(error => {

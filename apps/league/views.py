@@ -67,18 +67,22 @@ class CollegeTeamProfileAPI(APIView):
     }
     """
 
-    permission_classes = (MemberPermission, MemberAuthPermission)
+    permission_classes = (MemberPermission,)
 
     def get(self, request, college_id, format=None):
         try:
             college = Team.objects.get(id=college_id)
             college_info = TeamProfileSerializer(college).data
-            members = TeamMember.objects.all().filter(team=college, status__gte=0, leave=None)
-            if college_id == request.session.get('college'):
-                members_info = TeamMemberProfileListSerializer(members, many=True).data
+            member_id = request.session.get('id')
+            if Member.objects.get(id=member_id).is_auth:
+                members = TeamMember.objects.all().filter(team=college, status__gte=0, leave=None)
+                if college_id == request.session.get('college'):
+                    members_info = TeamMemberProfileListSerializer(members, many=True).data
+                else:
+                    members_info = TeamMemberListSerializer(members, many=True).data
+                return Response({'info': college_info, 'member': members_info})
             else:
-                members_info = TeamMemberListSerializer(members, many=True).data
-            return Response({'info': college_info, 'member': members_info})
+                return Response({'info': college_info})
         except Exception as e:
             return Response(status.HTTP_400_BAD_REQUEST)
 
@@ -353,18 +357,22 @@ class FreeTeamProfileAPI(APIView):
     }
     """
 
-    permission_classes = (MemberPermission, MemberAuthPermission)
+    permission_classes = (MemberPermission,)
 
     def get(self, request, team_id, format=None):
         try:
             team = Team.objects.get(id=team_id)
             team_profile = TeamProfileSerializer(team).data
-            members = TeamMember.objects.all().filter(team=team, status__gte=0, leave=None)
-            if team_id == request.session.get('team'):
-                members_info = TeamMemberProfileListSerializer(members, many=True).data
+            member_id = request.session.get('id')
+            if Member.objects.get(id=member_id).is_auth:
+                members = TeamMember.objects.all().filter(team=team, status__gte=0, leave=None)
+                if team_id == request.session.get('team'):
+                    members_info = TeamMemberProfileListSerializer(members, many=True).data
+                else:
+                    members_info = TeamMemberListSerializer(members, many=True).data
+                return Response({'info': team_profile, 'member': members_info})
             else:
-                members_info = TeamMemberListSerializer(members, many=True).data
-            return Response({'info': team_profile, 'member': members_info})
+                return Response({'info': team_profile})
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

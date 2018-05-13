@@ -1,5 +1,9 @@
+# IDE
 .idea/
 .vscode/
+.vs/
+
+# Project
 sufa.cnf
 __pycache__/
 media/

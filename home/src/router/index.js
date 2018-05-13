@@ -194,6 +194,9 @@ const router = new Router({
           props: true,
           components: {
             team: CollegeTeamProfile
+          },
+          meta: {
+            need_log: true
           }
         },
         {
@@ -216,6 +219,9 @@ const router = new Router({
           props: true,
           components: {
             team: FreeTeamProfile
+          },
+          meta: {
+            need_log: true
           }
         }
       ]

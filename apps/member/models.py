@@ -176,14 +176,32 @@ class PermissionToPosition(models.Model):
         unique_together = ('permission', 'position')
 
 
+class AdministratorApply(models.Model):
+    """
+    社团骨干申请
+    """
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, verbose_name='社团成员')
+    position = models.ForeignKey(Position, on_delete=models.CASCADE, verbose_name='申请职位')
+    introduction = models.CharField(max_length=200, verbose_name='自我介绍')
+    # -1: 审核未通过
+    #  0: 待审核
+    #  1: 审核通过
+    status = models.SmallIntegerField(default=0, verbose_name='状态')
+
+    class Meta:
+        db_table = 'administrator_apply'
+        verbose_name = '社团骨干申请'
+        verbose_name_plural = verbose_name
+
+
 class Administrator(models.Model):
     """
     社团骨干
     """
     member = models.OneToOneField(Member, on_delete=models.CASCADE, primary_key=True, verbose_name='成员')
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, verbose_name='职位')
-    introduction = models.CharField(max_length=200, verbose_name='自我介绍')
-    status = models.BooleanField(default=False, verbose_name='状态')
+    status = models.BooleanField(default=True, verbose_name='状态')
 
     class Meta:
         db_table = 'administrator'
@@ -191,4 +209,4 @@ class Administrator(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.member
+        return self.member.name

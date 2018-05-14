@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import (Member, MemberClasses,
-                     Permission, Department, Position, PermissionToDepartment, PermissionToPosition, Administrator)
+from .models import (Member, MemberClasses, Administrator, AdministratorApply,
+                     Permission, Department, Position, PermissionToDepartment, PermissionToPosition)
 
 
 # 社团成员注册
@@ -45,17 +45,6 @@ class MemberClassSerializer(serializers.ModelSerializer):
         fields = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday')
 
 
-# 社团骨干
-class AdminSerializer(serializers.HyperlinkedModelSerializer):
-    member_id = serializers.ReadOnlyField(source='member.id')
-    member_name = serializers.ReadOnlyField(source='member.name')
-    position_name = serializers.ReadOnlyField(source='position.name')
-
-    class Meta:
-        model = Administrator
-        fields = ('member_id', 'member_name', 'position_name', 'status')
-
-
 # 社团部门
 class DepartmentSerializer(serializers.ModelSerializer):
 
@@ -65,11 +54,12 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 # 社团职位
-class PositionSerializer(serializers.ModelSerializer):
+class PositionSerializer(serializers.HyperlinkedModelSerializer):
+    department_name = serializers.ReadOnlyField(source='department.name')
 
     class Meta:
         model = Position
-        fields = ('id', 'name', 'department', 'remind')
+        fields = ('id', 'name', 'department_name', 'remind')
 
 
 # 权限
@@ -98,3 +88,27 @@ class PositionPermissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PermissionToPosition
         fields = ('permission_id', 'permission_name')
+
+
+# 社团骨干申请
+class AdminApplySerializer(serializers.HyperlinkedModelSerializer):
+    member_id = serializers.ReadOnlyField(source='member.id')
+    member_name = serializers.ReadOnlyField(source='member.name')
+    member_gender = serializers.ReadOnlyField(source='member.gender')
+
+    class Meta:
+        model = AdministratorApply
+        fields = ('id', 'member_id', 'member_name', 'member_gender', 'position_name', 'introduction')
+
+
+# 社团骨干
+class AdminSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.ReadOnlyField(source='member.id')
+    name = serializers.ReadOnlyField(source='member.name')
+    gender = serializers.ReadOnlyField(source='member.gender')
+    mobile = serializers.ReadOnlyField(source='member.mobile')
+    position_name = serializers.ReadOnlyField(source='position.name')
+
+    class Meta:
+        model = Administrator
+        fields = ('id', 'name', 'gender', 'mobile', 'position_name')

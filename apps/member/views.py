@@ -4,10 +4,12 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-from .models import (Member, MemberClasses, Department, Position, Administrator,
+from .models import (Member, MemberClasses, Department, Position, Administrator, AdministratorApply,
                      Permission, PermissionToDepartment, PermissionToPosition)
 from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer,
-                          MemberListSerializer, MemberClassSerializer)
+                          MemberListSerializer, MemberClassSerializer,
+                          PermissionSerializer, DepartmentPermissionSerializer, PositionPermissionSerializer,
+                          DepartmentSerializer, PositionSerializer, AdminApplySerializer, AdminSerializer)
 from .permissions import (MemberPermission, MemberAuthPermission, AdminPermission)
 
 import datetime
@@ -381,12 +383,12 @@ class AdminLoginAPI(APIView):
         try:
             user = Member.objects.get(id=id)
             if user.check_password(password):
-                request.session['id'] = user.id
-                request.session['administrator'] = True
-                request.session.set_expiry(86400)
                 if user.is_active:
                     if user.is_auth:
                         if user.is_admin:
+                            request.session['id'] = user.id
+                            request.session['administrator'] = True
+                            request.session.set_expiry(86400)
                             return Response({'detail': 0})
                         else:
                             return Response({'detail': 15})
@@ -444,7 +446,8 @@ class AdminApplyAPI(APIView):
             # TODO: Add Error Tag
             return Response({'detail': ...})
         elif position and introduction:
-            admin = Administrator.objects.create(member__id=member_id, position__id=position, introduction=introduction)
+            admin = AdministratorApply.objects.\
+                create(member__id=member_id, position__id=position, introduction=introduction)
             if admin:
                 return Response({'detail': 0})
             else:
@@ -459,19 +462,49 @@ class AdministratorAccessAPI(APIView):
     """
     社团骨干审核接口
     (GET)
-    Response(array): {}
+    Response(array): {
+        'id': <编号>,
+        'member_id': <学号>,
+        'member_name': <姓名>,
+        'member_gender': <性别>，
+        'position_name': <申请职位>,
+        'introduction': <自我介绍>
+    }
     (POST)
-    Request: {}
-    Response: {}
+    Request: {
+        'access': (array)['id'],
+        'fail': (array)['id']
+    }
+    Response: {
+        'detail': <状态码>
+    }
     """
 
     permission_classes = (AdminPermission,)
 
     def get(self, request, format=None):
-        pass
+        admin_apply = AdministratorApply.objects.all().filter(status=0)
+        admin_apply_list = AdminApplySerializer(admin_apply, many=True).data
+        return Response(admin_apply_list)
 
     def post(self, request, format=None):
-        pass
+        access = request.data.get('access')
+        fail = request.data.get('fail')
+        detail = 0
+        if access:
+            for id in access:
+                try:
+                    admin_apply = AdministratorApply.objects.get(id=id)
+                    Administrator.objects.create(member__id=admin_apply.member.id, position=admin_apply.position.id)
+                    admin_apply.status = 1
+                    admin_apply.save()
+                except Exception as e:
+                    # TODO: Add Error Tag
+                    detail = ...
+        if fail:
+            for id in fail:
+                AdministratorApply.objects.filter(id=id).update(status=-1)
+        return Response({'detail': detail})
 
 
 class MemberListAPI(APIView):
@@ -492,3 +525,82 @@ class MemberListAPI(APIView):
         members = Member.objects.all().order_by('id').reverse()
         members_list = MemberListSerializer(members, many=True).data
         return Response(members_list)
+
+
+class AdminListAPI(APIView):
+    """
+    社团骨干列表接口
+    (GET)
+    Response(array): {
+        'id': <学号>,
+        'name': <姓名>,
+        'gender': <性别>,
+        'mobile': <电话>,
+        'position_name': <职位>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        admin = Administrator.objects.all().filter(status=True)
+        admin_list = AdminSerializer(admin, many=True).data
+        return Response(admin_list)
+
+
+class PermissionListAPI(APIView):
+    """
+    权限列表接口
+    (GET)
+    Response(array): {
+        'id': <编号>,
+        'name': <名称>,
+        'description': <描述>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        permission = Permission.objects.all()
+        permission_list = PermissionSerializer(permission, many=True).data
+        return Response(permission_list)
+
+
+class DepartmentListAPI(APIView):
+    """
+    部门列表接口
+    (GET)
+    Response(array): {
+        'id': <编号>,
+        'name': <部门名称>,
+        'description': <描述>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        department = Department.objects.all()
+        department_list = DepartmentSerializer(department, many=True).data
+        return Response(department_list)
+
+
+class PositionListAPI(APIView):
+    """
+    职位列表接口
+    (GET)
+    Response(array): {
+        'id': <编号>,
+        'name': <职位名称>,
+        'department_name': <部门名称>,
+        'remind': <提醒事项>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        position = Position.objects.all()
+        position_list = PositionSerializer(position, many=True).data
+        return Response(position_list)

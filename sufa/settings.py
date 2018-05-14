@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
-HOME_URLCONF = 'sufa.urls'
+ROOT_URLCONF = 'sufa.urls'
 ADMIN_URLCONF = 'sufa.admin_urls'
 ROOT_HOSTCONF = 'sufa.hosts'
 DEFAULT_HOST = 'home'

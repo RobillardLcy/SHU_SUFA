@@ -3,7 +3,7 @@ from .models import (Member, MemberClasses,
                      Permission, Department, Position, PermissionToDepartment, PermissionToPosition, Administrator)
 
 
-# 社团成员注册序列化
+# 社团成员注册
 class MemberRegistrationSerializer(serializers.ModelSerializer):
     id = serializers.CharField(required=True, min_length=8, max_length=8)
     name = serializers.CharField(required=True, max_length=50)
@@ -21,7 +21,7 @@ class MemberRegistrationSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'gender', 'mobile', 'campus', 'favorite_club', 'password')
 
 
-# 社团成员获取个人详细信息序列化
+# 社团成员获取个人详细信息
 class MemberProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -29,15 +29,15 @@ class MemberProfileSerializer(serializers.ModelSerializer):
         fields = ('name', 'gender', 'mobile', 'campus', 'favorite_club')
 
 
-# 社团成员列表学序列化
+# 社团成员列表
 class MemberListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
-        fields = ('id', 'name', 'gender', 'mobile', 'campus', 'favorite_club')
+        fields = ('id', 'name', 'gender', 'mobile')
 
 
-# 社团成员课程序列化
+# 社团成员课程
 class MemberClassSerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -4,8 +4,10 @@ import requests
 from PIL import Image
 from io import BytesIO
 
-from .models import Member
-from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer,)
+from .models import (Member, MemberClasses, Department, Position, Administrator,
+                     Permission, PermissionToDepartment, PermissionToPosition)
+from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer,
+                          MemberListSerializer, MemberClassSerializer)
 from .permissions import (MemberPermission, MemberAuthPermission, AdminPermission)
 
 import datetime
@@ -419,15 +421,74 @@ class AdminLogoutAPI(APIView):
         return Response({'detail': 0})
 
 
+class AdminApplyAPI(APIView):
+    """
+    社团骨干申请接口
+    (POST)
+    Request: {
+        'position': <职位>,
+        'introduction': <自我介绍>
+    }
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    permission_classes = (MemberPermission, MemberAuthPermission)
+
+    def post(self, request, format=None):
+        member_id = request.session.get('id')
+        position = request.data.get('position')
+        introduction = request.data.get('introduction')
+        if Administrator.objects.filter(member__id=member_id).exists:
+            # TODO: Add Error Tag
+            return Response({'detail': ...})
+        elif position and introduction:
+            admin = Administrator.objects.create(member__id=member_id, position__id=position, introduction=introduction)
+            if admin:
+                return Response({'detail': 0})
+            else:
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+        else:
+            # TODO: Add Error Tag
+            return Response({'detail': ...})
+
+
+class AdministratorAccessAPI(APIView):
+    """
+    社团骨干审核接口
+    (GET)
+    Response(array): {}
+    (POST)
+    Request: {}
+    Response: {}
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
 class MemberListAPI(APIView):
     """
     社团成员列表接口
     (GET)
-    Response(array): {}
+    Response(array): {
+        'id': <学号>,
+        'name': <姓名>,
+        'gender': <性别>,
+        'mobile': <电话>
+    }
     """
 
     permission_classes = (AdminPermission,)
 
     def get(self, request, format=None):
         members = Member.objects.all().order_by('id').reverse()
-
+        members_list = MemberListSerializer(members, many=True).data
+        return Response(members_list)

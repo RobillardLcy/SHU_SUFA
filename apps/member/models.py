@@ -182,7 +182,8 @@ class Administrator(models.Model):
     """
     member = models.OneToOneField(Member, on_delete=models.CASCADE, primary_key=True, verbose_name='成员')
     position = models.ForeignKey(Position, on_delete=models.SET_NULL, null=True, verbose_name='职位')
-    status = models.BooleanField(default=True, verbose_name='状态')
+    introduction = models.CharField(max_length=200, verbose_name='自我介绍')
+    status = models.BooleanField(default=False, verbose_name='状态')
 
     class Meta:
         db_table = 'administrator'

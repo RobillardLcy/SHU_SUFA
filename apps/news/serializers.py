@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import (NewsPosition, News, NewsContent, NewsReview)
+from .models import (NewsPosition, News, NewsReview)
 
 
 # 管理新闻板块位置使用

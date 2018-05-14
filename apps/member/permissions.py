@@ -69,3 +69,6 @@ class AdminPermission(BasePermission):
                 Member.objects.filter(id=member_id).update(is_admin=False)
                 # TODO: 异常情况记录
         raise MemberNotAdmin
+
+
+# TODO: Administrator Permission Config

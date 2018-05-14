@@ -4,7 +4,7 @@ from django.db import migrations
 
 
 def departments(apps, schema_editor):
-    Department = apps.get_model("administrator", "Department")
+    Department = apps.get_model("member", "Department")
     db_alias = schema_editor.connection.alias
     Department.objects.using(db_alias).bulk_create([
         Department(name='指导老师', description='社团指导老师'),
@@ -24,7 +24,7 @@ def departments(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('administrator', '0001_initial'),
+        ('member', '0001_initial'),
     ]
 
     operations = [

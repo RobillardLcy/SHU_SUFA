@@ -6,7 +6,7 @@ from io import BytesIO
 
 from .models import Member
 from .serializers import (MemberRegistrationSerializer, MemberProfileSerializer,)
-from .permissions import (MemberPermission, MemberAuthPermission)
+from .permissions import (MemberPermission, MemberAuthPermission, AdminPermission)
 
 import datetime
 from apps.league.models import Team, TeamMember
@@ -358,3 +358,76 @@ class MemberAuthenticationAPI(APIView):
             return Response({'detail': 0})
         else:
             return Response({'detail': '5'})
+
+
+class AdminLoginAPI(APIView):
+    """
+       管理平台登录接口
+       (POST)
+       Request: {
+           'id': <学生证号>,
+           'password': <密码>
+       }
+       Response: {
+           'detail': <状态码>
+       }
+       """
+
+    def post(self, request, format=None):
+        id = request.data.get('id', None)
+        password = request.data.get('password')
+        try:
+            user = Member.objects.get(id=id)
+            if user.check_password(password):
+                request.session['id'] = user.id
+                request.session['administrator'] = True
+                request.session.set_expiry(86400)
+                if user.is_active:
+                    if user.is_auth:
+                        if user.is_admin:
+                            return Response({'detail': 0})
+                        else:
+                            return Response({'detail': 15})
+                    else:
+                        return Response({'detail': 15})
+                else:
+                    return Response({'detail': 15})
+            else:
+                # 密码错误
+                return Response({"detail": 2})
+        except Exception as e:
+            # 未注册
+            return Response({"detail": 2})
+
+
+class AdminLogoutAPI(APIView):
+    """
+    管理平台注销接口
+    (POST)
+    Request: {}
+    Response: {
+        'detail': 0
+    }
+    """
+
+    def post(self, request, format=None):
+        try:
+            del request.session['id']
+            del request.session['administrator']
+        except KeyError:
+            pass
+        return Response({'detail': 0})
+
+
+class MemberListAPI(APIView):
+    """
+    社团成员列表接口
+    (GET)
+    Response(array): {}
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        members = Member.objects.all().order_by('id').reverse()
+

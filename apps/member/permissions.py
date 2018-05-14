@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import APIException
-from .models import Member
+from .models import (Member, Administrator)
 
 
 class MemberNotLogin(APIException):
@@ -42,3 +42,30 @@ class MemberAuthPermission(BasePermission):
             if Member.objects.get(id=member_id).is_auth:
                 return True
         raise MemberNotAuth
+
+
+class MemberNotAdmin(APIException):
+    status_code = 200
+    default_detail = 15
+
+
+class AdminNotLogin(APIException):
+    status_code = 200
+    default_detail = 16
+
+
+class AdminPermission(BasePermission):
+
+    def has_permission(self, request, view):
+        member_id = request.session.get('id', False)
+        administrator = request.session.get('administrator')
+        if Member.objects.get(id=member_id).is_admin:
+            if Administrator.objects.filter(member__id=member_id, status=True).exists:
+                if member_id and administrator:
+                    return True
+                else:
+                    raise AdminNotLogin
+            else:
+                Member.objects.filter(id=member_id).update(is_admin=False)
+                # TODO: 异常情况记录
+        raise MemberNotAdmin

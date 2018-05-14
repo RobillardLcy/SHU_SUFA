@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_hosts',
     'apps.member',
-    'apps.administrator',
     'apps.team',
     'apps.league',
     'apps.activity',
@@ -61,6 +60,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'sufa.urls'
+ADMIN_URLCONF = 'sufa.admin_urls'
 ROOT_HOSTCONF = 'sufa.hosts'
 DEFAULT_HOST = 'home'
 

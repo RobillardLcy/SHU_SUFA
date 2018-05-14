@@ -13,3 +13,6 @@ requests
 Pillow
 pygments
 mysqlclient
+# Program
+pylint
+pylint-django

@@ -361,7 +361,7 @@ class MemberAuthenticationAPI(APIView):
             Member.objects.filter(id=member_id).update(is_auth=True)
             return Response({'detail': 0})
         else:
-            return Response({'detail': '5'})
+            return Response({'detail': 5})
 
 
 class AdminLoginAPI(APIView):
@@ -458,7 +458,7 @@ class AdminApplyAPI(APIView):
             return Response({'detail': ...})
 
 
-class AdministratorAccessAPI(APIView):
+class AdminAccessAPI(APIView):
     """
     社团骨干审核接口
     (GET)
@@ -548,14 +548,19 @@ class AdminListAPI(APIView):
         return Response(admin_list)
 
 
-class PermissionListAPI(APIView):
+class PermissionAPI(APIView):
     """
-    权限列表接口
+    权限接口
     (GET)
     Response(array): {
         'id': <编号>,
         'name': <名称>,
         'description': <描述>
+    }
+    (POST)
+    Request: {}
+    Response: {
+        'detail': <状态码>
     }
     """
 
@@ -566,15 +571,23 @@ class PermissionListAPI(APIView):
         permission_list = PermissionSerializer(permission, many=True).data
         return Response(permission_list)
 
+    def post(self, request, format=None):
+        pass
 
-class DepartmentListAPI(APIView):
+
+class DepartmentAPI(APIView):
     """
-    部门列表接口
+    部门接口
     (GET)
     Response(array): {
         'id': <编号>,
         'name': <部门名称>,
         'description': <描述>
+    }
+    (POST)
+    Request: {}
+    Response: {
+        'detail': <状态码>
     }
     """
 
@@ -585,16 +598,24 @@ class DepartmentListAPI(APIView):
         department_list = DepartmentSerializer(department, many=True).data
         return Response(department_list)
 
+    def post(self, request, format=None):
+        pass
 
-class PositionListAPI(APIView):
+
+class PositionAPI(APIView):
     """
-    职位列表接口
+    职位接口
     (GET)
     Response(array): {
         'id': <编号>,
         'name': <职位名称>,
         'department_name': <部门名称>,
         'remind': <提醒事项>
+    }
+    (POST)
+    Request: {}
+    Response: {
+        'detail': <状态码>
     }
     """
 
@@ -604,3 +625,60 @@ class PositionListAPI(APIView):
         position = Position.objects.all()
         position_list = PositionSerializer(position, many=True).data
         return Response(position_list)
+
+    def post(self, request, format=None):
+        pass
+
+
+class PermissionToDepartmentAPI(APIView):
+    """
+    部门权限接口
+    (GET)
+    Response(array): {
+        'permission_id': <权限编号>,
+        'permission_name': <权限名称>
+    }
+    (POST)
+    Request: {}
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
+class PermissionToPositionAPI(APIView):
+    """
+    职位权限接口
+    (GET)
+    Response: {
+        'department'(array): {
+            'permission_id': <权限编号>,
+            'permission_name': <权限名称>
+        },
+        'position'(array): {
+            'permission_id': <权限编号>,
+            'permission_name': <权限名称>
+        }
+    }
+    (POST)
+    Request: {}
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass

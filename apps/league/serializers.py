@@ -4,17 +4,18 @@ from .models import (Referee, Team, TeamMember, League, LeagueTeamSignup, League
 
 # 裁判
 class RefereeSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.ReadOnlyField(source='member.id')
-    name = serializers.ReadOnlyField(source='member.name')
-    gender = serializers.ReadOnlyField(source='member.gender')
+    member_id = serializers.ReadOnlyField(source='member.id')
+    member_name = serializers.ReadOnlyField(source='member.name')
+    member_gender = serializers.ReadOnlyField(source='member.gender')
 
     class Meta:
         model = Referee
-        fields = ('id', 'name', 'gender', 'level')
+        fields = ('member_id', 'member_name', 'member_gender', 'level')
 
 
 # 队伍列表
 class TeamListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Team
         fields = ('id', 'name', 'logo')
@@ -32,29 +33,30 @@ class TeamProfileSerializer(serializers.HyperlinkedModelSerializer):
 
 # 队伍信息成员列表
 class TeamMemberListSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.ReadOnlyField(source='member.id')
-    name = serializers.ReadOnlyField(source='member.name')
-    gender = serializers.ReadOnlyField(source='member.gender')
+    member_id = serializers.ReadOnlyField(source='member.id')
+    member_name = serializers.ReadOnlyField(source='member.name')
+    member_gender = serializers.ReadOnlyField(source='member.gender')
 
     class Meta:
         model = TeamMember
-        fields = ('id', 'name', 'gender', 'num')
+        fields = ('member_id', 'member_name', 'member_gender', 'num')
 
 
 # 队伍成员详细信息列表
 class TeamMemberProfileListSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.ReadOnlyField(source='member.id')
-    name = serializers.ReadOnlyField(source='member.name')
-    gender = serializers.ReadOnlyField(source='member.gender')
-    mobile = serializers.ReadOnlyField(source='member.mobile')
+    member_id = serializers.ReadOnlyField(source='member.id')
+    member_name = serializers.ReadOnlyField(source='member.name')
+    member_gender = serializers.ReadOnlyField(source='member.gender')
+    member_mobile = serializers.ReadOnlyField(source='member.mobile')
 
     class Meta:
         model = TeamMember
-        fields = ('id', 'name', 'gender', 'mobile', 'num', 'join', 'status')
+        fields = ('id', 'name', 'gender', 'mobile', 'num', 'join')
 
 
 # 赛事列表
 class LeagueListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = League
         fields = ('id', 'name', 'reg_start', 'reg_end', 'start', 'category')
@@ -62,6 +64,7 @@ class LeagueListSerializer(serializers.ModelSerializer):
 
 # 赛事信息
 class LeagueProfileSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = League
         fields = ('id', 'name', 'reg_start', 'reg_end', 'start', 'description', 'photo', 'category')
@@ -69,22 +72,22 @@ class LeagueProfileSerializer(serializers.ModelSerializer):
 
 # 赛事队伍报名
 class LeagueTeamSignupSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='team.id')
-    name = serializers.ReadOnlyField(source='team.name')
+    team_id = serializers.ReadOnlyField(source='team.id')
+    team_name = serializers.ReadOnlyField(source='team.name')
 
     class Meta:
         model = LeagueTeamSignup
-        fields = ('id', 'name', 'status')
+        fields = ('team_id', 'team_name', 'status')
 
 
 # 赛事队员报名
 class LeagueTeamMemberSignupSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='team_member.id')
-    name = serializers.ReadOnlyField(source='team_member.name')
+    member_id = serializers.ReadOnlyField(source='team_member.id')
+    member_name = serializers.ReadOnlyField(source='team_member.name')
 
     class Meta:
         model = LeagueTeamMemberSignup
-        fields = ('id', 'name', 'status')
+        fields = ('member_id', 'member_name', 'status')
 
 
 # 比赛
@@ -98,7 +101,7 @@ class MatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        fields = ('home_team', 'away_team',
+        fields = ('home_team_name', 'away_team_name',
                   'time', 'place', 'result', 'category',
                   'master_referee_name', 'second_referee_name', 'third_referee_name', 'fourth_referee_name')
 

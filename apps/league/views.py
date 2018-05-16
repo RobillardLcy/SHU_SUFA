@@ -49,19 +49,18 @@ class CollegeTeamProfileAPI(APIView):
         },
         'member': {
             (array){
-                'id': <队员学号>,
-                'name': <队员姓名>,
-                'gender': <队员性别>,
+                'member_id': <队员学号>,
+                'member_name': <队员姓名>,
+                'member_gender': <队员性别>,
                 'num': <队员号码>
             }
             (队伍成员)(array){
-                'id': <队员学号>,
-                'name': <队员姓名>,
-                'gender': <队员性别>,
-                'mobile': <队员手机号码>,
+                'member_id': <队员学号>,
+                'member_name': <队员姓名>,
+                'member_gender': <队员性别>,
+                'member_mobile': <队员手机号码>,
                 'num': <队员号码>,
-                'join': <入队时间>,
-                'status': <状态>
+                'join': <入队时间>
             }
         }
     }
@@ -80,7 +79,7 @@ class CollegeTeamProfileAPI(APIView):
                     members_info = TeamMemberProfileListSerializer(members, many=True).data
                 else:
                     members_info = TeamMemberListSerializer(members, many=True).data
-                return Response({'info': college_info, 'member': members_info})
+                return Response({'info': college_info, 'members': members_info})
             else:
                 return Response({'info': college_info})
         except Exception as e:
@@ -156,8 +155,8 @@ class LeagueSignupCollegeMemberStatusAPI(APIView):
     学院赛事学院队员报名情况接口
     (GET)
     Response(array): {
-        'id': <队员学号>,
-        'name': <队员姓名>,
+        'member_id': <队员学号>,
+        'member_name': <队员姓名>,
         'status': <状态>
     }
     """
@@ -339,19 +338,18 @@ class FreeTeamProfileAPI(APIView):
         },
         'member': {
             (array){
-                'id': <队员学号>,
-                'name': <队员姓名>,
-                'gender': <队员性别>,
+                'member_id': <队员学号>,
+                'member_name': <队员姓名>,
+                'member_gender': <队员性别>,
                 'num': <队员号码>
             }
             (队伍成员)(array){
-                'id': <队员学号>,
-                'name': <队员姓名>,
-                'gender': <队员性别>,
-                'mobile': <队员手机号码>,
+                'member_id': <队员学号>,
+                'member_name': <队员姓名>,
+                'member_gender': <队员性别>,
+                'member_mobile': <队员手机号码>,
                 'num': <队员号码>,
-                'join': <入队时间>,
-                'status': <状态>
+                'join': <入队时间>
             }
         }
     }
@@ -370,7 +368,7 @@ class FreeTeamProfileAPI(APIView):
                     members_info = TeamMemberProfileListSerializer(members, many=True).data
                 else:
                     members_info = TeamMemberListSerializer(members, many=True).data
-                return Response({'info': team_profile, 'member': members_info})
+                return Response({'info': team_profile, 'members': members_info})
             else:
                 return Response({'info': team_profile})
         except Exception as e:
@@ -533,8 +531,8 @@ class LeagueTeamSignupStatusAPI(APIView):
     赛事队伍报名情况接口
     (GET)
     Response(array): {
-        'id': <队伍编号>,
-        'name': <队伍名称>,
+        'team_id': <队伍编号>,
+        'team_name': <队伍名称>,
         'status': <状态>
     }
     """
@@ -584,8 +582,8 @@ class LeagueSignupTeamMemberStatusAPI(APIView):
     赛事队伍队员报名情况接口
     (GET)
     Response(array): {
-        'id': <队员学号>,
-        'name': <队员姓名>,
+        'member_id': <队员学号>,
+        'member_name': <队员姓名>,
         'status': <状态>
     }
     """
@@ -696,8 +694,8 @@ class LeagueMatchTeamAPI(APIView):
     赛事队伍赛程接口
     (GET)
     Response: (array){
-        'home_team': <主队队名>,
-        'away_team': <客队队名>,
+        'home_team_name': <主队队名>,
+        'away_team_name': <客队队名>,
         'time': <比赛时间>,
         'place': <比赛地点>,
         'result': <比赛结果>,
@@ -746,9 +744,9 @@ class RefereeListAPI(APIView):
     裁判列表接口
     (GET)
     Response: {
-        'id': <学号>,
-        'name': <姓名>,
-        'gender': <性别>,
+        'member_id': <学号>,
+        'member_name': <姓名>,
+        'member_gender': <性别>,
         'level': <等级>
     }
     """

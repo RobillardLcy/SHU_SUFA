@@ -4,12 +4,11 @@ from .models import (Member, Administrator)
 
 
 class MemberNotLogin(APIException):
-    status_code = 200
+    status_code = 401
     default_detail = 1
 
 
 class MemberNotActive(APIException):
-    status_code = 200
     default_detail = 3
 
 
@@ -30,7 +29,6 @@ class MemberPermission(BasePermission):
 
 
 class MemberNotAuth(APIException):
-    status_code = 200
     default_detail = 4
 
 
@@ -45,12 +43,11 @@ class MemberAuthPermission(BasePermission):
 
 
 class MemberNotAdmin(APIException):
-    status_code = 200
     default_detail = 15
 
 
 class AdminNotLogin(APIException):
-    status_code = 200
+    status_code = 401
     default_detail = 16
 
 

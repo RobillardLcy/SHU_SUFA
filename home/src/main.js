@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import Axios from 'axios'
-import vueCookie from 'vue-cookie'
+import VueCookie from 'vue-cookie'
 import Home from './Home'
 import router from './router'
 
@@ -23,7 +23,7 @@ Vue.prototype.$axios = Axios.create({
   withCredentials: true
 })
 
-Vue.prototype.$cookie = vueCookie
+Vue.prototype.$cookie = VueCookie
 
 /* eslint-disable no-new */
 new Vue({

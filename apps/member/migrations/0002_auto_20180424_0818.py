@@ -15,10 +15,8 @@ def departments(apps, schema_editor):
         Department(name='财务部', description='管理记录社团经费收入开销'),
         Department(name='技术部', description='开放维护社团管理平台'),
         Department(name='裁判协会', description='裁判培训，安排比赛裁判'),
-        Department(name='校队经理', description='校队事务管理，校队宣传'),
+        Department(name='校队', description='校队事务管理'),
     ])
-
-# TODO: 职位、权限设置
 
 
 class Migration(migrations.Migration):

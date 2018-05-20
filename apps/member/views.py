@@ -15,6 +15,7 @@ from .permissions import (MemberPermission, MemberAuthPermission, AdminPermissio
 import datetime
 from apps.league.models import Team, TeamMember
 from apps.league.serializers import TeamListSerializer
+from utils import encrypt, verificode_recognition
 
 
 class MemberRegisterAuthenticationAPI(APIView):
@@ -117,6 +118,10 @@ class MemberRegistrationAPI(APIView):
 class MemberLoginAPI(APIView):
     """
     用户登录接口
+    (GET)
+    Response: {
+        'public_key': <公钥>
+    }
     (POST)
     Request: {
         'id': <学生证号>,
@@ -135,49 +140,56 @@ class MemberLoginAPI(APIView):
     }
     """
 
+    def get(self, request, format=None):
+        return Response({"public_key": encrypt.generate_key(request)})
+
     def post(self, request, format=None):
-        id = request.data.get('id', None)
-        password = request.data.get('password')
-        try:
-            user = Member.objects.get(id=id)
-            if user.check_password(password):
-                request.session['id'] = user.id
-                request.session.set_expiry(86400)
-                if user.is_active:
-                    if user.is_auth:
-                        college_id = TeamMember.objects.get(team__id__lte=1000,
-                                                            status__gte=0,
-                                                            leave__isnull=True).team_id
-                        college = TeamListSerializer(Team.objects.get(id=college_id)).data
-                        request.session['college'] = college_id
-                        try:
-                            team_id = TeamMember.objects.get(team__id__gt=1000,
-                                                             status__gte=0,
-                                                             leave__isnull=True).team_id
-                            team = TeamListSerializer(Team.objects.get(id=team_id)).data
-                            request.session['team'] = team_id
-                            return Response({'detail': 0,
-                                             'college': college,
-                                             'team': team})
-                        except Exception as e:
-                            return Response({'detail': 0,
-                                             'college': college})
+        content = encrypt.decrypt(request)
+        if content:
+            id = content[0:8]
+            password = content[8:]
+            try:
+                user = Member.objects.get(id=id)
+                if user.check_password(password):
+                    request.session['id'] = user.id
+                    request.session.set_expiry(86400)
+                    if user.is_active:
+                        if user.is_auth:
+                            college_id = TeamMember.objects.get(team__id__lte=1000,
+                                                                status__gte=0,
+                                                                leave__isnull=True).team_id
+                            college = TeamListSerializer(Team.objects.get(id=college_id)).data
+                            request.session['college'] = college_id
+                            try:
+                                team_id = TeamMember.objects.get(team__id__gt=1000,
+                                                                 status__gte=0,
+                                                                 leave__isnull=True).team_id
+                                team = TeamListSerializer(Team.objects.get(id=team_id)).data
+                                request.session['team'] = team_id
+                                return Response({'detail': 0,
+                                                 'college': college,
+                                                 'team': team})
+                            except Exception as e:
+                                return Response({'detail': 0,
+                                                 'college': college})
+                        else:
+                            # 本学期未认证及提交课表
+                            request.session['auth'] = True
+                            return Response({'detail': 4})
                     else:
-                        # 本学期未认证及提交课表
+                        # 未激活
                         request.session['auth'] = True
-                        return Response({'detail': 4})
+                        mobile = user.mobile
+                        request.session['mobile'] = mobile
+                        return Response({'detail': 3, 'mobile': mobile})
                 else:
-                    # 未激活
-                    request.session['auth'] = True
-                    mobile = user.mobile
-                    request.session['mobile'] = mobile
-                    return Response({'detail': 3, 'mobile': mobile})
-            else:
-                # 密码错误
-                return Response({"detail": 2})
-        except Exception as e:
-            # 未注册
-            return Response({"detail": 2})
+                    # 密码错误
+                    return Response({'detail': 2})
+            except Exception as e:
+                # 未注册
+                return Response({'detail': 2})
+        else:
+            return Response({'detail': 2})
 
 
 class MemberLogoutAPI(APIView):

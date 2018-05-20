@@ -257,6 +257,23 @@ class FreeTeamApplyAPI(APIView):
                     return Response({'detail': ...})
 
 
+class FreeTeamSearchAPI(APIView):
+    """
+    自由队伍搜索接口
+    (GET)
+    Response(array): {
+        'id': <队伍编号>,
+        'name': <名称>,
+        'logo': <队徽>
+    }
+    """
+
+    def get(self, request, team_info, format=None):
+        teams = Team.objects.all().filter(Q(id=team_info) | Q(name__contains=team_info))
+        teams_list = TeamListSerializer(teams, many=True).data
+        return Response(teams_list)
+
+
 class FreeTeamJoinAPI(APIView):
     """
     自由队伍入队申请接口

@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { JSEncrypt } from 'jsencrypt'
 export default {
   name: 'Login',
   data: () => ({
@@ -46,6 +47,7 @@ export default {
       errorAlert: false,
       error: null,
       visible: false,
+      publicKey: null,
       studentID: null,
       studentIDRules: [
         (v) => !!v || '学号不能为空'
@@ -64,13 +66,32 @@ export default {
       }
     }
   },
+  mounted: function () {
+    this.getKey()
+  },
   methods: {
+    // 获取公钥
+    getKey: function () {
+      this.$axios.get('member/login/')
+        .then(response => {
+          this.loginData.publicKey = response.data.public_key
+        })
+        .catch(error => {
+          console.log(error)
+          window.alert('网络出错，请刷新页面重试！')
+        })
+    },
     // 账户登录
     login: function () {
       if (this.$refs.loginForm.validate()) {
+        let timestamp = Date.now()
+        let encrypt = new JSEncrypt()
+        encrypt.setPublicKey(this.loginData.publicKey)
+        let content = encrypt.encrypt(timestamp + this.loginData.studentID + this.loginData.password)
         let loginInfo = JSON.stringify({
           id: this.loginData.studentID,
-          password: this.loginData.password
+          password: this.loginData.password,
+          content: content
         })
         this.$axios.post('member/login/', loginInfo)
           .then(response => {

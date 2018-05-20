@@ -13,7 +13,7 @@ urlpatterns = [
     path('register/active/', MemberActiveMobileAPI.as_view(), name='register-active'),
     # 用户学生证认证(POST)
     path('authentication/', MemberAuthenticationAPI.as_view(), name='authentication'),
-    # 用户登录(POST)
+    # 用户登录(GET、POST)
     path('login/', MemberLoginAPI.as_view(), name='login'),
     # 用户注销(POST)
     path('logout/', MemberLogoutAPI.as_view(), name='logout'),

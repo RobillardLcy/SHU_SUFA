@@ -34,7 +34,7 @@ class MemberListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
-        fields = ('id', 'name', 'gender', 'mobile')
+        fields = ('id', 'name', 'gender')
 
 
 # 社团成员课程
@@ -74,20 +74,24 @@ class PermissionSerializer(serializers.ModelSerializer):
 class DepartmentPermissionSerializer(serializers.HyperlinkedModelSerializer):
     permission_id = serializers.ReadOnlyField(source='permission.id')
     permission_name = serializers.ReadOnlyField(source='permission.name')
+    department_id = serializers.ReadOnlyField(source='department.id')
+    department_name = serializers.ReadOnlyField(source='department.name')
 
     class Meta:
         model = PermissionToDepartment
-        fields = ('permission_id', 'permission_name')
+        fields = ('permission_id', 'permission_name', 'department_id', 'department_name')
 
 
 # 职位权限
 class PositionPermissionSerializer(serializers.HyperlinkedModelSerializer):
     permission_id = serializers.ReadOnlyField(source='permission.id')
     permission_name = serializers.ReadOnlyField(source='permission.name')
+    position_id = serializers.ReadOnlyField(source='position.id')
+    position_name = serializers.ReadOnlyField(source='position.name')
 
     class Meta:
         model = PermissionToPosition
-        fields = ('permission_id', 'permission_name')
+        fields = ('permission_id', 'permission_name', 'position_id', 'position_name')
 
 
 # 社团骨干申请

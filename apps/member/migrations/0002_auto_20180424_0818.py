@@ -13,7 +13,7 @@ def departments(apps, schema_editor):
         Department(name='外联部', description='联系比赛参与队伍及队员，通知比赛、活动信息，拉赞助'),
         Department(name='宣传部', description='社团宣传，比赛、活动宣传'),
         Department(name='财务部', description='管理记录社团经费收入开销'),
-        Department(name='技术部', description='开放维护社团管理平台'),
+        Department(name='技术部', description='开发维护社团管理平台，为社团事务提供技术支持'),
         Department(name='裁判协会', description='裁判培训，安排比赛裁判'),
         Department(name='校队', description='校队事务管理'),
     ])

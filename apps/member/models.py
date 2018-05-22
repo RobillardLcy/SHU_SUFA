@@ -137,7 +137,10 @@ class Position(models.Model):
     name = models.CharField(max_length=10, verbose_name='名称')
     remind = models.CharField(max_length=200, blank=True, verbose_name='提醒事项')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='所属部门')
-    permission = models.ManyToManyField(Permission, through='PermissionToPosition', verbose_name='职位权限')
+    appointment = models.ForeignKey(Permission, on_delete=models.CASCADE,
+                                    related_name='appointment_permission', verbose_name='任命所需权限')
+    permission = models.ManyToManyField(Permission, through='PermissionToPosition',
+                                        related_name='position_permission', verbose_name='职位权限')
 
     class Meta:
         db_table = 'position'
@@ -152,6 +155,7 @@ class PermissionToDepartment(models.Model):
     """
     部门权限
     """
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE, verbose_name='权限')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='部门')
 
@@ -166,6 +170,7 @@ class PermissionToPosition(models.Model):
     """
     职位权限
     """
+    id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE, verbose_name='权限')
     position = models.ForeignKey(Position, on_delete=models.CASCADE, verbose_name='职位')
 

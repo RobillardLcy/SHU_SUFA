@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 import requests
 from PIL import Image
 from io import BytesIO
@@ -16,6 +17,19 @@ import datetime
 from apps.league.models import Team, TeamMember
 from apps.league.serializers import TeamListSerializer
 from utils import encrypt, verificode_recognition
+
+
+def permission_judge(request, permission_id):
+    id = request.session.get('id')
+    admin = Administrator.objects.get(member__id=id)
+    position_id = admin.position.id
+    department_id = admin.position.department.id
+    if PermissionToDepartment.objects.filter(department__id=department_id, permission__id=permission_id).exists():
+        return True
+    elif PermissionToPosition.objects.filter(position__id=position_id, permission__id=permission_id).exists():
+        return True
+    else:
+        return False
 
 
 class MemberRegisterAuthenticationAPI(APIView):
@@ -495,28 +509,32 @@ class AdminAccessAPI(APIView):
     permission_classes = (AdminPermission,)
 
     def get(self, request, format=None):
-        admin_apply = AdministratorApply.objects.all().filter(status=0)
-        admin_apply_list = AdminApplySerializer(admin_apply, many=True).data
-        return Response(admin_apply_list)
+        if permission_judge(request, 17):
+            admin_apply = AdministratorApply.objects.all().filter(status=0)
+            admin_apply_list = AdminApplySerializer(admin_apply, many=True).data
+            return Response(admin_apply_list)
+        else:
+            return Response({'detail': 17})
 
     def post(self, request, format=None):
-        access = request.data.get('access')
-        fail = request.data.get('fail')
-        detail = 0
-        if access:
-            for id in access:
-                try:
-                    admin_apply = AdministratorApply.objects.get(id=id)
-                    Administrator.objects.create(member__id=admin_apply.member.id, position=admin_apply.position.id)
-                    admin_apply.status = 1
-                    admin_apply.save()
-                except Exception as e:
-                    # TODO: Add Error Tag
-                    detail = ...
-        if fail:
-            for id in fail:
-                AdministratorApply.objects.filter(id=id).update(status=-1)
-        return Response({'detail': detail})
+        if permission_judge(request, 17):
+            access = request.data.get('access')
+            fail = request.data.get('fail')
+            if access:
+                for id in access:
+                    try:
+                        admin_apply = AdministratorApply.objects.get(id=id)
+                        Administrator.objects.create(member__id=admin_apply.member.id, position=admin_apply.position.id)
+                        admin_apply.status = 1
+                        admin_apply.save()
+                    except Exception as e:
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+            if fail:
+                for id in fail:
+                    AdministratorApply.objects.filter(id=id).update(status=-1)
+            return Response({'detail': 0})
+        else:
+            return Response({'detail': 17})
 
 
 class MemberListAPI(APIView):
@@ -560,33 +578,6 @@ class AdminListAPI(APIView):
         return Response(admin_list)
 
 
-class PermissionAPI(APIView):
-    """
-    权限接口
-    (GET)
-    Response(array): {
-        'id': <编号>,
-        'name': <名称>,
-        'description': <描述>
-    }
-    (POST)
-    Request: {}
-    Response: {
-        'detail': <状态码>
-    }
-    """
-
-    permission_classes = (AdminPermission,)
-
-    def get(self, request, format=None):
-        permission = Permission.objects.all()
-        permission_list = PermissionSerializer(permission, many=True).data
-        return Response(permission_list)
-
-    def post(self, request, format=None):
-        pass
-
-
 class DepartmentAPI(APIView):
     """
     部门接口
@@ -611,7 +602,16 @@ class DepartmentAPI(APIView):
         return Response(department_list)
 
     def post(self, request, format=None):
-        pass
+        if permission_judge(request, 16):
+            name = request.data.get('name')
+            description = request.data.get('description')
+            if name and description:
+                department = Department.objects.create(name=name, description=description)
+                if department:
+                    return Response({'detail': 0})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 17})
 
 
 class PositionAPI(APIView):
@@ -625,7 +625,11 @@ class PositionAPI(APIView):
         'remind': <提醒事项>
     }
     (POST)
-    Request: {}
+    Request: {
+        'name': <职位名称>,
+        'department_id': <部门编号>,
+        'remind': <提醒事项>
+    }
     Response: {
         'detail': <状态码>
     }
@@ -639,7 +643,39 @@ class PositionAPI(APIView):
         return Response(position_list)
 
     def post(self, request, format=None):
-        pass
+        if permission_judge(request, 16):
+            name = request.data.get('name')
+            department_id = request.data.get('department_id')
+            remind = request.data.get('remind')
+            if name and department_id:
+                position = Position.objects.create(name=name, department__id=department_id, remind=remind)
+                if position:
+                    return Response({'detail': 0})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 17})
+
+
+class PermissionAPI(APIView):
+    """
+    权限接口
+    (GET)
+    Response(array): {
+        'id': <编号>,
+        'name': <名称>,
+        'description': <描述>
+    }
+    """
+
+    permission_classes = (AdminPermission,)
+
+    def get(self, request, format=None):
+        if permission_judge(request, 15):
+            permission = Permission.objects.all()
+            permission_list = PermissionSerializer(permission, many=True).data
+            return Response(permission_list)
+        else:
+            return Response({'detail': 17})
 
 
 class PermissionToDepartmentAPI(APIView):
@@ -648,10 +684,21 @@ class PermissionToDepartmentAPI(APIView):
     (GET)
     Response(array): {
         'permission_id': <权限编号>,
-        'permission_name': <权限名称>
+        'permission_name': <权限名称>,
+        'department_id': <部门编号>,
+        'department_name': <部门名称>
     }
     (POST)
-    Request: {}
+    Request: {
+        'add'(array): {
+            'department_id': <部门编号>,
+            'permission_id': <权限编号>
+        },
+        'delete'(array): {
+            'department_id': <部门编号>,
+            'permission_id': <权限编号>
+        }
+    }
     Response: {
         'detail': <状态码>
     }
@@ -660,10 +707,26 @@ class PermissionToDepartmentAPI(APIView):
     permission_classes = (AdminPermission,)
 
     def get(self, request, format=None):
-        pass
+        if permission_judge(request, 14):
+            permissions = Permission.objects.all()
+            permissions_list = PermissionSerializer(permissions, many=True).data
+            return permissions_list
+        else:
+            return Response({'detail': 17})
 
     def post(self, request, format=None):
-        pass
+        if permission_judge(request, 14):
+            add = request.data.get('add')
+            delete = request.data.get('delete')
+            for permission_add in add:
+                PermissionToDepartment.objects.get_or_create(department__id=permission_add.department_id,
+                                                             permission__id=permission_add.permission_id)
+            for permission_delete in delete:
+                PermissionToDepartment.objects.filter(department__id=permission_delete.department_id,
+                                                      permission__id=permission_delete.permission_id).delete()
+            return Response({'detail': 0})
+        else:
+            return Response({'detail': 17})
 
 
 class PermissionToPositionAPI(APIView):
@@ -671,17 +734,22 @@ class PermissionToPositionAPI(APIView):
     职位权限接口
     (GET)
     Response: {
-        'department'(array): {
-            'permission_id': <权限编号>,
-            'permission_name': <权限名称>
-        },
-        'position'(array): {
-            'permission_id': <权限编号>,
-            'permission_name': <权限名称>
-        }
+        'permission_id': <权限编号>,
+        'permission_name': <权限名称>,
+        'position_id': <职位编号>,
+        'position_name': <职位名称>
     }
     (POST)
-    Request: {}
+    Request: {
+        'add'(array): {
+            'position_id': <职位编号>,
+            'permission_id': <权限编号>
+        },
+        'delete'(array): {
+            'position_id': <职位编号>,
+            'permission_id': <权限编号>
+        }
+    }
     Response: {
         'detail': <状态码>
     }
@@ -690,7 +758,49 @@ class PermissionToPositionAPI(APIView):
     permission_classes = (AdminPermission,)
 
     def get(self, request, format=None):
-        pass
+        if permission_judge(request, 14):
+            permissions = PermissionToPosition.objects.all()
+            permissions_list = PositionPermissionSerializer(permissions, many=True).data
+            return permissions_list
+        else:
+            return Response({'detail': 17})
 
     def post(self, request, format=None):
-        pass
+        if permission_judge(request, 14):
+            add = request.data.get('add')
+            delete = request.data.get('delete')
+            for permission_add in add:
+                PermissionToPosition.objects.get_or_create(department__id=permission_add.department_id,
+                                                           permission__id=permission_add.permission_id)
+            for permission_delete in delete:
+                PermissionToPosition.objects.filter(department__id=permission_delete.department_id,
+                                                    permission__id=permission_delete.permission_id).delete()
+            return Response({'detail': 0})
+        else:
+            return Response({'detail': 17})
+
+
+class ChangePositionAPI(APIView):
+    """
+    职位变更接口
+    (POST)
+    Request: {
+        'member_id': <社团骨干学号>,
+        'position_id': <职位编号>
+    }
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    def post(self, request, format=None):
+        member_id = request.data.get('member_id')
+        position_id = request.data.get('position_id')
+        if member_id and position_id:
+            appointment_permission_id = Position.objects.get(id=position_id).appointment.id
+            if permission_judge(request, appointment_permission_id):
+                Administrator.objects.filter(member__id=member_id).update(position__id=position_id)
+                return Response({'detail': 0})
+            else:
+                return Response({'detail': 17})
+        return Response(status=status.HTTP_400_BAD_REQUEST)

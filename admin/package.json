@@ -16,7 +16,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "chart.js": "^2.7.2",
-    "material-icons": "^0.2.1",
+    "material-design-icons-iconfont": "^3.0.3",
     "vue": "^2.5.2",
     "vue-cookie": "^1.1.4",
     "vue-router": "^3.0.1",

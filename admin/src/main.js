@@ -12,7 +12,7 @@ Vue.config.productionTip = true
 
 Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
-import('../node_modules/material-icons/iconfont/material-icons.css')
+import('../node_modules/material-design-icons-iconfont/dist/material-design-icons.css')
 
 Vue.prototype.$axios = axios.create({
   baseURL: 'http://administrator.shusufa.com/api/',

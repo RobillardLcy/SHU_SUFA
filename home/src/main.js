@@ -12,7 +12,7 @@ Vue.config.productionTip = true
 
 Vue.use(Vuetify)
 import('../node_modules/vuetify/dist/vuetify.min.css')
-import('../node_modules/material-icons/iconfont/material-icons.css')
+import('../node_modules/material-design-icons-iconfont/dist/material-design-icons.css')
 
 Axios.defaults.xsrfCookieName = 'csrftoken'
 Axios.defaults.xsrfHeaderName = 'X-CSRFToken'

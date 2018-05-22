@@ -16,7 +16,7 @@ from .permissions import (MemberPermission, MemberAuthPermission, AdminPermissio
 import datetime
 from apps.league.models import Team, TeamMember
 from apps.league.serializers import TeamListSerializer
-from utils import encrypt, verificode_recognition
+from utils import (encrypt, verificode_recognition, yunpian)
 
 
 def permission_judge(request, permission_id):
@@ -227,13 +227,26 @@ class MemberLogoutAPI(APIView):
         return Response({'detail': 0})
 
 
-class MemberActiveMobileAPI(APIView):
+class VerificationCodeAPI(APIView):
     """
-    用户手机激活接口
-    (GET)
+    手机验证码发送接口
+    (POST)
+    Request: {}
     Response: {
         'detail': <状态码>
     }
+    """
+
+    def post(self, request, format=None):
+        # TODO: 验证码验证
+        if True:
+            mobile = request.session.get('mobile')
+            yunpian.send_mobile_verification_code(mobile, request)
+
+
+class MemberActiveMobileAPI(APIView):
+    """
+    用户手机激活接口
     (POST)
     Request: {
         'code': <验证码>
@@ -243,13 +256,10 @@ class MemberActiveMobileAPI(APIView):
     }
     """
 
-    def get(self, request, format=None):
-        pass
-
     def post(self, request, format=None):
-        # TODO: 验证码验证
         member_id = request.session.get('id')
-        if True:
+        code = request.data.get('mobile_code')
+        if str(code) == request.session.get('code'):
             Member.objects.filter(id=member_id).update(is_active=True)
             try:
                 del request.session['mobile']
@@ -708,8 +718,8 @@ class PermissionToDepartmentAPI(APIView):
 
     def get(self, request, format=None):
         if permission_judge(request, 14):
-            permissions = Permission.objects.all()
-            permissions_list = PermissionSerializer(permissions, many=True).data
+            permissions = PermissionToDepartment.objects.all()
+            permissions_list = DepartmentPermissionSerializer(permissions, many=True).data
             return permissions_list
         else:
             return Response({'detail': 17})

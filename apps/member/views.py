@@ -139,7 +139,10 @@ class MemberLoginAPI(APIView):
     (POST)
     Request: {
         'id': <学生证号>,
-        'password': <密码>
+        'password': <密码>,
+        'ticket': <票据>,
+        'randstr': <随机串>,
+        'content': <内容>
     }
     Response: {
         'detail': <状态码>,
@@ -160,56 +163,59 @@ class MemberLoginAPI(APIView):
     def post(self, request, format=None):
         content = encrypt.decrypt(request)
         if content:
-            id = content[0:8]
-            password = content[8:]
-            try:
-                user = Member.objects.get(id=id)
-                if user.check_password(password):
-                    request.session['id'] = user.id
-                    request.session.set_expiry(86400)
-                    if user.is_active:
-                        if user.is_auth:
-                            college_id = TeamMember.objects.get(team__id__lte=1000,
-                                                                status__gte=0,
-                                                                leave__isnull=True).team_id
-                            college = TeamListSerializer(Team.objects.get(id=college_id)).data
-                            request.session['college'] = college_id
-                            try:
-                                team_id = TeamMember.objects.get(team__id__gt=1000,
-                                                                 status__gte=0,
-                                                                 leave__isnull=True).team_id
-                                team = TeamListSerializer(Team.objects.get(id=team_id)).data
-                                request.session['team'] = team_id
-                                return Response({'detail': 0,
-                                                 'college': college,
-                                                 'team': team})
-                            except Exception as e:
-                                return Response({'detail': 0,
-                                                 'college': college})
+            member_id = content[0]
+            password = content[1]
+            ticket = content[2]
+            randstr = content[3]
+            # TODO: 验证码识别
+            if True:
+                try:
+                    member = Member.objects.get(id=member_id)
+                    if member.check_password(password):
+                        request.session['id'] = member.id
+                        request.session.set_expiry(86400)
+                        if member.is_active:
+                            if member.is_auth:
+                                college_id = TeamMember.objects.get(team__id__lte=1000,
+                                                                    status__gte=0,
+                                                                    leave__isnull=True).team_id
+                                college = TeamListSerializer(Team.objects.get(id=college_id)).data
+                                request.session['college'] = college_id
+                                try:
+                                    team_id = TeamMember.objects.get(team__id__gt=1000,
+                                                                     status__gte=0,
+                                                                     leave__isnull=True).team_id
+                                    team = TeamListSerializer(Team.objects.get(id=team_id)).data
+                                    request.session['team'] = team_id
+                                    return Response({'detail': 0,
+                                                     'college': college,
+                                                     'team': team})
+                                except Exception as e:
+                                    return Response({'detail': 0,
+                                                     'college': college})
+                            else:
+                                # 本学期未认证及提交课表
+                                request.session['auth'] = True
+                                return Response({'detail': 4})
                         else:
-                            # 本学期未认证及提交课表
+                            # 未激活
                             request.session['auth'] = True
-                            return Response({'detail': 4})
+                            mobile = member.mobile
+                            request.session['mobile'] = mobile
+                            return Response({'detail': 3, 'mobile': mobile})
                     else:
-                        # 未激活
-                        request.session['auth'] = True
-                        mobile = user.mobile
-                        request.session['mobile'] = mobile
-                        return Response({'detail': 3, 'mobile': mobile})
-                else:
-                    # 密码错误
+                        # 密码错误
+                        return Response({'detail': 2})
+                except Exception as e:
+                    # 未注册
                     return Response({'detail': 2})
-            except Exception as e:
-                # 未注册
-                return Response({'detail': 2})
         else:
             return Response({'detail': 2})
 
 
 class MemberLogoutAPI(APIView):
     """
-    用户注销接口(POST)
-    Request: {}
+    用户注销接口(GET)
     Response: {
         'detail': 0
     }
@@ -217,7 +223,7 @@ class MemberLogoutAPI(APIView):
 
     permission_classes = (MemberPermission,)
 
-    def post(self, request, format=None):
+    def get(self, request, format=None):
         try:
             del request.session['id']
             del request.session['college']
@@ -227,11 +233,14 @@ class MemberLogoutAPI(APIView):
         return Response({'detail': 0})
 
 
-class VerificationCodeAPI(APIView):
+class SendMobileVerificationCodeAPI(APIView):
     """
     手机验证码发送接口
     (POST)
-    Request: {}
+    Request: {
+        'ticket': <票据>,
+        'randstr': <随机串>
+    }
     Response: {
         'detail': <状态码>
     }
@@ -249,7 +258,7 @@ class MemberActiveMobileAPI(APIView):
     用户手机激活接口
     (POST)
     Request: {
-        'code': <验证码>
+        'mobile_code': <验证码>
     }
     Response: {
         'detail': <状态码>
@@ -258,8 +267,9 @@ class MemberActiveMobileAPI(APIView):
 
     def post(self, request, format=None):
         member_id = request.session.get('id')
-        code = request.data.get('mobile_code')
-        if str(code) == request.session.get('code'):
+        mobile_code = request.data.get('mobile_code')
+        if mobile_code == request.session.get('mobile_code'):
+            del request.session['mobile_code']
             Member.objects.filter(id=member_id).update(is_active=True)
             try:
                 del request.session['mobile']
@@ -316,10 +326,24 @@ class MemberResetPasswordAPI(APIView):
     用户重置密码接口
     (GET)
     Response: {
-        'detail': <状态码>
+        'public_key': <公钥>
     }
     (POST)
-    Request: {}
+    Request:
+    (验证手机验证码){
+        'way': 1,
+        'mobile_code': <手机验证码>,
+        'new_password': <新密码>,
+        'content': <内容>
+    }
+    (验证原密码){
+        'way': 2,
+        'ticket': <票据>,
+        'randstr': <随机串>,
+        'old_password': <原密码>,
+        'new_password': <新密码>,
+        'content': <内容>
+    }
     Response: {
         'detail': <状态码>
     }
@@ -328,10 +352,46 @@ class MemberResetPasswordAPI(APIView):
     permission_classes = (MemberPermission,)
 
     def get(self, request, format=None):
-        pass
+        return Response({"public_key": encrypt.generate_key(request)})
 
     def post(self, request, format=None):
-        pass
+        way = request.data.get('way')
+        if way == 1:
+            content = encrypt.decrypt(request)
+            mobile_code = content[0]
+            if mobile_code == request.session.get('mobile_code'):
+                del request.session['mobile_code']
+                member_id = request.session.get('id')
+                new_password = content[1]
+                member = Member.objects.get(id=member_id)
+                member.set_password(new_password)
+                member.save()
+                return Response({'detail': 0})
+            else:
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+        elif way == 2:
+            # TODO: 验证码验证
+            content = encrypt.decrypt(request)
+            ticket = content[0]
+            randstr = content[1]
+            if ...:
+                member_id = request.session.get('id')
+                old_password = content[2]
+                new_password = content[3]
+                member = Member.objects.get(id=member_id)
+                if member.check_password(old_password):
+                    member.set_password(new_password)
+                    member.save()
+                    return Response({'detail': 0})
+                else:
+                    # TODO: Add Error Tag
+                    return Response({'detail': ...})
+            else:
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class MemberResetMobileAPI(APIView):
@@ -339,26 +399,64 @@ class MemberResetMobileAPI(APIView):
     用户重置手机接口
     (GET)
     Response: {
-        'mobile': <手机号码(中间４位不显示)>
-        'detail': <状态码>
+        'public_key': <公钥>
     }
     (POST)
-    Request: (验证手机号){
-        'mobile': <完整手机号>
-    }
-    (更改手机号){
+    Request:
+    (验证原手机号){
+        'way': 1,
+        'mobile_code': <手机验证码>,
         'new_mobile': <新手机号>,
-        'code': <手机验证码>
+        'content': <内容>
+    }
+    (验证密码){
+        'way': 2,
+        'ticket': <票据>,
+        'randstr': <随机串>,
+        'password': <密码>,
+        'new_mobile': <新手机号>,
+        'content': <内容>
+    }
+    Response: {
+        'detail': <状态码>
     }
     """
 
     permission_classes = (MemberPermission,)
 
-    def get(self, request, format=None):
-        pass
-
     def post(self, request, format=None):
-        pass
+        way = request.data.get('way')
+        if way == 1:
+            content = encrypt.decrypt(request)
+            mobile_code = content[0]
+            if mobile_code == request.session.get('mobile_code'):
+                del request.session['mobile_code']
+                member_id = request.session.get('id')
+                new_mobile = content[1]
+                Member.objects.filter(id=member_id).update(mobile=new_mobile)
+                return Response({'detail': 0})
+            else:
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+        elif way == 2:
+            # TODO: 验证码验证
+            content = encrypt.decrypt(request)
+            ticket = content[0]
+            randstr = content[1]
+            if ...:
+                member_id = request.session.get('id')
+                password = content[2]
+                new_mobile = content[3]
+                member = Member.objects.get(id=member_id)
+                if member.check_password(password):
+                    member.mobile = new_mobile
+                    member.save()
+                return Response({'detail': 0})
+            else:
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class MemberAuthenticationAPI(APIView):

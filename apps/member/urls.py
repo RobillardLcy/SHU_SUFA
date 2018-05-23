@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import (MemberRegisterAuthenticationAPI, MemberRegistrationAPI, MemberActiveMobileAPI,
+from .views import (MemberRegisterAuthenticationAPI, MemberRegistrationAPI,
+                    SendMobileVerificationCodeAPI, MemberActiveMobileAPI,
                     MemberLoginAPI, MemberLogoutAPI, MemberResetMobileAPI, MemberResetPasswordAPI,
                     MemberProfileAPI, MemberAuthenticationAPI)
 
@@ -19,4 +20,7 @@ urlpatterns = [
     path('logout/', MemberLogoutAPI.as_view(), name='logout'),
     # 用户详细信息(GET、POST)
     path('profile/', MemberProfileAPI.as_view(), name='profile'),
+    # 手机验证码发送(POST)
+    path('mobile/send/', SendMobileVerificationCodeAPI.as_view(), name='mobile-send-code'),
+    # 用户重置密码(POST)
 ]

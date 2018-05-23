@@ -1,7 +1,7 @@
 {
   "name": "home",
   "version": "1.0.0",
-  "description": "Shanghai University WebApp Frontend",
+  "description": "Shanghai University Football Association WebApp Frontend",
   "author": "yellowsea <yellowsea@shu.edu.cn>",
   "private": true,
   "scripts": {

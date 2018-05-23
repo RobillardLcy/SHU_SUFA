@@ -5,3 +5,10 @@ database=sufa
 default-character-set=utf8
 user=sufa
 password=secret
+
+[yunpian]
+apikey=secret
+
+[tencent]
+aid=2098665334
+app_secret_key=secret

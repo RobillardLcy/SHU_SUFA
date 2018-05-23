@@ -1,7 +1,7 @@
 {
   "name": "admin",
   "version": "1.0.0",
-  "description": "Shanghai University Football Association Management Platform",
+  "description": "Shanghai University Football Association Management Platform Frontend",
   "author": "yellowsea <yellowsea@shu.edu.cn>",
   "private": true,
   "scripts": {

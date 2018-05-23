@@ -14,9 +14,10 @@ def generate_key(request):
 def decrypt(request):
     pk = request.session.get('key')
     if pk:
+        del request.session['key']
         rsa_key = RSA.importKey(pk)
         cipher_rsa = PKCS1_v1_5.new(rsa_key)
         content = str(cipher_rsa.decrypt(base64.b64decode(request.data['content']), None), encoding="utf8")
         timestamp = content[0:13]
         # TODO: Check timestamp in time limit
-        return content[13:]
+        return content[13:].split('&')

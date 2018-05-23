@@ -89,8 +89,8 @@ export default {
         encrypt.setPublicKey(this.loginData.publicKey)
         let content = encrypt.encrypt(timestamp + this.loginData.studentID + this.loginData.password)
         let loginInfo = JSON.stringify({
-          id: this.loginData.studentID,
-          password: this.loginData.password,
+          id: null,
+          password: null,
           content: content
         })
         this.$axios.post('member/login/', loginInfo)

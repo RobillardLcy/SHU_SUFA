@@ -15,7 +15,7 @@ class MemberNotActive(APIException):
 class MemberPermission(BasePermission):
 
     def has_permission(self, request, view):
-        member_id = request.session.get('id', False)
+        member_id = request.session['id']
         if member_id:
             try:
                 member = Member.objects.get(id=member_id)
@@ -35,7 +35,7 @@ class MemberNotAuth(APIException):
 class MemberAuthPermission(BasePermission):
 
     def has_permission(self, request, view):
-        member_id = request.session.get('id', False)
+        member_id = request.session['id']
         if member_id:
             if Member.objects.get(id=member_id).is_auth:
                 return True
@@ -54,7 +54,7 @@ class AdminNotLogin(APIException):
 class AdminPermission(BasePermission):
 
     def has_permission(self, request, view):
-        member_id = request.session.get('id', False)
+        member_id = request.session['id']
         administrator = request.session.get('administrator')
         if Member.objects.get(id=member_id).is_admin:
             if Administrator.objects.filter(member__id=member_id, status=True).exists:
@@ -66,6 +66,3 @@ class AdminPermission(BasePermission):
                 Member.objects.filter(id=member_id).update(is_admin=False)
                 # TODO: 异常情况记录
         raise MemberNotAdmin
-
-
-# TODO: Administrator Permission Config

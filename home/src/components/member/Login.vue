@@ -48,6 +48,8 @@ export default {
       error: null,
       visible: false,
       publicKey: null,
+      ticket: null,
+      randstr: null,
       studentID: null,
       studentIDRules: [
         (v) => !!v || '学号不能为空'

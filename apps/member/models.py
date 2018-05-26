@@ -29,12 +29,11 @@ class Member(AbstractBaseUser):
     """
     id = models.CharField(max_length=8, primary_key=True, verbose_name='学号')
     name = models.CharField(max_length=50, verbose_name='姓名')
-    gender = models.CharField(max_length=5,
+    gender = models.CharField(max_length=6,
                               choices=(
                                   ('male', '男'),
                                   ('female', '女')
-                              ),
-                              default='female', verbose_name='性别')
+                              ), default='female', verbose_name='性别')
     mobile = models.CharField(max_length=11, unique=True, verbose_name='电话')
     campus = models.CharField(max_length=2,
                               choices=(

@@ -127,16 +127,17 @@ class LeagueSignupCollegeMemberAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, CollegeMemberPermission)
 
     def post(self, request, format=None):
-        team_signup_id = request.data.get('league')
-        college_id = request.session.get('college')
+        team_signup_id = request.data['league']
+        college_id = request.session['college']
         try:
             college_signup = LeagueTeamSignup.objects.get(id=team_signup_id)
             if college_id == college_signup.team.id:
                 if LeagueTeamSignup.objects.filter(id=team_signup_id).values('league__reg_start')\
                         < datetime.datetime.now() <\
                         LeagueTeamSignup.objects.filter(id=team_signup_id).values('league__reg_end'):
-                    member_id = request.session.get('id')
-                    team_member_signup = LeagueTeamMemberSignup.objects.get_or_create(team_signup__id=team_signup_id, team_member__id=member_id)
+                    member_id = request.session['id']
+                    team_member_signup = LeagueTeamMemberSignup.objects\
+                        .get_or_create(team_signup__id=team_signup_id, team_member__id=member_id)
                     if team_member_signup:
                         return Response({'detail': 0})
                     else:
@@ -166,7 +167,7 @@ class LeagueSignupCollegeMemberStatusAPI(APIView):
     def get(self, request, league, format=None):
         try:
             team_signup = LeagueTeamSignup.objects.get(id=league)
-            college_id = request.session.get('college')
+            college_id = request.session['college']
             if college_id == team_signup.team.id:
                 signup_list = LeagueTeamMemberSignup.objects.all().filter(team_signup__id=league)
                 signup_status_list = LeagueTeamMemberSignupSerializer(signup_list).data
@@ -183,7 +184,7 @@ class LeagueSignupCollegeMemberStatusCheckAPI(APIView):
     (POST)
     Request: {
         'league': <学院赛事报名编码>,
-        'pass': [<队员报名编号>]
+        'access': [<队员报名编号>]
     }
     Response: {
         'detail': <状态码>
@@ -193,13 +194,13 @@ class LeagueSignupCollegeMemberStatusCheckAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, CollegeCaptainPermission)
 
     def post(self, request, format=None):
-        team_signup_id = request.data.get('league')
-        college_id = request.session.get('college')
+        team_signup_id = request.data['league']
+        college_id = request.session['college']
         try:
             team_signup = LeagueTeamSignup.objects.get(id=team_signup_id)
             if college_id == team_signup.team.id:
-                member_pass = request.data.get('pass')
-                for member_signup_id in member_pass:
+                member_access = request.data['access']
+                for member_signup_id in member_access:
                     LeagueTeamMemberSignup.objects.filter(id=member_signup_id, team_member__team__id=college_id)\
                         .update(status=True)
                 return Response({'detail': 0})
@@ -231,19 +232,19 @@ class FreeTeamApplyAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission)
 
     def get(self, request, format=None):
-        member_id = request.session.get('id')
+        member_id = request.session['id']
         member = Member.objects.get(id=member_id)
         return Response({'name': member.name, 'mobile': member.mobile})
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
+        member_id = request.session['id']
         if TeamMember.objects.filter(member__id=member_id, leave__isnull=True):
             # TODO: Add Error Tag
             return Response({'detail': ...})
         else:
-            name = request.data.get('name')
-            logo = request.data.get('logo')
-            description = request.data.get('description')
+            name = request.data['name']
+            logo = request.data['logo']
+            description = request.data['description']
             if Team.objects.filter(name=name).exists():
                 # TODO: Add Error Tag
                 return Response({'detail': ...})
@@ -289,7 +290,7 @@ class FreeTeamJoinAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission)
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
+        member_id = request.session['id']
         if TeamMember.objects.filter(member__id=member_id, status__gte=0).exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -316,8 +317,8 @@ class FreeTeamLeaveAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, TeamMemberPermission)
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
-        team_id = request.session.get('team')
+        member_id = request.session['id']
+        team_id = request.session['team']
         TeamMember.objects.filter(member__id=member_id, team__id=team_id).update(leave=datetime.date.today())
         return Response({'detail': 0})
 
@@ -378,10 +379,10 @@ class FreeTeamProfileAPI(APIView):
         try:
             team = Team.objects.get(id=team_id)
             team_profile = TeamProfileSerializer(team).data
-            member_id = request.session.get('id')
+            member_id = request.session['id']
             if Member.objects.get(id=member_id).is_auth:
                 members = TeamMember.objects.all().filter(team=team, status__gte=0, leave=None)
-                if team_id == request.session.get('team'):
+                if team_id == request.session['team']:
                     members_info = TeamMemberProfileListSerializer(members, many=True).data
                 else:
                     members_info = TeamMemberListSerializer(members, many=True).data
@@ -409,13 +410,13 @@ class FreeTeamProfileChangeAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
-        name = request.data.get('name')
-        logo = request.data.get('logo')
-        description = request.data.get('description')
+        name = request.data['name']
+        logo = request.data['logo']
+        description = request.data['description']
         if Team.objects.filter(name=name).exists():
             # TODO: Add Error Tag
             return Response({'detail': ...})
-        team_id = request.session.get('id')
+        team_id = request.session['id']
         Team.objects.filter(id=team_id).update(name=name, logo=logo, description=description)
         return Response({'detail': 0})
 
@@ -526,11 +527,11 @@ class LeagueTeamSignupAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
-        league_id = request.data.get('league')
+        league_id = request.data['league']
         try:
             league = League.objects.get(id=league_id)
             if league.reg_start < datetime.datetime.now() < league.reg_end:
-                team_id = request.session.get('team')
+                team_id = request.session['team']
                 team = Team.objects.get(id=team_id)
                 team_signup = LeagueTeamSignup.objects.get_or_create(team=team, league=league)
                 if team_signup:
@@ -575,13 +576,13 @@ class LeagueSignupTeamMemberAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, TeamMemberPermission)
 
     def post(self, request, format=None):
-        team_signup_id = request.data.get('league', False)
-        team_id = request.session.get('team')
+        team_signup_id = request.data['league']
+        team_id = request.session['team']
         try:
             team_signup = LeagueTeamSignup.objects.get(id=team_signup_id)
             if team_id == team_signup.team.id:
                 if team_signup.league.reg_start < datetime.datetime.now() < team_signup.league.reg_end:
-                    member_id = request.session.get('id')
+                    member_id = request.session['id']
                     team_member_signup = LeagueTeamMemberSignup.objects.get_or_create(team_signup__id=team_signup_id,
                                                                                       team_member__id=member_id)
                     if team_member_signup:
@@ -610,7 +611,7 @@ class LeagueSignupTeamMemberStatusAPI(APIView):
     def get(self, request, league, format=None):
         try:
             team_signup = LeagueTeamSignup.objects.get(id=league)
-            team_id = request.session.get('team')
+            team_id = request.session['team']
             if team_id == team_signup.team.id:
                 signup_list = LeagueTeamMemberSignup.objects.all().filter(team_signup__id=league)
                 signup_status_list = LeagueTeamMemberSignupSerializer(signup_list).data
@@ -627,7 +628,7 @@ class LeagueSignupTeamMemberStatusCheckAPI(APIView):
     (POST)
     Request: {
         'league': <队伍赛事报名编号>,
-        'pass': [<队员赛事报名编号>]
+        'access': [<队员赛事报名编号>]
     }
     Response: {
         'detail': <状态码>
@@ -637,13 +638,13 @@ class LeagueSignupTeamMemberStatusCheckAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission, TeamCaptainPermission)
 
     def post(self, request, format=None):
-        team_signup_id = request.data.get('league')
-        team_id = request.session.get('team')
+        team_signup_id = request.data['league']
+        team_id = request.session['team']
         try:
             team_signup = LeagueTeamSignup.objects.get(id=team_signup_id)
             if team_id == team_signup.team.id:
-                member_pass = request.data.get('pass')
-                for member_signup_id in member_pass:
+                member_access = request.data['access']
+                for member_signup_id in member_access:
                     LeagueTeamMemberSignup.objects.filter(id=member_signup_id, team_member__team__id=team_id)\
                         .update(status=True)
                 return Response({'detail': 0})
@@ -699,7 +700,7 @@ class LeagueMatchCollegeAPI(APIView):
     permission_classes = (MemberPermission, CollegeMemberPermission)
 
     def get(self, request, league_id, format=None):
-        college_id = request.session.get('college')
+        college_id = request.session['college']
         matches = Match.objects.all().filter(league__id=league_id)\
             .filter(Q(home_team__id=college_id) | Q(away_team__id=college_id))
         matches_list = MatchSerializer(matches, many=True).data
@@ -727,7 +728,7 @@ class LeagueMatchTeamAPI(APIView):
     permission_classes = (MemberPermission, TeamMemberPermission)
 
     def get(self, request, league_id, format=None):
-        team_id = request.session.get('team')
+        team_id = request.session['team']
         matches = Match.objects.all().filter(league__id=league_id)\
             .filter(Q(home_team__id=team_id) | Q(away_team__id=team_id))
         matches_list = MatchSerializer(matches, many=True).data

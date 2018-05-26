@@ -22,5 +22,8 @@ urlpatterns = [
     path('profile/', MemberProfileAPI.as_view(), name='profile'),
     # 手机验证码发送(POST)
     path('mobile/send/', SendMobileVerificationCodeAPI.as_view(), name='mobile-send-code'),
-    # 用户重置密码(POST)
+    # 用户重置密码(GET、POST)
+    path('reset/password/', MemberResetPasswordAPI.as_view(), name='reset-password'),
+    # 用户重置手机(GET、POST)
+    path('reset/mobile/', MemberResetMobileAPI.as_view(), name='reset-mobile'),
 ]

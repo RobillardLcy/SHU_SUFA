@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import APIException
 import requests
 from PIL import Image
 from io import BytesIO
@@ -19,8 +20,13 @@ from apps.league.serializers import TeamListSerializer
 from utils import (encrypt, verificode_recognition, yunpian)
 
 
+class NotPermission(APIException):
+    status_code = 403
+    default_detail = 17
+
+
 def permission_judge(request, permission_id):
-    id = request.session.get('id')
+    id = request.session['id']
     admin = Administrator.objects.get(member__id=id)
     position_id = admin.position.id
     department_id = admin.position.department.id
@@ -29,7 +35,7 @@ def permission_judge(request, permission_id):
     elif PermissionToPosition.objects.filter(position__id=position_id, permission__id=permission_id).exists():
         return True
     else:
-        return False
+        raise NotPermission
 
 
 class MemberRegisterAuthenticationAPI(APIView):
@@ -95,14 +101,14 @@ class MemberRegistrationAPI(APIView):
     """
 
     def post(self, request, format=None):
-        if request.session.get('studentID', False):
+        if request.session['studentID']:
             if request.data['college'] not in range(1, 101):
                 return Response({'detail': 8})
             if Member.objects.filter(mobile=request.data['mobile']).exists():
                 return Response({'detail': 9})
             member_info = {
-                'id': request.session.get('studentID'),
-                'name': request.session.get('studentName'),
+                'id': request.session['studentID'],
+                'name': request.session['studentName'],
                 'gender': request.data['gender'],
                 'mobile': request.data['mobile'],
                 'campus': request.data['campus'],
@@ -249,7 +255,7 @@ class SendMobileVerificationCodeAPI(APIView):
     def post(self, request, format=None):
         # TODO: 验证码验证
         if True:
-            mobile = request.session.get('mobile')
+            mobile = request.session['mobile']
             yunpian.send_mobile_verification_code(mobile, request)
 
 
@@ -266,9 +272,9 @@ class MemberActiveMobileAPI(APIView):
     """
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
-        mobile_code = request.data.get('mobile_code')
-        if mobile_code == request.session.get('mobile_code'):
+        member_id = request.session['id']
+        mobile_code = request.data['mobile_code']
+        if mobile_code == request.session['mobile_code']:
             del request.session['mobile_code']
             Member.objects.filter(id=member_id).update(is_active=True)
             try:
@@ -303,15 +309,15 @@ class MemberProfileAPI(APIView):
     permission_classes = (MemberPermission,)
 
     def get(self, request, format=None):
-        member_id = request.session.get('id')
+        member_id = request.session['id']
         member = Member.objects.get(id=member_id)
         member_info = MemberProfileSerializer(member).data
         return Response(member_info)
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
-        campus = request.data.get('campus')
-        favorite_club = request.data.get('favorite_club')
+        member_id = request.session['id']
+        campus = request.data['campus']
+        favorite_club = request.data['favorite_club']
         if campus and favorite_club:
             Member.objects.filter(id=member_id).update(campus=campus, favorite_club=favorite_club)
         elif campus:
@@ -355,13 +361,13 @@ class MemberResetPasswordAPI(APIView):
         return Response({"public_key": encrypt.generate_key(request)})
 
     def post(self, request, format=None):
-        way = request.data.get('way')
+        way = request.data['way']
         if way == 1:
             content = encrypt.decrypt(request)
             mobile_code = content[0]
-            if mobile_code == request.session.get('mobile_code'):
+            if mobile_code == request.session['mobile_code']:
                 del request.session['mobile_code']
-                member_id = request.session.get('id')
+                member_id = request.session['id']
                 new_password = content[1]
                 member = Member.objects.get(id=member_id)
                 member.set_password(new_password)
@@ -376,7 +382,7 @@ class MemberResetPasswordAPI(APIView):
             ticket = content[0]
             randstr = content[1]
             if ...:
-                member_id = request.session.get('id')
+                member_id = request.session['id']
                 old_password = content[2]
                 new_password = content[3]
                 member = Member.objects.get(id=member_id)
@@ -425,13 +431,13 @@ class MemberResetMobileAPI(APIView):
     permission_classes = (MemberPermission,)
 
     def post(self, request, format=None):
-        way = request.data.get('way')
+        way = request.data['way']
         if way == 1:
             content = encrypt.decrypt(request)
             mobile_code = content[0]
-            if mobile_code == request.session.get('mobile_code'):
+            if mobile_code == request.session['mobile_code']:
                 del request.session['mobile_code']
-                member_id = request.session.get('id')
+                member_id = request.session['id']
                 new_mobile = content[1]
                 Member.objects.filter(id=member_id).update(mobile=new_mobile)
                 return Response({'detail': 0})
@@ -444,7 +450,7 @@ class MemberResetMobileAPI(APIView):
             ticket = content[0]
             randstr = content[1]
             if ...:
-                member_id = request.session.get('id')
+                member_id = request.session['id']
                 password = content[2]
                 new_mobile = content[3]
                 member = Member.objects.get(id=member_id)
@@ -474,8 +480,8 @@ class MemberAuthenticationAPI(APIView):
     permission_classes = (MemberPermission,)
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
-        password = request.data.get('password')
+        member_id = request.session['id']
+        password = request.data['password']
         url = 'http://xk.autoisp.shu.edu.cn:8080/'
         img_url = 'http://xk.autoisp.shu.edu.cn:8080/Login/GetValidateCode?%20%20+%20GetTimestamp()'
         headers = {
@@ -512,10 +518,10 @@ class AdminLoginAPI(APIView):
        """
 
     def post(self, request, format=None):
-        id = request.data.get('id', None)
-        password = request.data.get('password')
+        member_id = request.data['id']
+        password = request.data['password']
         try:
-            user = Member.objects.get(id=id)
+            user = Member.objects.get(id=member_id)
             if user.check_password(password):
                 if user.is_active:
                     if user.is_auth:
@@ -573,9 +579,9 @@ class AdminApplyAPI(APIView):
     permission_classes = (MemberPermission, MemberAuthPermission)
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
-        position = request.data.get('position')
-        introduction = request.data.get('introduction')
+        member_id = request.session['id']
+        position = request.data['position']
+        introduction = request.data['introduction']
         if Administrator.objects.filter(member__id=member_id).exists:
             # TODO: Add Error Tag
             return Response({'detail': ...})
@@ -621,28 +627,24 @@ class AdminAccessAPI(APIView):
             admin_apply = AdministratorApply.objects.all().filter(status=0)
             admin_apply_list = AdminApplySerializer(admin_apply, many=True).data
             return Response(admin_apply_list)
-        else:
-            return Response({'detail': 17})
 
     def post(self, request, format=None):
         if permission_judge(request, 17):
-            access = request.data.get('access')
-            fail = request.data.get('fail')
+            access = request.data['access']
+            fail = request.data['fail']
             if access:
-                for id in access:
+                for member_id in access:
                     try:
-                        admin_apply = AdministratorApply.objects.get(id=id)
+                        admin_apply = AdministratorApply.objects.get(id=member_id)
                         Administrator.objects.create(member__id=admin_apply.member.id, position=admin_apply.position.id)
                         admin_apply.status = 1
                         admin_apply.save()
                     except Exception as e:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
             if fail:
-                for id in fail:
-                    AdministratorApply.objects.filter(id=id).update(status=-1)
+                for member_id in fail:
+                    AdministratorApply.objects.filter(id=member_id).update(status=-1)
             return Response({'detail': 0})
-        else:
-            return Response({'detail': 17})
 
 
 class MemberListAPI(APIView):
@@ -660,7 +662,7 @@ class MemberListAPI(APIView):
     permission_classes = (AdminPermission,)
 
     def get(self, request, format=None):
-        members = Member.objects.all().order_by('id').reverse()
+        members = Member.objects.all().order_by('id')
         members_list = MemberListSerializer(members, many=True).data
         return Response(members_list)
 
@@ -711,15 +713,13 @@ class DepartmentAPI(APIView):
 
     def post(self, request, format=None):
         if permission_judge(request, 16):
-            name = request.data.get('name')
-            description = request.data.get('description')
+            name = request.data['name']
+            description = request.data['description']
             if name and description:
                 department = Department.objects.create(name=name, description=description)
                 if department:
                     return Response({'detail': 0})
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'detail': 17})
 
 
 class PositionAPI(APIView):
@@ -752,16 +752,14 @@ class PositionAPI(APIView):
 
     def post(self, request, format=None):
         if permission_judge(request, 16):
-            name = request.data.get('name')
-            department_id = request.data.get('department_id')
-            remind = request.data.get('remind')
+            name = request.data['name']
+            department_id = request.data['department_id']
+            remind = request.data['remind']
             if name and department_id:
                 position = Position.objects.create(name=name, department__id=department_id, remind=remind)
                 if position:
                     return Response({'detail': 0})
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'detail': 17})
 
 
 class PermissionAPI(APIView):
@@ -782,8 +780,6 @@ class PermissionAPI(APIView):
             permission = Permission.objects.all()
             permission_list = PermissionSerializer(permission, many=True).data
             return Response(permission_list)
-        else:
-            return Response({'detail': 17})
 
 
 class PermissionToDepartmentAPI(APIView):
@@ -819,13 +815,11 @@ class PermissionToDepartmentAPI(APIView):
             permissions = PermissionToDepartment.objects.all()
             permissions_list = DepartmentPermissionSerializer(permissions, many=True).data
             return permissions_list
-        else:
-            return Response({'detail': 17})
 
     def post(self, request, format=None):
         if permission_judge(request, 14):
-            add = request.data.get('add')
-            delete = request.data.get('delete')
+            add = request.data['add']
+            delete = request.data['delete']
             for permission_add in add:
                 PermissionToDepartment.objects.get_or_create(department__id=permission_add.department_id,
                                                              permission__id=permission_add.permission_id)
@@ -833,8 +827,6 @@ class PermissionToDepartmentAPI(APIView):
                 PermissionToDepartment.objects.filter(department__id=permission_delete.department_id,
                                                       permission__id=permission_delete.permission_id).delete()
             return Response({'detail': 0})
-        else:
-            return Response({'detail': 17})
 
 
 class PermissionToPositionAPI(APIView):
@@ -870,13 +862,11 @@ class PermissionToPositionAPI(APIView):
             permissions = PermissionToPosition.objects.all()
             permissions_list = PositionPermissionSerializer(permissions, many=True).data
             return permissions_list
-        else:
-            return Response({'detail': 17})
 
     def post(self, request, format=None):
         if permission_judge(request, 14):
-            add = request.data.get('add')
-            delete = request.data.get('delete')
+            add = request.data['add']
+            delete = request.data['delete']
             for permission_add in add:
                 PermissionToPosition.objects.get_or_create(department__id=permission_add.department_id,
                                                            permission__id=permission_add.permission_id)
@@ -884,8 +874,6 @@ class PermissionToPositionAPI(APIView):
                 PermissionToPosition.objects.filter(department__id=permission_delete.department_id,
                                                     permission__id=permission_delete.permission_id).delete()
             return Response({'detail': 0})
-        else:
-            return Response({'detail': 17})
 
 
 class ChangePositionAPI(APIView):
@@ -902,13 +890,11 @@ class ChangePositionAPI(APIView):
     """
 
     def post(self, request, format=None):
-        member_id = request.data.get('member_id')
-        position_id = request.data.get('position_id')
+        member_id = request.data['member_id']
+        position_id = request.data['position_id']
         if member_id and position_id:
             appointment_permission_id = Position.objects.get(id=position_id).appointment.id
             if permission_judge(request, appointment_permission_id):
                 Administrator.objects.filter(member__id=member_id).update(position__id=position_id)
                 return Response({'detail': 0})
-            else:
-                return Response({'detail': 17})
         return Response(status=status.HTTP_400_BAD_REQUEST)

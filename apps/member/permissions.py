@@ -9,13 +9,14 @@ class MemberNotLogin(APIException):
 
 
 class MemberNotActive(APIException):
+    status_code = 403
     default_detail = 3
 
 
 class MemberPermission(BasePermission):
 
     def has_permission(self, request, view):
-        member_id = request.session['id']
+        member_id = request.session.get('id', False)
         if member_id:
             try:
                 member = Member.objects.get(id=member_id)
@@ -29,20 +30,24 @@ class MemberPermission(BasePermission):
 
 
 class MemberNotAuth(APIException):
+    status_code = 403
     default_detail = 4
 
 
 class MemberAuthPermission(BasePermission):
 
     def has_permission(self, request, view):
-        member_id = request.session['id']
+        member_id = request.session.get('id', False)
         if member_id:
             if Member.objects.get(id=member_id).is_auth:
                 return True
-        raise MemberNotAuth
+            else:
+                raise MemberNotAuth
+        raise MemberNotLogin
 
 
 class MemberNotAdmin(APIException):
+    status_code = 403
     default_detail = 15
 
 
@@ -54,15 +59,17 @@ class AdminNotLogin(APIException):
 class AdminPermission(BasePermission):
 
     def has_permission(self, request, view):
-        member_id = request.session['id']
+        member_id = request.session.get('id', False)
         administrator = request.session.get('administrator')
-        if Member.objects.get(id=member_id).is_admin:
-            if Administrator.objects.filter(member__id=member_id, status=True).exists:
-                if member_id and administrator:
-                    return True
+        if member_id:
+            if Member.objects.get(id=member_id).is_admin:
+                if Administrator.objects.filter(member__id=member_id, status=True).exists:
+                    if member_id and administrator:
+                        return True
+                    else:
+                        raise AdminNotLogin
                 else:
-                    raise AdminNotLogin
-            else:
-                Member.objects.filter(id=member_id).update(is_admin=False)
-                # TODO: 异常情况记录
-        raise MemberNotAdmin
+                    Member.objects.filter(id=member_id).update(is_admin=False)
+                    # TODO: 异常情况记录
+            raise MemberNotAdmin
+        raise MemberNotLogin

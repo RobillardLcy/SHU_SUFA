@@ -99,12 +99,14 @@ class NewsReviewPublishAPI(APIView):
     permission_classes = (MemberPermission,)
 
     def post(self, request, format=None):
-        member_id = request.session.get('id')
-        news_id = request.data.get('news')
-        content = request.data.get('content')
-        news_review = NewsReview.objects.create(member__id=member_id, news__id=news_id, content=content)
-        if news_review:
-            return Response({'detail': 0})
-        else:
-            # TODO: Add Error Tag
-            return Response({'detail': ...})
+        member_id = request.session['id']
+        news_id = request.data.get('news', False)
+        content = request.data.get('content', False)
+        if news_id and content:
+            news_review = NewsReview.objects.create(member_id=member_id, news_id=news_id, content=content)
+            if news_review:
+                return Response({'detail': 0})
+            else:
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+        return Response(status=status.HTTP_400_BAD_REQUEST)

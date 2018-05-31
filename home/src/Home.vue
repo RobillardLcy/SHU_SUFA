@@ -133,7 +133,7 @@ import Login from '@/components/member/Login'
 export default {
   name: 'home',
   data: () => ({
-    drawer: null,
+    drawer: false,
     loginDialog: false,
     menu: false,
     register: '/register',

@@ -64,18 +64,20 @@ class ActivitySignupAPI(APIView):
 
     def post(self, request, format=None):
         member_id = request.session.get('id')
-        activity_id = request.data.get('activity')
-        try:
-            activity = Activity.objects.get(id=activity_id)
-            if activity.reg_start < datetime.datetime.now() < activity.reg_end:
-                activity_signup = Activity.objects.get_or_create(activity=activity, member__id=member_id)
-                if activity_signup:
-                    return Response({'detail': 0})
-                # TODO: Add Error Tag
-                return Response({'detail': ...})
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        activity_id = request.data.get('activity', False)
+        if activity_id:
+            try:
+                activity = Activity.objects.get(id=activity_id)
+                if activity.reg_start < datetime.datetime.now() < activity.reg_end:
+                    activity_signup = Activity.objects.get_or_create(activity=activity, member__id=member_id)
+                    if activity_signup:
+                        return Response({'detail': 0})
+                    # TODO: Add Error Tag
+                    return Response({'detail': ...})
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivitySignupStatusAPI(APIView):

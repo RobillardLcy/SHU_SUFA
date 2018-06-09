@@ -14,7 +14,7 @@ requests
 Pillow
 pygments
 mysqlclient
-Crypto
+pycrypto
 ### Mobile Verification Code ###
 yunpian-python-sdk
 ### Program ###

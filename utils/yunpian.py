@@ -1,6 +1,6 @@
 import os
 import random
-import ConfigParser
+import configparser
 from urllib.parse import urlencode
 from sufa.settings import BASE_DIR
 from yunpian_python_sdk.model import constant as YC

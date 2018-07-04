@@ -481,7 +481,7 @@ class LeagueAllListAPI(APIView):
         return Response(leagues_list)
 
 
-class LeagueRecentlyListAPI(APIView):
+class LeagueRecentListAPI(APIView):
     """
     近期赛事列表接口
     (GET)

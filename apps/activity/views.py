@@ -8,7 +8,7 @@ from .serializers import (ActivitySerializer, ActivitySignupSerializer, Activity
 from apps.member.permissions import (MemberPermission, MemberAuthPermission)
 
 
-class ActivityRecentlyListAPI(APIView):
+class ActivityRecentListAPI(APIView):
     """
     近期活动接口
     (GET)
@@ -51,10 +51,7 @@ class ActivityAllListAPI(APIView):
 class ActivitySignupAPI(APIView):
     """
     活动报名接口
-    (POST)
-    Request: {
-        'activity': <活动编号>
-    }
+    (GET)
     Response: {
         'detail': <状态码>
     }
@@ -62,22 +59,19 @@ class ActivitySignupAPI(APIView):
 
     permission_classes = (MemberPermission, MemberAuthPermission)
 
-    def post(self, request, format=None):
+    def post(self, request, activity_id, format=None):
         member_id = request.session.get('id')
-        activity_id = request.data.get('activity', False)
-        if activity_id:
-            try:
-                activity = Activity.objects.get(id=activity_id)
-                if activity.reg_start < datetime.datetime.now() < activity.reg_end:
-                    activity_signup = Activity.objects.get_or_create(activity=activity, member__id=member_id)
-                    if activity_signup:
-                        return Response({'detail': 0})
-                    # TODO: Add Error Tag
-                    return Response({'detail': ...})
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            except Exception as e:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            activity = Activity.objects.get(id=activity_id)
+            if activity.reg_start < datetime.datetime.now() < activity.reg_end:
+                activity_signup = Activity.objects.get_or_create(activity=activity, member__id=member_id)
+                if activity_signup:
+                    return Response({'detail': 0})
+                # TODO: Add Error Tag
+                return Response({'detail': ...})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivitySignupStatusAPI(APIView):

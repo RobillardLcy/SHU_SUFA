@@ -8,7 +8,7 @@ from .serializers import (NewsPositionSerializer, NewsSerializer, NewsReviewSeri
 from apps.member.permissions import (MemberPermission, MemberAuthPermission)
 
 
-class NewsRecentlyListAPI(APIView):
+class NewsRecentListAPI(APIView):
     """
     近期新闻列表接口
     (GET)
@@ -67,7 +67,7 @@ class NewsContentAPI(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class NewsReviewListAPI(APIView):
+class NewsReviewAPI(APIView):
     """
     新闻评论列表接口
     (GET)
@@ -109,4 +109,51 @@ class NewsReviewPublishAPI(APIView):
             else:
                 # TODO: Add Error Tag
                 return Response({'detail': ...})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class NewsPublishAPI(APIView):
+    """
+    新闻发布借口
+    (POST)
+    Request: {
+        'title': <标题>,
+        'content': <内容>
+    }
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    permission_classes = (MemberPermission, MemberAuthPermission)
+
+    def post(self, request, format=None):
+        member_id = request.session['id']
+        title = request.data.get('title', False)
+        content = request.data.get('content', False)
+        if title and content:
+            news = News.objects.create(title=title, content=content, writer__id=member_id)
+            if news:
+                return Response({'detail': 0})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class NewsThumbUpAPI(APIView):
+    """
+    新闻点赞借口
+    (GET)
+    Response: {
+        'detail': <状态码>
+    }
+    """
+
+    permission_classes = (MemberPermission,)
+
+    def get(self, request, news_id, format=None):
+        news_filter = News.objects.filter(id=news_id)
+        if news_filter.exists():
+            news = news_filter.get()
+            news.thumb_up += 1
+            news.save()
+            return Response({'detail': 0})
         return Response(status=status.HTTP_400_BAD_REQUEST)

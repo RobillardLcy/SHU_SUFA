@@ -146,8 +146,6 @@ class MemberLoginAPI(APIView):
     Request: {
         'id': <学生证号>,
         'password': <密码>,
-        'ticket': <票据>,
-        'randstr': <随机串>,
         'content': <内容>
     }
     Response: {
@@ -171,52 +169,48 @@ class MemberLoginAPI(APIView):
         if content:
             member_id = content[0]
             password = content[1]
-            ticket = content[2]
-            randstr = content[3]
-            # TODO: 验证码识别
-            if True:
-                try:
-                    member = Member.objects.get(id=member_id)
-                    if member.check_password(password):
-                        request.session['id'] = member.id
-                        request.session.set_expiry(86400)
-                        if member.is_active:
-                            if member.is_auth:
-                                college_id = TeamMember.objects.get(team__id__lte=1000,
-                                                                    status__gte=0,
-                                                                    leave__isnull=True).team_id
-                                college = TeamListSerializer(Team.objects.get(id=college_id)).data
-                                request.session['college'] = college_id
-                                try:
-                                    team_id = TeamMember.objects.get(team__id__gt=1000,
-                                                                     status__gte=0,
-                                                                     leave__isnull=True).team_id
-                                    team = TeamListSerializer(Team.objects.get(id=team_id)).data
-                                    request.session['team'] = team_id
-                                    return Response({'detail': 0,
-                                                     'college': college,
-                                                     'team': team})
-                                except Exception as e:
-                                    return Response({'detail': 0,
-                                                     'college': college})
-                            else:
-                                # 本学期未认证及提交课表
-                                request.session['auth'] = True
-                                return Response({'detail': 4})
+            try:
+                member = Member.objects.get(id=member_id)
+                if member.check_password(password):
+                    request.session['id'] = member.id
+                    request.session.set_expiry(86400)
+                    if member.is_active:
+                        if member.is_auth:
+                            college_id = TeamMember.objects.get(team__id__lte=1000,
+                                                                status__gte=0,
+                                                                leave__isnull=True).team_id
+                            college = TeamListSerializer(Team.objects.get(id=college_id)).data
+                            request.session['college'] = college_id
+                            try:
+                                team_id = TeamMember.objects.get(team__id__gt=1000,
+                                                                 status__gte=0,
+                                                                 leave__isnull=True).team_id
+                                team = TeamListSerializer(Team.objects.get(id=team_id)).data
+                                request.session['team'] = team_id
+                                return Response({'detail': 0,
+                                                 'college': college,
+                                                 'team': team})
+                            except Exception as e:
+                                return Response({'detail': 0,
+                                                 'college': college})
                         else:
-                            # 未激活
+                            # 本学期未认证及提交课表
                             request.session['auth'] = True
-                            mobile = member.mobile
-                            request.session['mobile'] = mobile
-                            return Response({'detail': 3, 'mobile': mobile})
+                            return Response({'detail': 4})
                     else:
-                        # 密码错误
-                        return Response({'detail': 2})
-                except Exception as e:
-                    # 未注册
+                        # 未激活
+                        request.session['auth'] = True
+                        mobile = member.mobile
+                        request.session['mobile'] = mobile
+                        return Response({'detail': 3, 'mobile': mobile})
+                else:
+                    # 密码错误
                     return Response({'detail': 2})
+            except Exception as e:
+                # 未注册
+                return Response({'detail': 2})
         else:
-            return Response({'detail': 2})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class MemberLogoutAPI(APIView):
@@ -345,8 +339,6 @@ class MemberResetPasswordAPI(APIView):
     }
     (验证原密码){
         'way': 2,
-        'ticket': <票据>,
-        'randstr': <随机串>,
         'old_password': <原密码>,
         'new_password': <新密码>,
         'content': <内容>
@@ -380,20 +372,14 @@ class MemberResetPasswordAPI(APIView):
         elif way == 2:
             # TODO: 验证码验证
             content = encrypt.decrypt(request)
-            ticket = content[0]
-            randstr = content[1]
-            if ...:
-                member_id = request.session['id']
-                old_password = content[2]
-                new_password = content[3]
-                member = Member.objects.get(id=member_id)
-                if member.check_password(old_password):
-                    member.set_password(new_password)
-                    member.save()
-                    return Response({'detail': 0})
-                else:
-                    # TODO: Add Error Tag
-                    return Response({'detail': ...})
+            member_id = request.session['id']
+            old_password = content[0]
+            new_password = content[1]
+            member = Member.objects.get(id=member_id)
+            if member.check_password(old_password):
+                member.set_password(new_password)
+                member.save()
+                return Response({'detail': 0})
             else:
                 # TODO: Add Error Tag
                 return Response({'detail': ...})
@@ -418,8 +404,6 @@ class MemberResetMobileAPI(APIView):
     }
     (验证密码){
         'way': 2,
-        'ticket': <票据>,
-        'randstr': <随机串>,
         'password': <密码>,
         'new_mobile': <新手机号>,
         'content': <内容>
@@ -448,16 +432,13 @@ class MemberResetMobileAPI(APIView):
         elif way == 2:
             # TODO: 验证码验证
             content = encrypt.decrypt(request)
-            ticket = content[0]
-            randstr = content[1]
-            if ...:
-                member_id = request.session['id']
-                password = content[2]
-                new_mobile = content[3]
-                member = Member.objects.get(id=member_id)
-                if member.check_password(password):
-                    member.mobile = new_mobile
-                    member.save()
+            member_id = request.session['id']
+            password = content[2]
+            new_mobile = content[3]
+            member = Member.objects.get(id=member_id)
+            if member.check_password(password):
+                member.mobile = new_mobile
+                member.save()
                 return Response({'detail': 0})
             else:
                 # TODO: Add Error Tag
@@ -520,10 +501,13 @@ class AdminLoginAPI(APIView):
        }
        """
 
+    def get(self, request, format=None):
+        return Response({"public_key": encrypt.generate_key(request)})
+
     def post(self, request, format=None):
-        #TODO: 加密
-        member_id = request.data['id']
-        password = request.data['password']
+        content = encrypt.decrypt(request)
+        member_id = content[0]
+        password = content[1]
         try:
             user = Member.objects.get(id=member_id)
             if user.check_password(password):
@@ -551,14 +535,13 @@ class AdminLoginAPI(APIView):
 class AdminLogoutAPI(APIView):
     """
     管理平台注销接口
-    (POST)
-    Request: {}
+    (GET)
     Response: {
         'detail': 0
     }
     """
 
-    def post(self, request, format=None):
+    def get(self, request, format=None):
         try:
             del request.session['id']
             del request.session['administrator']
@@ -694,7 +677,7 @@ class AdminListAPI(APIView):
 
 class DepartmentAPI(APIView):
     """
-    部门接口
+    部门列表接口
     (GET)
     Response(array): {
         'id': <编号>,
@@ -702,9 +685,14 @@ class DepartmentAPI(APIView):
         'description': <描述>
     }
     (POST)
-    Request: {}
-    Response: {
-        'detail': <状态码>
+    (Add): {
+        'operation': 1,
+        'name': <部门名称>,
+        'description': <描述>
+    }
+    (Delete): {
+        'operation': 2,
+        'department_id': <部门编号>
     }
     """
 
@@ -717,11 +705,19 @@ class DepartmentAPI(APIView):
 
     def post(self, request, format=None):
         if permission_judge(request, 16):
-            name = request.data.get('name', False)
-            description = request.data.get('description', False)
-            if name and description:
-                department = Department.objects.create(name=name, description=description)
-                if department:
+            operation = request.data.get('operation')
+            if operation == 1:
+                name = request.data.get('name', False)
+                description = request.data.get('description', False)
+                if name and description:
+                    department = Department.objects.create(name=name, description=description)
+                    if department:
+                        return Response({'detail': 0})
+            elif operation == 2:
+                department_id = request.data.get('department_id')
+                department_filter = Department.objects.filter(id=department_id)
+                if department_filter.exists():
+                    department_filter.update(status=False)
                     return Response({'detail': 0})
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -737,10 +733,16 @@ class PositionAPI(APIView):
         'remind': <提醒事项>
     }
     (POST)
-    Request: {
+    Request:
+    (Add): {
+        'operation': 1
         'name': <职位名称>,
         'department_id': <部门编号>,
         'remind': <提醒事项>
+    }
+    (Delete): {
+        'operation': 2,
+        'position_id': <职位编号>
     }
     Response: {
         'detail': <状态码>
@@ -756,12 +758,20 @@ class PositionAPI(APIView):
 
     def post(self, request, format=None):
         if permission_judge(request, 16):
-            name = request.data.get('name', False)
-            department_id = request.data.get('department_id', False)
-            remind = request.data.get('remind', False)
-            if name and department_id:
-                position = Position.objects.create(name=name, department_id=department_id, remind=remind)
-                if position:
+            operation = request.data.get('operation')
+            if operation == 1:
+                name = request.data.get('name', False)
+                department_id = request.data.get('department_id', False)
+                remind = request.data.get('remind', False)
+                if name and department_id:
+                    position = Position.objects.create(name=name, department_id=department_id, remind=remind)
+                    if position:
+                        return Response({'detail': 0})
+            elif operation == 2:
+                position_id = request.data.get('position_id')
+                position_filter = Position.objects.filter(id=position_id)
+                if position_filter.exists():
+                    position_filter.update(status=False)
                     return Response({'detail': 0})
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

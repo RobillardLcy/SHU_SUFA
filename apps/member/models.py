@@ -117,6 +117,7 @@ class Department(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, verbose_name='编号')
     name = models.CharField(max_length=10, verbose_name='名称')
     description = models.CharField(max_length=200, verbose_name='简介')
+    status = models.BooleanField(default=True, verbose_name='状态')
     permission = models.ManyToManyField(Permission, through='PermissionToDepartment', verbose_name='部门权限')
 
     class Meta:

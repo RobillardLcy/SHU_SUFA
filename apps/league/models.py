@@ -55,8 +55,8 @@ class TeamMember(models.Model):
     member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='成员')
     team = models.ForeignKey(Team, on_delete=models.CASCADE, verbose_name='队伍')
     num = models.CharField(null=True, max_length=2, verbose_name='号码')
-    join = models.DateField(null=True, verbose_name='入队时间')
-    leave = models.DateField(null=True, verbose_name='离队时间')
+    join = models.DateTimeField(null=True, verbose_name='入队时间')
+    leave = models.DateTimeField(null=True, verbose_name='离队时间')
     # -1:待审核
     #  0：通过审核（队伍成员）
     # >=0:成员等级
@@ -80,6 +80,7 @@ class League(models.Model):
     reg_start = models.DateTimeField(verbose_name='报名开始时间')
     reg_end = models.DateTimeField(verbose_name='报名结束时间')
     start = models.DateTimeField(verbose_name='赛事开始时间')
+    end = models.DateTimeField(verbose_name='赛事结束时间')
     # TODO:赛事简介：文字照片－> Vue组件显示(页面编辑器设计)，自动引入组件并载入
     description = models.CharField(max_length=500, verbose_name="赛事简介")
     photo = models.ImageField(upload_to='league/%(this.name)', max_length=100,
@@ -176,6 +177,7 @@ class Match(models.Model):
         db_table = 'match'
         verbose_name = '比赛'
         verbose_name_plural = verbose_name
+        unique_together = ('time', 'place')
 
     def __str__(self):
         return self.league, self.home_team, self.away_team
@@ -204,7 +206,7 @@ class MatchData(models.Model):
     sub = models.ForeignKey(LeagueTeamMemberSignup, on_delete=models.PROTECT, related_name='sub_teammate',
                             null=True, default=None, verbose_name='替换队员')
     time = models.CharField(max_length=3, verbose_name='时间')
-    remind = models.CharField(max_length=20, verbose_name='备注')
+    remind = models.CharField(max_length=20, null=True, verbose_name='备注')
 
     class Meta:
         db_table = 'match_data'

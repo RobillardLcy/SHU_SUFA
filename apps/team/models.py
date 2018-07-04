@@ -126,7 +126,7 @@ class ManTeamMatchData(models.Model):
                                 ), verbose_name='类别')
     sub = models.ForeignKey(ManTeamMember, on_delete=models.PROTECT, related_name='sub', null=True, default=None, verbose_name='替换队员')
     time = models.CharField(max_length=3, verbose_name='时间')
-    remind = models.CharField(max_length=20, verbose_name='备注')
+    remind = models.CharField(max_length=20, null=True, verbose_name='备注')
 
     class Meta:
         db_table = 'man_team_match_data'
